@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_nama">ZX Parenting</string>
+    <string name="asset_statements">
+        [{
+            \"relation\": [\"delegate_permission/common.handle_all_urls\"],
+            \"target\": {
+                \"namespace\": \"android_app\",
+                \"package_name\": \"com.zxparenting.ortu\",
+                \"sha256_cert_fingerprints\": [\"06:58:64:07:9D:B2:74:D6:47:38:38:9D:79:92:B5:0E:FE:6A:9C:63:6F:30:2F:A0:FF:20:40:0E:1A:48:76:4A\"]
+            }
+        }]
+    </string>
+</resources>
