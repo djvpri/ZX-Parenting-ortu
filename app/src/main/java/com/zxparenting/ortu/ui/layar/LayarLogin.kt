@@ -1,0 +1,117 @@
+package com.zxparenting.ortu.ui.layar
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.zxparenting.ortu.ui.UiState
+import com.zxparenting.ortu.ui.tema.*
+
+@Composable
+fun LayarLogin(state: UiState, onLogin: (String, String) -> Unit) {
+    var email by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+    var lihatPass by remember { mutableStateOf(false) }
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Bg)
+            .padding(24.dp)
+            .verticalScroll(rememberScrollState()),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        // Logo / header
+        Box(
+            modifier = Modifier
+                .size(72.dp)
+                .clip(RoundedCornerShape(24.dp))
+                .background(Brush.verticalGradient(listOf(Biru, Ungu))),
+            contentAlignment = Alignment.Center,
+        ) {
+            Text("ZX", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 24.sp)
+        }
+        Spacer(Modifier.height(16.dp))
+        Text("ZX Parenting", style = MaterialTheme.typography.titleLarge, textAlign = TextAlign.Center)
+        Text("Masuk sebagai orang tua", fontSize = 13.sp, color = MutedFg, textAlign = TextAlign.Center)
+        Spacer(Modifier.height(32.dp))
+
+        // Email
+        OutlinedTextField(
+            value = email,
+            onValueChange = { email = it },
+            label = { Text("Email") },
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+        )
+        Spacer(Modifier.height(12.dp))
+
+        // Password
+        OutlinedTextField(
+            value = password,
+            onValueChange = { password = it },
+            label = { Text("Password") },
+            singleLine = true,
+            visualTransformation = if (lihatPass) VisualTransformation.None else PasswordVisualTransformation(),
+            trailingIcon = {
+                IconButton(onClick = { lihatPass = !lihatPass }) {
+                    Icon(
+                        imageVector = if (lihatPass) Icons.Default.VisibilityOff else Icons.Default.Visibility,
+                        contentDescription = "Lihat password",
+                    )
+                }
+            },
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+        )
+        Spacer(Modifier.height(20.dp))
+
+        if (state.error != null) {
+            Text(
+                state.error,
+                color = Merah,
+                fontSize = 12.sp,
+                modifier = Modifier.padding(bottom = 12.dp),
+            )
+        }
+
+        Button(
+            onClick = { onLogin(email, password) },
+            enabled = !state.loading && email.isNotBlank() && password.isNotBlank(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(48.dp),
+            shape = RoundedCornerShape(16.dp),
+        ) {
+            if (state.loading) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(20.dp),
+                    color = Color.White,
+                    strokeWidth = 2.dp,
+                )
+            } else {
+                Text("Masuk", fontWeight = FontWeight.Bold, fontSize = 14.5.sp)
+            }
+        }
+    }
+}
