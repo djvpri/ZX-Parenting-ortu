@@ -100,6 +100,10 @@ class ZxVm(val simpanan: Simpanan) : ViewModel() {
         }
     }
 
+    fun setError(msg: String) {
+        state.value = state.value.copy(loading = false, error = msg)
+    }
+
     private suspend fun suksesLogin(body: LoginRes) {
         simpanan.simpanSesi(body.token, body.user.nama, body.user.id)
         state.value = state.value.copy(

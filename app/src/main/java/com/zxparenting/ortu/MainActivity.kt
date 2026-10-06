@@ -104,7 +104,9 @@ class MainActivity : ComponentActivity() {
                             onKeDaftar = { modeDaftar = true },
                             onGoogle = {
                                 scope.launch {
-                                    val idToken = ambilGoogleIdToken()
+                                    val idToken = ambilGoogleIdToken { err ->
+                                        vm.setError(err)
+                                    }
                                     if (idToken != null) {
                                         vm.loginGoogle(idToken, GOOGLE_WEB_ID)
                                     }
@@ -194,7 +196,8 @@ class MainActivity : ComponentActivity() {
 
     // Credential Manager — dapatkan Google ID token untuk login native.
     // Web Client ID = AUTH_GOOGLE_ID server (audience yang diverifikasi backend).
-    private suspend fun ambilGoogleIdToken(): String? {
+    // Return: ID token (sukses) atau null + set errorMsg (gagal).
+    private suspend fun ambilGoogleIdToken(errorMsg: (String) -> Unit): String? {
         return try {
             val cm = CredentialManager.create(this)
             val googleIdOption = GetGoogleIdOption.Builder()
@@ -206,7 +209,8 @@ class MainActivity : ComponentActivity() {
                 .build()
             val res = cm.getCredential(this, req)
             GoogleIdTokenCredential.createFrom(res.credential.data).idToken
-        } catch (_: Exception) {
+        } catch (e: Exception) {
+            errorMsg("Google: ${e.message ?: "gagal"}")
             null
         }
     }
