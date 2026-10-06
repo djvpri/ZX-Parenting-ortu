@@ -65,6 +65,7 @@ class MainActivity : ComponentActivity() {
                         LayarLogin(
                             state,
                             onLogin = { email, pass -> vm.login(email, pass) },
+                            onKeDaftar = { modeDaftar = true },
                             onGoogle = {
                                 scope.launch {
                                     val idToken = ambilGoogleIdToken()
@@ -73,7 +74,7 @@ class MainActivity : ComponentActivity() {
                                     }
                                 }
                             },
-                        ) { modeDaftar = true }
+                        )
                     }
                     return@TemaZX
                 }
@@ -128,7 +129,7 @@ class MainActivity : ComponentActivity() {
                 .setServerClientId(GOOGLE_WEB_ID)
                 .build()
             val req = GetCredentialRequest.Builder()
-                .addCredentialProvider(googleIdOption)
+                .addCredentialOption(googleIdOption)
                 .build()
             val res = cm.getCredential(this, req)
             GoogleIdTokenCredential.createFrom(res.credential.data).idToken
