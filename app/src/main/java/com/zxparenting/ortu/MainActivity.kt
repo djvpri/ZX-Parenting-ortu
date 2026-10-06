@@ -36,6 +36,7 @@ import androidx.credentials.CredentialManager
 import androidx.credentials.GetCredentialRequest
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
+import com.google.android.libraries.identity.googleid.GetSignInWithGoogleOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.android.play.core.appupdate.AppUpdateManager
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory
@@ -196,10 +197,14 @@ class MainActivity : ComponentActivity() {
 
     // Credential Manager — dapatkan Google ID token untuk login native.
     // Web Client ID = AUTH_GOOGLE_ID server (audience yang diverifikasi backend).
-    // Return: ID token (sukses) atau null + set errorMsg (gagal).
+    // Strategi: GetGoogleIdOption dulu; kalau "no credentials available"
+    // (akun Google tak ter-link ke Credential Manager), fallback ke
+    // GetSignInWithGoogleOption yang langsung tampilkan account picker.
     private suspend fun ambilGoogleIdToken(errorMsg: (String) -> Unit): String? {
-        return try {
-            val cm = CredentialManager.create(this)
+        val cm = CredentialManager.create(this)
+
+        // 1. Credential Manager standar
+        try {
             val googleIdOption = GetGoogleIdOption.Builder()
                 .setFilterByAuthorizedAccounts(false)
                 .setServerClientId(GOOGLE_WEB_ID)
@@ -208,10 +213,21 @@ class MainActivity : ComponentActivity() {
                 .addCredentialOption(googleIdOption)
                 .build()
             val res = cm.getCredential(this, req)
-            GoogleIdTokenCredential.createFrom(res.credential.data).idToken
+            return GoogleIdTokenCredential.createFrom(res.credential.data).idToken
+        } catch (_: Exception) { /* lanjut fallback */ }
+
+        // 2. Fallback: GetSignInWithGoogleOption (account picker eksplisit)
+        try {
+            val signInOption = GetSignInWithGoogleOption.Builder(GOOGLE_WEB_ID)
+                .build()
+            val req2 = GetCredentialRequest.Builder()
+                .addCredentialOption(signInOption)
+                .build()
+            val res2 = cm.getCredential(this, req2)
+            return GoogleIdTokenCredential.createFrom(res2.credential.data).idToken
         } catch (e: Exception) {
             errorMsg("Google: ${e.message ?: "gagal"}")
-            null
+            return null
         }
     }
 
