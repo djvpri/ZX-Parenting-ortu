@@ -10,6 +10,7 @@ import retrofit2.http.Query
 
 // ===== Model =====
 data class LoginReq(val email: String, val password: String)
+data class DaftarReq(val nama: String, val email: String, val password: String, val setuju: Boolean)
 data class LoginRes(val token: String, val user: UserRes)
 data class UserRes(val id: String, val nama: String, val role: String)
 
@@ -47,6 +48,9 @@ data class ActivityLog(
 interface ApiZx {
     @POST("auth/native-login")
     suspend fun login(@Body req: LoginReq): Response<LoginRes>
+
+    @POST("auth/native-daftar")
+    suspend fun daftar(@Body req: DaftarReq): Response<LoginRes>
 
     @GET("device-session")
     suspend fun deviceList(@Header("Authorization") bearer: String): Response<List<Device>>

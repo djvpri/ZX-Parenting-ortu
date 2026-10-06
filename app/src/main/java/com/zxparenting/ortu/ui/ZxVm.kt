@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.zxparenting.ortu.api.AktivitasRes
 import com.zxparenting.ortu.api.ApiZx
 import com.zxparenting.ortu.api.Device
+import com.zxparenting.ortu.api.DaftarReq
 import com.zxparenting.ortu.api.Klien
 import com.zxparenting.ortu.api.LoginReq
 import com.zxparenting.ortu.api.LoginRes
@@ -45,14 +46,7 @@ class ZxVm(val simpanan: Simpanan) : ViewModel() {
             try {
                 val res = api.login(LoginReq(email, password))
                 if (res.isSuccessful) {
-                    val body: LoginRes = res.body()!!
-                    simpanan.simpanSesi(body.token, body.user.nama, body.user.id)
-                    state.value = state.value.copy(
-                        loading = false,
-                        loginOk = true,
-                        nama = body.user.nama,
-                    )
-                    muatDevices(body.token)
+                    suksesLogin(res.body()!!)
                 } else {
                     state.value = state.value.copy(
                         loading = false,
@@ -63,6 +57,37 @@ class ZxVm(val simpanan: Simpanan) : ViewModel() {
                 state.value = state.value.copy(loading = false, error = "Jaringan error: ${e.message}")
             }
         }
+    }
+
+    fun daftar(nama: String, email: String, password: String) {
+        state.value = state.value.copy(loading = true, error = null)
+        viewModelScope.launch {
+            try {
+                val res = api.daftar(DaftarReq(nama, email, password, setuju = true))
+                if (res.isSuccessful) {
+                    suksesLogin(res.body()!!)
+                } else {
+                    val msg = when (res.code()) {
+                        409 -> "Email sudah terdaftar"
+                        400 -> "Data tidak valid"
+                        else -> "Gagal daftar (${res.code()})"
+                    }
+                    state.value = state.value.copy(loading = false, error = msg)
+                }
+            } catch (e: Exception) {
+                state.value = state.value.copy(loading = false, error = "Jaringan error: ${e.message}")
+            }
+        }
+    }
+
+    private suspend fun suksesLogin(body: LoginRes) {
+        simpanan.simpanSesi(body.token, body.user.nama, body.user.id)
+        state.value = state.value.copy(
+            loading = false,
+            loginOk = true,
+            nama = body.user.nama,
+        )
+        muatDevices(body.token)
     }
 
     fun muatDevices(token: String?) {

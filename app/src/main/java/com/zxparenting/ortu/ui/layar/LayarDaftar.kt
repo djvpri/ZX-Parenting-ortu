@@ -26,10 +26,12 @@ import com.zxparenting.ortu.ui.UiState
 import com.zxparenting.ortu.ui.tema.*
 
 @Composable
-fun LayarLogin(state: UiState, onLogin: (String, String) -> Unit, onKeDaftar: () -> Unit) {
+fun LayarDaftar(state: UiState, onDaftar: (String, String, String) -> Unit, onKeLogin: () -> Unit) {
+    var nama by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var lihatPass by remember { mutableStateOf(false) }
+    var setuju by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -40,7 +42,6 @@ fun LayarLogin(state: UiState, onLogin: (String, String) -> Unit, onKeDaftar: ()
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        // Logo / header
         Box(
             modifier = Modifier
                 .size(72.dp)
@@ -51,26 +52,35 @@ fun LayarLogin(state: UiState, onLogin: (String, String) -> Unit, onKeDaftar: ()
             Text("ZX", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 24.sp)
         }
         Spacer(Modifier.height(16.dp))
-        Text("ZX Parenting", style = MaterialTheme.typography.titleLarge, textAlign = TextAlign.Center)
-        Text("Masuk sebagai orang tua", fontSize = 13.sp, color = MutedFg, textAlign = TextAlign.Center)
-        Spacer(Modifier.height(32.dp))
+        Text("Daftar Akun Ortu", style = MaterialTheme.typography.titleLarge, textAlign = TextAlign.Center)
+        Text("Gratis 30 hari (Free Trial)", fontSize = 13.sp, color = MutedFg, textAlign = TextAlign.Center)
+        Spacer(Modifier.height(24.dp))
 
-        // Email
         OutlinedTextField(
-            value = email,
-            onValueChange = { email = it },
-            label = { Text("Email") },
+            value = nama,
+            onValueChange = { nama = it },
+            label = { Text("Nama") },
             singleLine = true,
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(16.dp),
         )
         Spacer(Modifier.height(12.dp))
 
-        // Password
+        OutlinedTextField(
+            value = email,
+            onValueChange = { email = it },
+            label = { Text("Email") },
+            singleLine = true,
+            keyboardOptions = KeyboardOptions(keyboardType = androidx.compose.ui.text.input.KeyboardType.Email),
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+        )
+        Spacer(Modifier.height(12.dp))
+
         OutlinedTextField(
             value = password,
             onValueChange = { password = it },
-            label = { Text("Password") },
+            label = { Text("Password (min. 6)") },
             singleLine = true,
             visualTransformation = if (lihatPass) VisualTransformation.None else PasswordVisualTransformation(),
             trailingIcon = {
@@ -84,7 +94,17 @@ fun LayarLogin(state: UiState, onLogin: (String, String) -> Unit, onKeDaftar: ()
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(16.dp),
         )
-        Spacer(Modifier.height(20.dp))
+        Spacer(Modifier.height(12.dp))
+
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Checkbox(checked = setuju, onCheckedChange = { setuju = it })
+            Text(
+                "Saya setuju pengelolaan data anak (consent ortu)",
+                fontSize = 12.sp,
+                color = MutedFg,
+            )
+        }
+        Spacer(Modifier.height(16.dp))
 
         if (state.error != null) {
             Text(
@@ -96,8 +116,8 @@ fun LayarLogin(state: UiState, onLogin: (String, String) -> Unit, onKeDaftar: ()
         }
 
         Button(
-            onClick = { onLogin(email, password) },
-            enabled = !state.loading && email.isNotBlank() && password.isNotBlank(),
+            onClick = { onDaftar(nama, email, password) },
+            enabled = !state.loading && setuju && nama.isNotBlank() && email.isNotBlank() && password.length >= 6,
             modifier = Modifier
                 .fillMaxWidth()
                 .height(48.dp),
@@ -110,13 +130,13 @@ fun LayarLogin(state: UiState, onLogin: (String, String) -> Unit, onKeDaftar: ()
                     strokeWidth = 2.dp,
                 )
             } else {
-                Text("Masuk", fontWeight = FontWeight.Bold, fontSize = 14.5.sp)
+                Text("Daftar", fontWeight = FontWeight.Bold, fontSize = 14.5.sp)
             }
         }
-        Spacer(Modifier.height(20.dp))
+        Spacer(Modifier.height(16.dp))
 
-        TextButton(onClick = onKeDaftar) {
-            Text("Belum punya akun? Daftar", fontSize = 13.sp, color = Biru)
+        TextButton(onClick = onKeLogin) {
+            Text("Sudah punya akun? Masuk", fontSize = 13.sp, color = Biru)
         }
     }
 }

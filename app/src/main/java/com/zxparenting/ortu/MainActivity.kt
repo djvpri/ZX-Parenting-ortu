@@ -31,6 +31,7 @@ import com.zxparenting.ortu.data.Simpanan
 import com.zxparenting.ortu.ui.ZxVm
 import com.zxparenting.ortu.ui.ZxVmFactory
 import com.zxparenting.ortu.ui.layar.LayarBeranda
+import com.zxparenting.ortu.ui.layar.LayarDaftar
 import com.zxparenting.ortu.ui.layar.LayarLogin
 import com.zxparenting.ortu.ui.layar.LayarNotif
 import com.zxparenting.ortu.ui.layar.LayarPerangkat
@@ -49,7 +50,12 @@ class MainActivity : ComponentActivity() {
                 val state by vm.state.collectAsState()
 
                 if (!state.loginOk) {
-                    LayarLogin(state) { email, pass -> vm.login(email, pass) }
+                    var modeDaftar by remember { mutableStateOf(false) }
+                    if (modeDaftar) {
+                        LayarDaftar(state, onDaftar = { nama, email, pass -> vm.daftar(nama, email, pass) }) { modeDaftar = false }
+                    } else {
+                        LayarLogin(state, onLogin = { email, pass -> vm.login(email, pass) }) { modeDaftar = true }
+                    }
                     return@TemaZX
                 }
 
