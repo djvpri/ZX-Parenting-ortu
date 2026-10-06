@@ -1,5 +1,6 @@
 package com.zxparenting.ortu.ui.tema
 
+import androidx.compose.foundation.Shapes
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.lightColorScheme
@@ -57,7 +58,7 @@ fun TemaZX(content: @Composable () -> Unit) {
     MaterialTheme(
         colorScheme = SkemaWarna,
         typography = Tipografi,
-        shapes = androidx.compose.foundation.Shapes(
+        shapes = Shapes(
             small = RoundedCornerShape(RadiusKecil),
             medium = BentukKartuKecil,
             large = BentukKartu,
