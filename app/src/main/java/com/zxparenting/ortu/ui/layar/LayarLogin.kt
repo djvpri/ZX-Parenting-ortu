@@ -26,7 +26,12 @@ import com.zxparenting.ortu.ui.UiState
 import com.zxparenting.ortu.ui.tema.*
 
 @Composable
-fun LayarLogin(state: UiState, onLogin: (String, String) -> Unit, onKeDaftar: () -> Unit) {
+fun LayarLogin(
+    state: UiState,
+    onLogin: (String, String) -> Unit,
+    onKeDaftar: () -> Unit,
+    onGoogle: () -> Unit,
+) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var lihatPass by remember { mutableStateOf(false) }
@@ -113,6 +118,29 @@ fun LayarLogin(state: UiState, onLogin: (String, String) -> Unit, onKeDaftar: ()
                 Text("Masuk", fontWeight = FontWeight.Bold, fontSize = 14.5.sp)
             }
         }
+
+        // Pemisah "atau"
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            HorizontalDivider(modifier = Modifier.weight(1f))
+            Text("atau", fontSize = 12.sp, color = MutedFg, modifier = Modifier.padding(horizontal = 12.dp))
+            HorizontalDivider(modifier = Modifier.weight(1f))
+        }
+
+        // Tombol Google — Credential Manager dipanggil dari Activity (onGoogle)
+        OutlinedButton(
+            onClick = onGoogle,
+            enabled = !state.loading,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(48.dp),
+            shape = RoundedCornerShape(16.dp),
+        ) {
+            Text("Masuk dengan Google", fontWeight = FontWeight.Medium, fontSize = 14.sp)
+        }
+
         Spacer(Modifier.height(20.dp))
 
         TextButton(onClick = onKeDaftar) {

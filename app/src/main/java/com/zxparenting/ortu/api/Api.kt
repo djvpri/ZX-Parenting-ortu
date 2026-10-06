@@ -10,9 +10,11 @@ import retrofit2.http.Query
 
 // ===== Model =====
 data class LoginReq(val email: String, val password: String)
-data class DaftarReq(val nama: String, val email: String, val password: String, val setuju: Boolean)
 data class LoginRes(val token: String, val user: UserRes)
 data class UserRes(val id: String, val nama: String, val role: String)
+
+data class DaftarReq(val nama: String, val email: String, val password: String, val setuju: Boolean)
+data class GoogleReq(val idToken: String, val audience: String)
 
 data class Device(
     val id: String,
@@ -51,6 +53,9 @@ interface ApiZx {
 
     @POST("auth/native-daftar")
     suspend fun daftar(@Body req: DaftarReq): Response<LoginRes>
+
+    @POST("auth/native-google")
+    suspend fun loginGoogle(@Body req: GoogleReq): Response<LoginRes>
 
     @GET("device-session")
     suspend fun deviceList(@Header("Authorization") bearer: String): Response<List<Device>>

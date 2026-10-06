@@ -24,10 +24,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.credentials.CredentialManager
+import androidx.credentials.GetCredentialRequest
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.google.android.libraries.identity.googleid.GetGoogleIdOption
+import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.zxparenting.ortu.data.Simpanan
 import com.zxparenting.ortu.ui.ZxVm
 import com.zxparenting.ortu.ui.ZxVmFactory
@@ -39,6 +44,7 @@ import com.zxparenting.ortu.ui.layar.LayarPerangkat
 import com.zxparenting.ortu.ui.layar.LayarProfil
 import com.zxparenting.ortu.ui.tema.Bg
 import com.zxparenting.ortu.ui.tema.TemaZX
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -49,13 +55,25 @@ class MainActivity : ComponentActivity() {
                 val simpanan = remember { Simpanan(this) }
                 val vm: ZxVm = viewModel(factory = ZxVmFactory(simpanan))
                 val state by vm.state.collectAsState()
+                val scope = rememberCoroutineScope()
 
                 if (!state.loginOk) {
                     var modeDaftar by remember { mutableStateOf(false) }
                     if (modeDaftar) {
                         LayarDaftar(state, onDaftar = { nama, email, pass -> vm.daftar(nama, email, pass) }) { modeDaftar = false }
                     } else {
-                        LayarLogin(state, onLogin = { email, pass -> vm.login(email, pass) }) { modeDaftar = true }
+                        LayarLogin(
+                            state,
+                            onLogin = { email, pass -> vm.login(email, pass) },
+                            onGoogle = {
+                                scope.launch {
+                                    val idToken = ambilGoogleIdToken()
+                                    if (idToken != null) {
+                                        vm.loginGoogle(idToken, GOOGLE_WEB_ID)
+                                    }
+                                }
+                            },
+                        ) { modeDaftar = true }
                     }
                     return@TemaZX
                 }
@@ -98,6 +116,31 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    // Credential Manager — dapatkan Google ID token untuk login native.
+    // Web Client ID = AUTH_GOOGLE_ID server (audience yang diverifikasi backend).
+    private suspend fun ambilGoogleIdToken(): String? {
+        return try {
+            val cm = CredentialManager.create(this)
+            val googleIdOption = GetGoogleIdOption.Builder()
+                .setFilterByAuthorizedAccounts(false)
+                .setServerClientId(GOOGLE_WEB_ID)
+                .build()
+            val req = GetCredentialRequest.Builder()
+                .addCredentialProvider(googleIdOption)
+                .build()
+            val res = cm.getCredential(this, req)
+            GoogleIdTokenCredential.createFrom(res.credential.data).idToken
+        } catch (_: Exception) {
+            null
+        }
+    }
+
+    companion object {
+        // Web Client ID Google = AUTH_GOOGLE_ID di Coolify app 9.
+        private const val GOOGLE_WEB_ID =
+            "117197293834-5do5mam50v62vn5d4rc8mpj80rfm97gh.apps.googleusercontent.com"
     }
 }
 

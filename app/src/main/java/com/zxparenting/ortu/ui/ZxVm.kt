@@ -6,6 +6,7 @@ import com.zxparenting.ortu.api.AktivitasRes
 import com.zxparenting.ortu.api.ApiZx
 import com.zxparenting.ortu.api.Device
 import com.zxparenting.ortu.api.DaftarReq
+import com.zxparenting.ortu.api.GoogleReq
 import com.zxparenting.ortu.api.Klien
 import com.zxparenting.ortu.api.LoginReq
 import com.zxparenting.ortu.api.LoginRes
@@ -73,6 +74,25 @@ class ZxVm(val simpanan: Simpanan) : ViewModel() {
                         else -> "Gagal daftar (${res.code()})"
                     }
                     state.value = state.value.copy(loading = false, error = msg)
+                }
+            } catch (e: Exception) {
+                state.value = state.value.copy(loading = false, error = "Jaringan error: ${e.message}")
+            }
+        }
+    }
+
+    fun loginGoogle(idToken: String, audience: String) {
+        state.value = state.value.copy(loading = true, error = null)
+        viewModelScope.launch {
+            try {
+                val res = api.loginGoogle(GoogleReq(idToken, audience))
+                if (res.isSuccessful) {
+                    suksesLogin(res.body()!!)
+                } else {
+                    state.value = state.value.copy(
+                        loading = false,
+                        error = "Login Google gagal (${res.code()})",
+                    )
                 }
             } catch (e: Exception) {
                 state.value = state.value.copy(loading = false, error = "Jaringan error: ${e.message}")
