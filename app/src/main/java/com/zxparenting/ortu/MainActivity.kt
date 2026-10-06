@@ -1,5 +1,7 @@
 package com.zxparenting.ortu
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -14,11 +16,13 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Devices
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -33,6 +37,11 @@ import androidx.credentials.GetCredentialRequest
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
+import com.google.android.play.core.appupdate.AppUpdateManager
+import com.google.android.play.core.appupdate.AppUpdateManagerFactory
+import com.google.android.play.core.appupdate.AppUpdateOptions
+import com.google.android.play.core.install.model.AppUpdateType
+import com.google.android.play.core.install.model.UpdateAvailability
 import com.zxparenting.ortu.data.Simpanan
 import com.zxparenting.ortu.ui.ZxVm
 import com.zxparenting.ortu.ui.ZxVmFactory
@@ -44,18 +53,45 @@ import com.zxparenting.ortu.ui.layar.LayarPerangkat
 import com.zxparenting.ortu.ui.layar.LayarProfil
 import com.zxparenting.ortu.ui.tema.Bg
 import com.zxparenting.ortu.ui.tema.TemaZX
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class MainActivity : ComponentActivity() {
+    private lateinit var appUpdateManager: AppUpdateManager
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        appUpdateManager = AppUpdateManagerFactory.create(this)
         enableEdgeToEdge()
+        cekUpdate()
         setContent {
             TemaZX {
                 val simpanan = remember { Simpanan(this) }
                 val vm: ZxVm = viewModel(factory = ZxVmFactory(simpanan))
                 val state by vm.state.collectAsState()
                 val scope = rememberCoroutineScope()
+
+                // Dialog update tersedia
+                if (tanyaUpdate) {
+                    AlertDialog(
+                        onDismissRequest = { tanyaUpdate = false },
+                        title = { Text("Update tersedia") },
+                        text = { Text("Versi baru tersedia di Play Store. Update sekarang?") },
+                        confirmButton = {
+                            TextButton(onClick = {
+                                tanyaUpdate = false
+                                mulaiUpdate()
+                            }) { Text("Update") }
+                        },
+                        dismissButton = {
+                            TextButton(onClick = {
+                                tanyaUpdate = false
+                                bukaPlayStore()
+                            }) { Text("Buka Play Store") }
+                        },
+                    )
+                }
 
                 if (!state.loginOk) {
                     var modeDaftar by remember { mutableStateOf(false) }
@@ -119,6 +155,43 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    // In-App Update — cek Play Store saat app dibuka.
+    // Flexible: download di background, dialog tanya install ulang.
+    // Kalau Play Core tak tersedia (sideload), fallback buka halaman Play Store.
+    private var tanyaUpdate by mutableStateOf(false)
+
+    private fun cekUpdate() {
+        appUpdateManager.appUpdateInfo.addOnSuccessListener { info ->
+            if (info.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE &&
+                info.isUpdateTypeAllowed(AppUpdateType.FLEXIBLE)
+            ) {
+                tanyaUpdate = true
+            }
+        }
+    }
+
+    private fun mulaiUpdate() {
+        appUpdateManager.appUpdateInfo.addOnSuccessListener { info ->
+            if (info.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE) {
+                appUpdateManager.startUpdateFlowForResult(
+                    info,
+                    AppUpdateType.FLEXIBLE,
+                    this,
+                    KODE_UPDATE,
+                )
+            }
+        }
+    }
+
+    private fun bukaPlayStore() {
+        try {
+            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=$packageName")))
+        } catch (_: Exception) {
+            startActivity(Intent(Intent.ACTION_VIEW,
+                Uri.parse("https://play.google.com/store/apps/details?id=$packageName")))
+        }
+    }
+
     // Credential Manager — dapatkan Google ID token untuk login native.
     // Web Client ID = AUTH_GOOGLE_ID server (audience yang diverifikasi backend).
     private suspend fun ambilGoogleIdToken(): String? {
@@ -142,6 +215,7 @@ class MainActivity : ComponentActivity() {
         // Web Client ID Google = AUTH_GOOGLE_ID di Coolify app 9.
         private const val GOOGLE_WEB_ID =
             "117197293834-5do5mam50v62vn5d4rc8mpj80rfm97gh.apps.googleusercontent.com"
+        private const val KODE_UPDATE = 1001
     }
 }
 
