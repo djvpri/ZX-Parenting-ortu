@@ -29,8 +29,12 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.zxparenting.ortu.data.Simpanan
 import com.zxparenting.ortu.ui.ZxVm
+import com.zxparenting.ortu.ui.ZxVmFactory
 import com.zxparenting.ortu.ui.layar.LayarBeranda
 import com.zxparenting.ortu.ui.layar.LayarLogin
+import com.zxparenting.ortu.ui.layar.LayarNotif
+import com.zxparenting.ortu.ui.layar.LayarPerangkat
+import com.zxparenting.ortu.ui.layar.LayarProfil
 import com.zxparenting.ortu.ui.tema.Bg
 import com.zxparenting.ortu.ui.tema.TemaZX
 
