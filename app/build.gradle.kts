@@ -57,5 +57,4 @@ android {
 
 dependencies {
     implementation("com.google.androidbrowserhelper:androidbrowserhelper:2.5.0")
-    implementation("androidx.appcompat:appcompat:1.7.0")
 }
