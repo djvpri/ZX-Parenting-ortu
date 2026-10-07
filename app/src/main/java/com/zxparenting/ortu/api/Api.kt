@@ -153,6 +153,58 @@ data class QuestCreateReq(
     val deadline: String? = null,
 )
 
+// ===== Pesan (Direct Chat) =====
+data class Pesan(
+    val id: String,
+    val pengirimId: String,
+    val penerimaId: String,
+    val isi: String,
+    val createdAt: String,
+)
+
+data class PesanRingkas(
+    val userId: String,
+    val lastIsi: String,
+    val lastAt: String,
+)
+
+data class PesanKirimReq(
+    val penerimaId: String,
+    val isi: String,
+)
+
+// ===== Insights =====
+data class Insight(
+    val kategori: String,
+    val teks: String,
+    val level: String, // info | warning | positive
+)
+
+data class InsightsRes(
+    val anakNama: String,
+    val periode: String,
+    val insights: List<Insight>,
+    val ringkasan: InsightRingkasan,
+)
+
+data class InsightRingkasan(
+    val totalAktivitas: Int,
+    val tugasSelesai: Int,
+    val tugasPending: Int,
+    val tugasDitolak: Int,
+    val saldoToken: Int,
+)
+
+// ===== Langganan =====
+data class LanggananRes(
+    val tier: String? = null,   // FREE_TRIAL | PRO | ELITE | null
+    val mulai: String? = null,
+    val berakhir: String? = null,
+    val hariSisa: Int = 0,
+    val aktif: Boolean = false,
+    val limitAnak: Int = 0,
+)
+
 // ===== Forum =====
 data class ForumPost(
     val id: String,
@@ -306,6 +358,37 @@ interface ApiZx {
         @Header("Authorization") bearer: String,
         @Body req: QuestCreateReq,
     ): Response<Quest>
+
+    // Langganan
+    @GET("langganan/status")
+    suspend fun langgananStatus(
+        @Header("Authorization") bearer: String,
+    ): Response<LanggananRes>
+
+    // Pesan
+    @GET("pesan")
+    suspend fun pesanList(
+        @Header("Authorization") bearer: String,
+    ): Response<List<PesanRingkas>>
+
+    @GET("pesan")
+    suspend fun pesanThread(
+        @Header("Authorization") bearer: String,
+        @Query("with") withUserId: String,
+    ): Response<List<Pesan>>
+
+    @POST("pesan")
+    suspend fun pesanKirim(
+        @Header("Authorization") bearer: String,
+        @Body req: PesanKirimReq,
+    ): Response<Pesan>
+
+    // Insights
+    @GET("insights")
+    suspend fun insights(
+        @Header("Authorization") bearer: String,
+        @Query("anakId") anakId: String,
+    ): Response<InsightsRes>
 
     // Forum
     @GET("forum")

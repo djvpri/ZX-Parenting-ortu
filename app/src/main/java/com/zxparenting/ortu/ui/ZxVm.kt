@@ -18,9 +18,15 @@ import com.zxparenting.ortu.api.HadiahCreateReq
 import com.zxparenting.ortu.api.HadiahMarketRes
 import com.zxparenting.ortu.api.Klien
 import com.zxparenting.ortu.api.KomentarReq
+import com.zxparenting.ortu.api.LanggananRes
+import com.zxparenting.ortu.api.PesanKirimReq
+import com.zxparenting.ortu.api.PesanRingkas
+import com.zxparenting.ortu.api.InsightsRes
 import com.zxparenting.ortu.api.LoginReq
 import com.zxparenting.ortu.api.LoginRes
 import com.zxparenting.ortu.api.PesananProsesReq
+import com.zxparenting.ortu.api.Pesan
+import com.zxparenting.ortu.api.PesananHadiah
 import com.zxparenting.ortu.api.Quest
 import com.zxparenting.ortu.api.QuestCreateReq
 import com.zxparenting.ortu.api.Tugas
@@ -47,6 +53,10 @@ data class UiState(
     val quests: List<Quest> = emptyList(),
     val forumPosts: List<ForumPost> = emptyList(),
     val forumDetail: ForumPost? = null,
+    val langganan: LanggananRes? = null,
+    val pesanList: List<PesanRingkas> = emptyList(),
+    val pesanThread: List<Pesan> = emptyList(),
+    val insights: InsightsRes? = null,
 )
 
 class ZxVm(val simpanan: Simpanan) : ViewModel() {
@@ -149,6 +159,19 @@ class ZxVm(val simpanan: Simpanan) : ViewModel() {
             muatCoin(token)
             muatQuest(token)
             muatForum(token)
+            muatLangganan(token)
+        }
+    }
+
+    fun muatLangganan(token: String?) {
+        if (token == null) return
+        viewModelScope.launch {
+            try {
+                val res = api.langgananStatus("Bearer $token")
+                if (res.isSuccessful) {
+                    state.value = state.value.copy(langganan = res.body())
+                }
+            } catch (_: Exception) {}
         }
     }
 
@@ -490,5 +513,55 @@ class ZxVm(val simpanan: Simpanan) : ViewModel() {
 
     fun clearForumDetail() {
         state.value = state.value.copy(forumDetail = null)
+    }
+
+    // ===== F10: Pesan (Direct Chat) =====
+
+    fun muatPesan(token: String?) {
+        if (token == null) return
+        viewModelScope.launch {
+            try {
+                val res = api.pesanList("Bearer $token")
+                if (res.isSuccessful) {
+                    state.value = state.value.copy(pesanList = res.body() ?: emptyList())
+                }
+            } catch (_: Exception) {}
+        }
+    }
+
+    fun muatThread(token: String?, partnerId: String) {
+        if (token == null) return
+        viewModelScope.launch {
+            try {
+                val res = api.pesanThread("Bearer $token", partnerId)
+                if (res.isSuccessful) {
+                    state.value = state.value.copy(pesanThread = res.body() ?: emptyList())
+                }
+            } catch (_: Exception) {}
+        }
+    }
+
+    fun kirimPesan(penerimaId: String, isi: String) {
+        val token = state.value.token ?: return
+        viewModelScope.launch {
+            try {
+                api.pesanKirim("Bearer $token", PesanKirimReq(penerimaId, isi))
+                muatThread(token, penerimaId)
+            } catch (_: Exception) {}
+        }
+    }
+
+    // ===== F11: AI Insights =====
+
+    fun muatInsights(token: String?, anakId: String) {
+        if (token == null) return
+        viewModelScope.launch {
+            try {
+                val res = api.insights("Bearer $token", anakId)
+                if (res.isSuccessful) {
+                    state.value = state.value.copy(insights = res.body())
+                }
+            } catch (_: Exception) {}
+        }
     }
 }

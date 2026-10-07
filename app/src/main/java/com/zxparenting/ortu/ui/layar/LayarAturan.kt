@@ -119,15 +119,15 @@ private fun KartuAturanDevice(
                 })
             }
 
-            // Master unlock
+            // Master unlock / Emergency Override
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Column(modifier = Modifier.weight(1f)) {
-                    Text("Master Unlock", fontSize = 12.sp)
-                    Text("Buka semua batasan", fontSize = 10.sp, color = MutedFg)
+                    Text("Master Unlock / Emergency Override", fontSize = 12.sp)
+                    Text("Buka semua batasan dari jarak jauh", fontSize = 10.sp, color = MutedFg)
                 }
                 Switch(checked = masterUnlock, onCheckedChange = {
                     masterUnlock = it

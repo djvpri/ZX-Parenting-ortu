@@ -52,10 +52,13 @@ import com.zxparenting.ortu.ui.layar.LayarBeranda
 import com.zxparenting.ortu.ui.layar.LayarCoin
 import com.zxparenting.ortu.ui.layar.LayarDaftar
 import com.zxparenting.ortu.ui.layar.LayarForum
+import com.zxparenting.ortu.ui.layar.LayarLangganan
 import com.zxparenting.ortu.ui.layar.LayarLaporan
 import com.zxparenting.ortu.ui.layar.LayarLokasi
 import com.zxparenting.ortu.ui.layar.LayarLogin
 import com.zxparenting.ortu.ui.layar.LayarMarketplace
+import com.zxparenting.ortu.ui.layar.LayarPesan
+import com.zxparenting.ortu.ui.layar.LayarInsights
 import com.zxparenting.ortu.ui.layar.LayarProfil
 import com.zxparenting.ortu.ui.layar.LayarQuest
 import com.zxparenting.ortu.ui.layar.LayarTugas
@@ -190,6 +193,24 @@ class MainActivity : ComponentActivity() {
                                     onKomentar = { id, isi -> vm.tambahKomentar(id, isi) },
                                     onBack = { vm.clearForumDetail() },
                                 )
+                                7 -> LayarLangganan(
+                                    langganan = state.langganan,
+                                    loading = state.loading,
+                                )
+                                8 -> LayarPesan(
+                                    pesanList = state.pesanList,
+                                    pesanThread = state.pesanThread,
+                                    loading = state.loading,
+                                    onBukaThread = { id -> vm.muatThread(state.token, id) },
+                                    onKirim = { id, isi -> vm.kirimPesan(id, isi) },
+                                    onBack = {},
+                                )
+                                9 -> LayarInsights(
+                                    anakList = state.anakList,
+                                    insights = state.insights,
+                                    loading = state.loading,
+                                    onPilihAnak = { id -> vm.muatInsights(state.token, id) },
+                                )
                             }
                             return@Box
                         }
@@ -201,6 +222,15 @@ class MainActivity : ComponentActivity() {
                                 anakList = state.anakList,
                                 tugasList = state.tugasList,
                                 coinSaldo = state.coin?.saldo ?: 0,
+                                tierLabel = {
+                                    val lg = state.langganan
+                                    when (lg?.tier) {
+                                        "FREE_TRIAL" -> "Trial ${lg.hariSisa}h"
+                                        "PRO" -> "Pro"
+                                        "ELITE" -> "Elite"
+                                        else -> "-"
+                                    }
+                                }(),
                                 onKlikAnak = { tab = 1 },
                                 onKlikTugas = { tab = 2 },
                                 onKlikAturan = { subLayar = 1 },
@@ -210,6 +240,9 @@ class MainActivity : ComponentActivity() {
                                 onKlikCoin = { subLayar = 4 },
                                 onKlikQuest = { subLayar = 5 },
                                 onKlikForum = { subLayar = 6 },
+                                onKlikLangganan = { subLayar = 7 },
+                                onKlikPesan = { subLayar = 8 },
+                                onKlikInsights = { subLayar = 9 },
                                 onKlikProfil = { tab = 4 },
                             )
                             1 -> LayarAnak(

@@ -30,6 +30,7 @@ fun LayarBeranda(
     anakList: List<Anak>,
     tugasList: List<Tugas>,
     coinSaldo: Int,
+    tierLabel: String,
     onKlikAnak: () -> Unit,
     onKlikTugas: () -> Unit,
     onKlikAturan: () -> Unit,
@@ -39,6 +40,9 @@ fun LayarBeranda(
     onKlikCoin: () -> Unit,
     onKlikQuest: () -> Unit,
     onKlikForum: () -> Unit,
+    onKlikLangganan: () -> Unit,
+    onKlikPesan: () -> Unit,
+    onKlikInsights: () -> Unit,
     onKlikProfil: () -> Unit,
 ) {
     Column(
@@ -128,6 +132,17 @@ fun LayarBeranda(
             TileMenu("Coin", "$coinSaldo ZX", Hijau, Icons.Default.AccountBalanceWallet, Modifier.weight(1f), onKlikCoin)
             TileMenu("Quest", "Keluarga", Ungu, Icons.Default.Flag, Modifier.weight(1f), onKlikQuest)
             TileMenu("Forum", "Diskusi", Biru, Icons.Default.Forum, Modifier.weight(1f), onKlikForum)
+        }
+
+        // Row 4: Langganan, Pesan, Insights
+        Spacer(Modifier.height(10.dp))
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+        ) {
+            TileMenu("Langganan", tierLabel, Amber, Icons.Default.Star, Modifier.weight(1f), onKlikLangganan)
+            TileMenu("Pesan", "Chat", Hijau, Icons.Default.Chat, Modifier.weight(1f), onKlikPesan)
+            TileMenu("Insights", "AI", Ungu, Icons.Default.Insights, Modifier.weight(1f), onKlikInsights)
         }
 
         Spacer(Modifier.height(16.dp))
