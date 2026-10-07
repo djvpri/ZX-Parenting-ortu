@@ -11,4 +11,5 @@
 app/rilis.keystore
 app/keystore.properties
 /keystore.properties
+/keystore/
 *.apk
