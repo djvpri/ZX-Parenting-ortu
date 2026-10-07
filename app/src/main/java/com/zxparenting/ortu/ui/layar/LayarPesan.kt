@@ -40,7 +40,7 @@ fun LayarPesan(
             verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
             Spacer(Modifier.height(14.dp))
-            Text("Pesan", style = MaterialTheme.typography.titleLarge)
+            Text(Teks["pesan"], style = MaterialTheme.typography.titleLarge)
 
             if (loading && pesanList.isEmpty()) {
                 Box(Modifier.fillMaxWidth().padding(32.dp), contentAlignment = Alignment.Center) {
@@ -50,7 +50,7 @@ fun LayarPesan(
 
             if (pesanList.isEmpty()) {
                 KartuClay {
-                    Text("Belum ada percakapan.", fontSize = 12.sp, color = MutedFg)
+                    Text(Teks["belum_pesan"], fontSize = 12.sp, color = MutedFg)
                 }
             }
 
@@ -66,7 +66,7 @@ fun LayarPesan(
                                 Text(ringkas.lastIsi, fontSize = 11.sp, color = MutedFg, maxLines = 1)
                             }
                             TextButton(onClick = { partnerId = ringkas.userId; onBukaThread(ringkas.userId) }) {
-                                Text("Buka")
+                                Text(Teks["buka"])
                             }
                         }
                     }
@@ -79,8 +79,8 @@ fun LayarPesan(
             modifier = Modifier.fillMaxSize().background(Bg).padding(16.dp),
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                TextButton(onClick = { partnerId = null; onBack() }) { Text("← Kembali") }
-                Text("Chat", fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
+                TextButton(onClick = { partnerId = null; onBack() }) { Text(Teks["kembali"]) }
+                Text(Teks["pesan"], fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
             }
 
             LazyColumn(
@@ -112,7 +112,7 @@ fun LayarPesan(
                     value = inputPesan,
                     onValueChange = { inputPesan = it },
                     modifier = Modifier.weight(1f),
-                    placeholder = { Text("Tulis pesan...", fontSize = 13.sp) },
+                    placeholder = { Text(Teks["tulis_pesan"], fontSize = 13.sp) },
                     shape = RoundedCornerShape(12.dp),
                     singleLine = true,
                 )

@@ -35,12 +35,12 @@ fun LayarInsights(
         verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
         Spacer(Modifier.height(14.dp))
-        Text("AI Insights", style = MaterialTheme.typography.titleLarge)
+        Text(Teks["insights"], style = MaterialTheme.typography.titleLarge)
 
         // Pilih anak
         KartuClay(kecil = true) {
             Column {
-                Text("Pilih Anak", fontSize = 11.sp, color = MutedFg, fontWeight = FontWeight.Bold)
+                Text(Teks["pilih_anak"], fontSize = 11.sp, color = MutedFg, fontWeight = FontWeight.Bold)
                 Spacer(Modifier.height(8.dp))
                 anakList.forEach { anak ->
                     Row(
@@ -70,12 +70,12 @@ fun LayarInsights(
             // Ringkasan
             KartuClay(kecil = true) {
                 Column {
-                    Text("Ringkasan (${insights.periode})", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                    Text("${Teks["ringkasan"]} (${insights.periode})", fontSize = 12.sp, fontWeight = FontWeight.Bold)
                     Spacer(Modifier.height(8.dp))
-                    BarisKV("Total Aktivitas", "${insights.ringkasan.totalAktivitas}")
-                    BarisKV("Tugas Selesai", "${insights.ringkasan.tugasSelesai}")
-                    BarisKV("Tugas Pending", "${insights.ringkasan.tugasPending}")
-                    BarisKV("Saldo Token", "${insights.ringkasan.saldoToken} menit")
+                    BarisKV(Teks["total_aktivitas"], "${insights.ringkasan.totalAktivitas}")
+                    BarisKV(Teks["tugas_selesai"], "${insights.ringkasan.tugasSelesai}")
+                    BarisKV(Teks["tugas_pending"], "${insights.ringkasan.tugasPending}")
+                    BarisKV(Teks["saldo_token"], "${insights.ringkasan.saldoToken} ${Teks["menit"]}")
                 }
             }
 

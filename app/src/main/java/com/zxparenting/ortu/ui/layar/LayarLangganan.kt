@@ -30,7 +30,7 @@ fun LayarLangganan(
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         Spacer(Modifier.height(14.dp))
-        Text("Langganan", style = MaterialTheme.typography.titleLarge)
+        Text(Teks["langganan"], style = MaterialTheme.typography.titleLarge)
 
         if (loading && langganan == null) {
             Box(Modifier.fillMaxWidth().padding(32.dp), contentAlignment = Alignment.Center) {
@@ -43,11 +43,11 @@ fun LayarLangganan(
             // Tidak ada langganan aktif
             KartuClay {
                 Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text("Tidak Ada Langganan Aktif", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                    Text(Teks["trial_habis"], fontWeight = FontWeight.Bold, fontSize = 16.sp)
                     Spacer(Modifier.height(8.dp))
-                    Text("Langganan berakhir atau belum dimulai.", fontSize = 12.sp, color = MutedFg)
+                    Text(Teks["trial_habis"], fontSize = 12.sp, color = MutedFg)
                     Spacer(Modifier.height(16.dp))
-                    Text("Upgrade ke ZX Pro atau Elite untuk melanjutkan.", fontSize = 12.sp, color = MutedFg)
+                    Text("${Teks["upgrade"]} → ZX ${Teks["tier_pro"]} / ${Teks["tier_elite"]}.", fontSize = 12.sp, color = MutedFg)
                 }
             }
             return@Column
@@ -93,8 +93,8 @@ fun LayarLangganan(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,
                     ) {
-                        Text("Sisa masa trial", fontSize = 12.sp, color = MutedFg)
-                        Text("${langganan.hariSisa} hari", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = if (langganan.hariSisa <= 7) Merah else Hijau)
+                        Text("${Teks["trial_aktif"]}: ${langganan.hariSisa} ${Teks["hari"]}", fontSize = 12.sp, color = MutedFg)
+                        Text("${langganan.hariSisa} ${Teks["hari"]}", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = if (langganan.hariSisa <= 7) Merah else Hijau)
                     }
                     Spacer(Modifier.height(12.dp))
                     LinearProgressIndicator(
@@ -115,7 +115,7 @@ fun LayarLangganan(
                         horizontalArrangement = Arrangement.SpaceBetween,
                     ) {
                         Text("Berakhir", fontSize = 12.sp, color = MutedFg)
-                        Text("${langganan.hariSisa} hari lagi", fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                        Text("${langganan.hariSisa} ${Teks["hari"]}", fontSize = 14.sp, fontWeight = FontWeight.Bold)
                     }
                 }
             }
@@ -124,14 +124,14 @@ fun LayarLangganan(
         // Info limit anak
         KartuClay(kecil = true) {
             BarisKV(
-                k = "Limit Profil Anak",
+                k = Teks["limit_anak"],
                 v = if (langganan.limitAnak == Int.MAX_VALUE) "Tak terbatas" else "${langganan.limitAnak}",
             )
         }
 
         // Paket comparison
         Spacer(Modifier.height(8.dp))
-        Text("Pilih Paket", fontWeight = FontWeight.Bold, fontSize = 15.sp)
+        Text(Teks["paket"], fontWeight = FontWeight.Bold, fontSize = 15.sp)
 
         KartuPaket(
             nama = "ZX Pro",

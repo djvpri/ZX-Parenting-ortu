@@ -64,6 +64,7 @@ import com.zxparenting.ortu.ui.layar.LayarQuest
 import com.zxparenting.ortu.ui.layar.LayarTugas
 import com.zxparenting.ortu.ui.tema.Bg
 import com.zxparenting.ortu.ui.tema.PengaturanTema
+import com.zxparenting.ortu.ui.tema.Teks
 import com.zxparenting.ortu.ui.tema.TemaRepo
 import com.zxparenting.ortu.ui.tema.TemaZX
 import kotlinx.coroutines.Dispatchers
@@ -143,8 +144,8 @@ class MainActivity : ComponentActivity() {
                                 NavigationBarItem(
                                     selected = tab == i && subLayar == 0,
                                     onClick = { tab = i; subLayar = 0 },
-                                    icon = { Icon(t.ikon, contentDescription = t.label) },
-                                    label = { Text(t.label) },
+                                    icon = { Icon(t.ikon, contentDescription = t.label()) },
+                                    label = { Text(t.label()) },
                                 )
                             }
                         }
@@ -350,10 +351,18 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-enum class BottomTab(val label: String, val ikon: ImageVector) {
-    Beranda("Beranda", Icons.Default.Home),
-    Anak("Anak", Icons.Default.ChildCare),
-    Tugas("Tugas", Icons.Default.Assignment),
-    Market("Market", Icons.Default.ShoppingBag),
-    Profil("Profil", Icons.Default.Person),
+enum class BottomTab(val ikon: ImageVector) {
+    Beranda(Icons.Default.Home),
+    Anak(Icons.Default.ChildCare),
+    Tugas(Icons.Default.Assignment),
+    Market(Icons.Default.ShoppingBag),
+    Profil(Icons.Default.Person);
+
+    fun label(): String = when (this) {
+        Beranda -> Teks["beranda"]
+        Anak -> Teks["anak"]
+        Tugas -> Teks["tugas"]
+        Market -> Teks["market"]
+        Profil -> Teks["profil"]
+    }
 }

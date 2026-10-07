@@ -109,9 +109,9 @@ fun LayarBeranda(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(10.dp),
         ) {
-            TileMenu("Anak", "${anakList.size} profil", Biru, Icons.Default.ChildCare, Modifier.weight(1f), onKlikAnak)
-            TileMenu("Tugas", "${tugasList.size} tugas", Hijau, Icons.Default.Assignment, Modifier.weight(1f), onKlikTugas)
-            TileMenu("Market", "Hadiah", Pink, Icons.Default.ShoppingBag, Modifier.weight(1f), onKlikMarket)
+            TileMenu(Teks["anak"], "${anakList.size} ${Teks["profil_jumlah"]}", Biru, Icons.Default.ChildCare, Modifier.weight(1f), onKlikAnak)
+            TileMenu(Teks["tugas"], "${tugasList.size} ${Teks["tugas_jumlah"]}", Hijau, Icons.Default.Assignment, Modifier.weight(1f), onKlikTugas)
+            TileMenu(Teks["market"], Teks["hadiah"], Pink, Icons.Default.ShoppingBag, Modifier.weight(1f), onKlikMarket)
         }
 
         // Row 2: Aturan, Lokasi, Laporan
@@ -119,9 +119,9 @@ fun LayarBeranda(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(10.dp),
         ) {
-            TileMenu("Aturan", "${devices.size} perangkat", Ungu, Icons.Default.Tune, Modifier.weight(1f), onKlikAturan)
-            TileMenu("Lokasi", "GPS", Merah, Icons.Default.LocationOn, Modifier.weight(1f), onKlikLokasi)
-            TileMenu("Laporan", "Aktivitas", Amber, Icons.Default.Analytics, Modifier.weight(1f), onKlikLaporan)
+            TileMenu(Teks["aturan"], "${devices.size} ${Teks["perangkat_jumlah"]}", Ungu, Icons.Default.Tune, Modifier.weight(1f), onKlikAturan)
+            TileMenu(Teks["lokasi"], Teks["gps"], Merah, Icons.Default.LocationOn, Modifier.weight(1f), onKlikLokasi)
+            TileMenu(Teks["laporan"], Teks["aktivitas"], Amber, Icons.Default.Analytics, Modifier.weight(1f), onKlikLaporan)
         }
 
         // Row 3: Coin, Quest, Forum
@@ -129,9 +129,9 @@ fun LayarBeranda(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(10.dp),
         ) {
-            TileMenu("Coin", "$coinSaldo ZX", Hijau, Icons.Default.AccountBalanceWallet, Modifier.weight(1f), onKlikCoin)
-            TileMenu("Quest", "Keluarga", Ungu, Icons.Default.Flag, Modifier.weight(1f), onKlikQuest)
-            TileMenu("Forum", "Diskusi", Biru, Icons.Default.Forum, Modifier.weight(1f), onKlikForum)
+            TileMenu(Teks["coin"], "$coinSaldo ZX", Hijau, Icons.Default.AccountBalanceWallet, Modifier.weight(1f), onKlikCoin)
+            TileMenu(Teks["quest"], Teks["keluarga"], Ungu, Icons.Default.Flag, Modifier.weight(1f), onKlikQuest)
+            TileMenu(Teks["forum"], Teks["diskusi"], Biru, Icons.Default.Forum, Modifier.weight(1f), onKlikForum)
         }
 
         // Row 4: Langganan, Pesan, Insights
@@ -140,9 +140,9 @@ fun LayarBeranda(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(10.dp),
         ) {
-            TileMenu("Langganan", tierLabel, Amber, Icons.Default.Star, Modifier.weight(1f), onKlikLangganan)
-            TileMenu("Pesan", "Chat", Hijau, Icons.Default.Chat, Modifier.weight(1f), onKlikPesan)
-            TileMenu("Insights", "AI", Ungu, Icons.Default.Insights, Modifier.weight(1f), onKlikInsights)
+            TileMenu(Teks["langganan"], tierLabel, Amber, Icons.Default.Star, Modifier.weight(1f), onKlikLangganan)
+            TileMenu(Teks["pesan"], Teks["chat"], Hijau, Icons.Default.Chat, Modifier.weight(1f), onKlikPesan)
+            TileMenu(Teks["insights"], Teks["ai"], Ungu, Icons.Default.Insights, Modifier.weight(1f), onKlikInsights)
         }
 
         Spacer(Modifier.height(16.dp))
