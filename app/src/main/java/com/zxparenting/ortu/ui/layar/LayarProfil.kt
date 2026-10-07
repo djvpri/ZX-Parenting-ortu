@@ -8,6 +8,7 @@ import androidx.compose.material.icons.filled.DeleteForever
 import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -43,6 +44,30 @@ fun LayarProfil(
 
         KartuClay(kecil = true) {
             Text("ZX Parenting v${BuildConfig.VERSI_NAMA} (${BuildConfig.VERSI_KODE})", fontSize = 11.sp, color = MutedFg)
+        }
+
+        // Toggle bahasa
+        KartuClay(kecil = true) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text("Bahasa", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                Row {
+                    FilterChip(
+                        selected = Teks.bahasa() == Bahasa.ID,
+                        onClick = { Teks.setBahasa(Bahasa.ID) },
+                        label = { Text("ID", fontSize = 11.sp) },
+                    )
+                    Spacer(Modifier.width(6.dp))
+                    FilterChip(
+                        selected = Teks.bahasa() == Bahasa.EN,
+                        onClick = { Teks.setBahasa(Bahasa.EN) },
+                        label = { Text("EN", fontSize = 11.sp) },
+                    )
+                }
+            }
         }
 
         Spacer(Modifier.weight(1f))

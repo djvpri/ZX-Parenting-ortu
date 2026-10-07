@@ -11,10 +11,13 @@ import com.zxparenting.ortu.api.CoinTopupReq
 import com.zxparenting.ortu.api.Device
 import com.zxparenting.ortu.api.DevicePatch
 import com.zxparenting.ortu.api.DaftarReq
+import com.zxparenting.ortu.api.ForumCreateReq
+import com.zxparenting.ortu.api.ForumPost
 import com.zxparenting.ortu.api.GoogleReq
 import com.zxparenting.ortu.api.HadiahCreateReq
 import com.zxparenting.ortu.api.HadiahMarketRes
 import com.zxparenting.ortu.api.Klien
+import com.zxparenting.ortu.api.KomentarReq
 import com.zxparenting.ortu.api.LoginReq
 import com.zxparenting.ortu.api.LoginRes
 import com.zxparenting.ortu.api.PesananProsesReq
@@ -42,6 +45,8 @@ data class UiState(
     val market: HadiahMarketRes? = null,
     val coin: CoinRes? = null,
     val quests: List<Quest> = emptyList(),
+    val forumPosts: List<ForumPost> = emptyList(),
+    val forumDetail: ForumPost? = null,
 )
 
 class ZxVm(val simpanan: Simpanan) : ViewModel() {
@@ -133,7 +138,7 @@ class ZxVm(val simpanan: Simpanan) : ViewModel() {
         muatSemua(body.token)
     }
 
-    // Muat semua data awal: devices + anak + tugas + market + coin + quest.
+    // Muat semua data awal: devices + anak + tugas + market + coin + quest + forum.
     fun muatSemua(token: String?) {
         if (token == null) return
         viewModelScope.launch {
@@ -143,6 +148,7 @@ class ZxVm(val simpanan: Simpanan) : ViewModel() {
             muatMarket(token)
             muatCoin(token)
             muatQuest(token)
+            muatForum(token)
         }
     }
 
@@ -419,5 +425,70 @@ class ZxVm(val simpanan: Simpanan) : ViewModel() {
             simpanan.hapus()
             state.value = UiState()
         }
+    }
+
+    // ===== F4: Forum =====
+
+    fun muatForum(token: String?) {
+        if (token == null) return
+        viewModelScope.launch {
+            try {
+                val res = api.forumList("Bearer $token")
+                if (res.isSuccessful) {
+                    state.value = state.value.copy(forumPosts = res.body() ?: emptyList())
+                }
+            } catch (_: Exception) {}
+        }
+    }
+
+    fun buatPost(judul: String, isi: String, kategori: String) {
+        val token = state.value.token ?: return
+        state.value = state.value.copy(loading = true, error = null)
+        viewModelScope.launch {
+            try {
+                val res = api.forumCreate("Bearer $token", ForumCreateReq(judul, isi, kategori))
+                state.value = state.value.copy(loading = false)
+                if (res.isSuccessful) muatForum(token)
+                else state.value = state.value.copy(error = "Gagal buat post (${res.code()})")
+            } catch (e: Exception) {
+                state.value = state.value.copy(loading = false, error = "Jaringan error: ${e.message}")
+            }
+        }
+    }
+
+    fun muatForumDetail(token: String?, postId: String) {
+        if (token == null) return
+        viewModelScope.launch {
+            try {
+                val res = api.forumDetail("Bearer $token", postId)
+                if (res.isSuccessful) {
+                    state.value = state.value.copy(forumDetail = res.body())
+                }
+            } catch (_: Exception) {}
+        }
+    }
+
+    fun hapusPost(postId: String) {
+        val token = state.value.token ?: return
+        viewModelScope.launch {
+            try {
+                api.forumDelete("Bearer $token", postId)
+                muatForum(token)
+            } catch (_: Exception) {}
+        }
+    }
+
+    fun tambahKomentar(postId: String, isi: String) {
+        val token = state.value.token ?: return
+        viewModelScope.launch {
+            try {
+                api.forumKomentar("Bearer $token", postId, KomentarReq(isi))
+                muatForumDetail(token, postId)
+            } catch (_: Exception) {}
+        }
+    }
+
+    fun clearForumDetail() {
+        state.value = state.value.copy(forumDetail = null)
     }
 }

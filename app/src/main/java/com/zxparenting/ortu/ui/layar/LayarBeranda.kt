@@ -38,6 +38,7 @@ fun LayarBeranda(
     onKlikMarket: () -> Unit,
     onKlikCoin: () -> Unit,
     onKlikQuest: () -> Unit,
+    onKlikForum: () -> Unit,
     onKlikProfil: () -> Unit,
 ) {
     Column(
@@ -119,14 +120,14 @@ fun LayarBeranda(
             TileMenu("Laporan", "Aktivitas", Amber, Icons.Default.Analytics, Modifier.weight(1f), onKlikLaporan)
         }
 
-        // Row 3: Coin, Quest, Profil
+        // Row 3: Coin, Quest, Forum
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(10.dp),
         ) {
             TileMenu("Coin", "$coinSaldo ZX", Hijau, Icons.Default.AccountBalanceWallet, Modifier.weight(1f), onKlikCoin)
             TileMenu("Quest", "Keluarga", Ungu, Icons.Default.Flag, Modifier.weight(1f), onKlikQuest)
-            TileMenu("Profil", "Akun", Amber, Icons.Default.Person, Modifier.weight(1f), onKlikProfil)
+            TileMenu("Forum", "Diskusi", Biru, Icons.Default.Forum, Modifier.weight(1f), onKlikForum)
         }
 
         Spacer(Modifier.height(16.dp))

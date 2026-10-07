@@ -51,6 +51,7 @@ import com.zxparenting.ortu.ui.layar.LayarAturan
 import com.zxparenting.ortu.ui.layar.LayarBeranda
 import com.zxparenting.ortu.ui.layar.LayarCoin
 import com.zxparenting.ortu.ui.layar.LayarDaftar
+import com.zxparenting.ortu.ui.layar.LayarForum
 import com.zxparenting.ortu.ui.layar.LayarLaporan
 import com.zxparenting.ortu.ui.layar.LayarLokasi
 import com.zxparenting.ortu.ui.layar.LayarLogin
@@ -175,6 +176,16 @@ class MainActivity : ComponentActivity() {
                                     loading = state.loading,
                                     onBuat = { j, d, r -> vm.buatQuest(j, d, r) },
                                 )
+                                6 -> LayarForum(
+                                    posts = state.forumPosts,
+                                    detail = state.forumDetail,
+                                    loading = state.loading,
+                                    onBuatPost = { j, i, k -> vm.buatPost(j, i, k) },
+                                    onBukaPost = { id -> vm.muatForumDetail(state.token, id) },
+                                    onHapusPost = { id -> vm.hapusPost(id) },
+                                    onKomentar = { id, isi -> vm.tambahKomentar(id, isi) },
+                                    onBack = { vm.clearForumDetail() },
+                                )
                             }
                             return@Box
                         }
@@ -194,6 +205,7 @@ class MainActivity : ComponentActivity() {
                                 onKlikMarket = { tab = 3 },
                                 onKlikCoin = { subLayar = 4 },
                                 onKlikQuest = { subLayar = 5 },
+                                onKlikForum = { subLayar = 6 },
                                 onKlikProfil = { tab = 4 },
                             )
                             1 -> LayarAnak(

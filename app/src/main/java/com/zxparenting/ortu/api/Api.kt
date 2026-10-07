@@ -153,6 +153,31 @@ data class QuestCreateReq(
     val deadline: String? = null,
 )
 
+// ===== Forum =====
+data class ForumPost(
+    val id: String,
+    val judul: String,
+    val isi: String,
+    val kategori: String,
+    val createdAt: String,
+    val ortu: AnakRef, // reuse: nama field
+    val _count: KomentarCount? = null,
+    val komentar: List<ForumKomentar>? = null,
+)
+data class KomentarCount(val komentar: Int)
+data class ForumKomentar(
+    val id: String,
+    val isi: String,
+    val createdAt: String,
+    val ortu: AnakRef,
+)
+data class ForumCreateReq(
+    val judul: String,
+    val isi: String,
+    val kategori: String = "umum",
+)
+data class KomentarReq(val isi: String)
+
 // ===== Aktivitas =====
 data class AktivitasRes(
     val anak: AnakRef,
@@ -281,6 +306,35 @@ interface ApiZx {
         @Header("Authorization") bearer: String,
         @Body req: QuestCreateReq,
     ): Response<Quest>
+
+    // Forum
+    @GET("forum")
+    suspend fun forumList(@Header("Authorization") bearer: String): Response<List<ForumPost>>
+
+    @POST("forum")
+    suspend fun forumCreate(
+        @Header("Authorization") bearer: String,
+        @Body req: ForumCreateReq,
+    ): Response<ForumPost>
+
+    @GET("forum/{id}")
+    suspend fun forumDetail(
+        @Header("Authorization") bearer: String,
+        @Path("id") id: String,
+    ): Response<ForumPost>
+
+    @DELETE("forum/{id}")
+    suspend fun forumDelete(
+        @Header("Authorization") bearer: String,
+        @Path("id") id: String,
+    ): Response<TugasOkRes>
+
+    @POST("forum/{id}/komentar")
+    suspend fun forumKomentar(
+        @Header("Authorization") bearer: String,
+        @Path("id") id: String,
+        @Body req: KomentarReq,
+    ): Response<ForumKomentar>
 }
 
 data class AnakCreateRes(val ok: Boolean, val anakId: String)
