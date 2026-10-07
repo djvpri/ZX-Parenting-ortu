@@ -10,7 +10,9 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -24,6 +26,15 @@ fun LayarProfil(
     onHapusAkun: () -> Unit,
 ) {
     var tanyaHapus by remember { mutableStateOf(false) }
+    val ctx = LocalContext.current
+    val daftarTema = remember { TemaRepo.daftarTema() }
+    var temaAktif by remember { mutableStateOf(PengaturanTema.muat(ctx)) }
+
+    fun gantiTema(key: String) {
+        temaAktif = key
+        PengaturanTema.simpan(ctx, key)
+        WarnaAktif.gantiByKey(key)
+    }
 
     Column(
         modifier = Modifier
@@ -66,6 +77,38 @@ fun LayarProfil(
                         onClick = { Teks.setBahasa(Bahasa.EN) },
                         label = { Text("EN", fontSize = 11.sp) },
                     )
+                }
+            }
+        }
+
+        // Tema picker
+        KartuClay(kecil = true) {
+            Column {
+                Text("Tema", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                Spacer(Modifier.height(8.dp))
+                daftarTema.forEach { key ->
+                    val palet = remember(key) { TemaRepo.load(key) }
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 4.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        // Preview swatch
+                        Row(horizontalArrangement = Arrangement.spacedBy(2.dp)) {
+                            Box(modifier = Modifier.size(20.dp).clip(RoundedCornerShape(6.dp)).background(palet.bg))
+                            Box(modifier = Modifier.size(20.dp).clip(RoundedCornerShape(6.dp)).background(palet.utama))
+                            Box(modifier = Modifier.size(20.dp).clip(RoundedCornerShape(6.dp)).background(palet.aksen))
+                            Box(modifier = Modifier.size(20.dp).clip(RoundedCornerShape(6.dp)).background(palet.hijau))
+                            Box(modifier = Modifier.size(20.dp).clip(RoundedCornerShape(6.dp)).background(palet.merah))
+                        }
+                        Spacer(Modifier.width(10.dp))
+                        Text(palet.nama, fontSize = 12.sp, modifier = Modifier.weight(1f))
+                        RadioButton(
+                            selected = temaAktif == key,
+                            onClick = { gantiTema(key) },
+                        )
+                    }
                 }
             }
         }

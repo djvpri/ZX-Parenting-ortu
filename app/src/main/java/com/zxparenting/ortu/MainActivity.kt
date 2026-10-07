@@ -60,6 +60,8 @@ import com.zxparenting.ortu.ui.layar.LayarProfil
 import com.zxparenting.ortu.ui.layar.LayarQuest
 import com.zxparenting.ortu.ui.layar.LayarTugas
 import com.zxparenting.ortu.ui.tema.Bg
+import com.zxparenting.ortu.ui.tema.PengaturanTema
+import com.zxparenting.ortu.ui.tema.TemaRepo
 import com.zxparenting.ortu.ui.tema.TemaZX
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -73,6 +75,8 @@ class MainActivity : ComponentActivity() {
         appUpdateManager = AppUpdateManagerFactory.create(this)
         enableEdgeToEdge()
         cekUpdate()
+        TemaRepo.init(this)
+        PengaturanTema.terapkan(this)
         setContent {
             TemaZX {
                 val simpanan = remember { Simpanan(this) }

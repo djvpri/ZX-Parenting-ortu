@@ -14,7 +14,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -101,7 +100,7 @@ private fun KartuAnak(anak: Anak) {
         }
         if (anak.dormant) {
             Spacer(Modifier.height(8.dp))
-            BadgePill(teks = "Dormant", bg = Color(0xFFF1F5F9), fg = MutedFg)
+            BadgePill(teks = "Dormant", bg = Muted, fg = MutedFg)
         }
     }
 }
