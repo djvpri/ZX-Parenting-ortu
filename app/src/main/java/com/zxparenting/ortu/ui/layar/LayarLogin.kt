@@ -146,5 +146,13 @@ fun LayarLogin(
         TextButton(onClick = onKeDaftar) {
             Text("Belum punya akun? Daftar", fontSize = 13.sp, color = Biru)
         }
+
+        Spacer(Modifier.height(12.dp))
+        Text(
+            "ZX Parenting v${com.zxparenting.ortu.BuildConfig.VERSI_NAMA} (${com.zxparenting.ortu.BuildConfig.VERSI_KODE})",
+            fontSize = 10.sp,
+            color = MutedFg,
+            textAlign = TextAlign.Center,
+        )
     }
 }

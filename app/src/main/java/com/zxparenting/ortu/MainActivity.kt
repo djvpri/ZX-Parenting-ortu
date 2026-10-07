@@ -226,7 +226,11 @@ class MainActivity : ComponentActivity() {
             val res2 = cm.getCredential(this, req2)
             return GoogleIdTokenCredential.createFrom(res2.credential.data).idToken
         } catch (e: Exception) {
-            errorMsg("Google: ${e.message ?: "gagal"}")
+            // Error code 16 = "account reauth failed" — SHA-1 signing key belum
+            // terdaftar di Google Cloud Android OAuth Client, atau google-services.json
+            // belum ada. Tampilkan error mentah agar user tahu penyebabnya.
+            val msg = e.message ?: e.toString()
+            errorMsg("Google gagal [$msg]. Pastikan app terinstall dari Play Store atau hubungi developer.")
             return null
         }
     }
