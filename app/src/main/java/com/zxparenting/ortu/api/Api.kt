@@ -210,6 +210,70 @@ data class PinjamRes(
     val hutang: Int,
 )
 
+// ===== Referral =====
+data class ReferralRes(
+    val kode: String,
+    val totalReferral: Int,
+    val totalBonusCoin: Int,
+    val riwayat: List<ReferralRiwayatItem>,
+)
+
+data class ReferralRiwayatItem(
+    val id: String,
+    val jumlah: Int,
+    val catatan: String? = null,
+    val createdAt: String,
+)
+
+// ===== Leaderboard =====
+data class LeaderboardRes(
+    val ranking: List<LeaderboardEntry>,
+    val periode: String,
+    val scope: String,
+)
+
+data class LeaderboardEntry(
+    val id: String,
+    val nama: String,
+    val kelas: String? = null,
+    val umur: Int,
+    val tokenMinggu: Int,
+    val isMine: Boolean,
+    val rank: Int,
+)
+
+// ===== Daily Challenges =====
+data class ChallengeItem(
+    val id: String,
+    val nama: String,
+    val deskripsi: String,
+    val target: Int,
+    val reward: Int,
+    val progress: Int,
+    val selesai: Boolean,
+    val diklaim: Boolean,
+)
+
+data class ChallengesRes(
+    val challenges: List<ChallengeItem>,
+    val tanggal: String,
+)
+
+data class ChallengeClaimRes(
+    val ok: Boolean,
+    val reward: Int,
+    val nama: String,
+)
+
+data class ReferralClaimReq(
+    val kode: String,
+)
+
+data class ChallengeClaimReq(
+    val anakId: String,
+    val challengeId: String,
+)
+
 // ===== Langganan =====
 data class LanggananRes(
     val tier: String? = null,   // FREE_TRIAL | PRO | ELITE | null
@@ -411,6 +475,36 @@ interface ApiZx {
         @Header("Authorization") bearer: String,
         @Query("anakId") anakId: String,
     ): Response<PinjamRes>
+
+    // Referral
+    @GET("referral")
+    suspend fun referralInfo(@Header("Authorization") bearer: String): Response<ReferralRes>
+
+    @POST("referral")
+    suspend fun referralClaim(
+        @Header("Authorization") bearer: String,
+        @Body body: ReferralClaimReq,
+    ): Response<ReferralRes>
+
+    // Leaderboard
+    @GET("leaderboard")
+    suspend fun leaderboard(
+        @Header("Authorization") bearer: String,
+        @Query("scope") scope: String = "global",
+    ): Response<LeaderboardRes>
+
+    // Daily Challenges
+    @GET("challenges")
+    suspend fun challenges(
+        @Header("Authorization") bearer: String,
+        @Query("anakId") anakId: String,
+    ): Response<ChallengesRes>
+
+    @POST("challenges")
+    suspend fun challengeClaim(
+        @Header("Authorization") bearer: String,
+        @Body body: ChallengeClaimReq,
+    ): Response<ChallengeClaimRes>
 
     // Forum
     @GET("forum")

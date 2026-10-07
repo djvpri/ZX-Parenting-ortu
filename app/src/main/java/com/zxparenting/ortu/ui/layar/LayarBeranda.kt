@@ -44,6 +44,9 @@ fun LayarBeranda(
     onKlikPesan: () -> Unit,
     onKlikInsights: () -> Unit,
     onKlikPinjam: () -> Unit,
+    onKlikReferral: () -> Unit,
+    onKlikLeaderboard: () -> Unit,
+    onKlikChallenges: () -> Unit,
     onKlikProfil: () -> Unit,
 ) {
     Column(
@@ -153,6 +156,17 @@ fun LayarBeranda(
             horizontalArrangement = Arrangement.spacedBy(10.dp),
         ) {
             TileMenu(Teks["pinjam_waktu"], Teks["hutang"], Amber, Icons.Default.Schedule, Modifier.weight(1f), onKlikPinjam)
+        }
+
+        // Row 6: Referral + Leaderboard + Challenges
+        Spacer(Modifier.height(10.dp))
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+        ) {
+            TileMenu(Teks["referral"], Teks["bonus_coin"], Ungu, Icons.Default.Share, Modifier.weight(1f), onKlikReferral)
+            TileMenu(Teks["leaderboard"], Teks["global"], Amber, Icons.Default.EmojiEvents, Modifier.weight(1f), onKlikLeaderboard)
+            TileMenu(Teks["daily_challenges"], Teks["klaim"], Hijau, Icons.Default.Star, Modifier.weight(1f), onKlikChallenges)
         }
 
         Spacer(Modifier.height(16.dp))

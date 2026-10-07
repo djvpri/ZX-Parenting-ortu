@@ -23,6 +23,12 @@ import com.zxparenting.ortu.api.PesanKirimReq
 import com.zxparenting.ortu.api.PesanRingkas
 import com.zxparenting.ortu.api.InsightsRes
 import com.zxparenting.ortu.api.PinjamRes
+import com.zxparenting.ortu.api.ReferralRes
+import com.zxparenting.ortu.api.LeaderboardRes
+import com.zxparenting.ortu.api.ChallengesRes
+import com.zxparenting.ortu.api.ChallengeClaimReq
+import com.zxparenting.ortu.api.ChallengeClaimRes
+import com.zxparenting.ortu.api.ReferralClaimReq
 import com.zxparenting.ortu.api.LoginReq
 import com.zxparenting.ortu.api.LoginRes
 import com.zxparenting.ortu.api.PesananProsesReq
@@ -59,6 +65,10 @@ data class UiState(
     val pesanThread: List<Pesan> = emptyList(),
     val insights: InsightsRes? = null,
     val pinjam: PinjamRes? = null,
+    val referral: ReferralRes? = null,
+    val leaderboard: LeaderboardRes? = null,
+    val challenges: ChallengesRes? = null,
+    val claimResult: String? = null,
 )
 
 class ZxVm(val simpanan: Simpanan) : ViewModel() {
@@ -578,6 +588,87 @@ class ZxVm(val simpanan: Simpanan) : ViewModel() {
                     state.value = state.value.copy(pinjam = res.body())
                 }
             } catch (_: Exception) {}
+        }
+    }
+
+    // ===== Referral =====
+
+    fun muatReferral(token: String?) {
+        if (token == null) return
+        viewModelScope.launch {
+            try {
+                val res = api.referralInfo("Bearer $token")
+                if (res.isSuccessful) {
+                    state.value = state.value.copy(referral = res.body())
+                }
+            } catch (_: Exception) {}
+        }
+    }
+
+    fun klaimReferral(token: String?, kode: String, onResult: (String) -> Unit) {
+        if (token == null) return
+        viewModelScope.launch {
+            try {
+                val res = api.referralClaim("Bearer $token", ReferralClaimReq(kode))
+                if (res.isSuccessful) {
+                    onResult("Berhasil! +${res.body()?.totalBonusCoin} Coin")
+                    muatReferral(token)
+                } else {
+                    onResult("Gagal: ${res.code()}")
+                }
+            } catch (e: Exception) {
+                onResult("Error: ${e.message}")
+            }
+        }
+    }
+
+    // ===== Leaderboard =====
+
+    fun muatLeaderboard(token: String?, scope: String = "global") {
+        if (token == null) return
+        viewModelScope.launch {
+            try {
+                val res = api.leaderboard("Bearer $token", scope)
+                if (res.isSuccessful) {
+                    state.value = state.value.copy(leaderboard = res.body())
+                }
+            } catch (_: Exception) {}
+        }
+    }
+
+    // ===== Daily Challenges =====
+
+    fun setClaimResult(msg: String) {
+        state.value = state.value.copy(claimResult = msg)
+    }
+
+    fun muatChallenges(token: String?, anakId: String) {
+        if (token == null) return
+        viewModelScope.launch {
+            try {
+                val res = api.challenges("Bearer $token", anakId)
+                if (res.isSuccessful) {
+                    state.value = state.value.copy(challenges = res.body())
+                }
+            } catch (_: Exception) {}
+        }
+    }
+
+    fun klaimChallenge(token: String?, anakId: String, challengeId: String, onResult: (String) -> Unit) {
+        if (token == null) return
+        viewModelScope.launch {
+            try {
+                val res = api.challengeClaim("Bearer $token", ChallengeClaimReq(anakId, challengeId))
+                if (res.isSuccessful) {
+                    val body = res.body()
+                    onResult("✓ ${body?.nama}: +${body?.reward} token")
+                    muatChallenges(token, anakId)
+                } else {
+                    onResult("Gagal klaim: ${res.code()}")
+                }
+            } catch (e: Exception) {
+                onResult("Error: ${e.message}")
+            }
         }
     }
 }

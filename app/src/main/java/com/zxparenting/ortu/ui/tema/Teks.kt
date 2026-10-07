@@ -87,6 +87,21 @@ object Teks {
         "hutang" to mapOf(Bahasa.ID to "Hutang Token", Bahasa.EN to "Token Debt"),
         "riwayat_pinjam" to mapOf(Bahasa.ID to "Riwayat", Bahasa.EN to "History"),
         "belum_riwayat" to mapOf(Bahasa.ID to "Belum ada riwayat pinjaman.", Bahasa.EN to "No loan history yet."),
+        // Referral
+        "referral" to mapOf(Bahasa.ID to "Referral", Bahasa.EN to "Referral"),
+        "kode_referral" to mapOf(Bahasa.ID to "Kode Referral Anda", Bahasa.EN to "Your Referral Code"),
+        "total_referral" to mapOf(Bahasa.ID to "Total Referral", Bahasa.EN to "Total Referrals"),
+        "bonus_coin" to mapOf(Bahasa.ID to "Bonus Coin", Bahasa.EN to "Bonus Coins"),
+        "klaim_referral" to mapOf(Bahasa.ID to "Klaim Kode Teman", Bahasa.EN to "Claim Friend's Code"),
+        "klaim" to mapOf(Bahasa.ID to "Klaim", Bahasa.EN to "Claim"),
+        "diklaim" to mapOf(Bahasa.ID to "Diklaim", Bahasa.EN to "Claimed"),
+        // Leaderboard
+        "leaderboard" to mapOf(Bahasa.ID to "Papan Peringkat", Bahasa.EN to "Leaderboard"),
+        "global" to mapOf(Bahasa.ID to "Global", Bahasa.EN to "Global"),
+        "kelas" to mapOf(Bahasa.ID to "Kelas", Bahasa.EN to "Class"),
+        "periode" to mapOf(Bahasa.ID to "Periode", Bahasa.EN to "Period"),
+        // Challenges
+        "daily_challenges" to mapOf(Bahasa.ID to "Misi Harian", Bahasa.EN to "Daily Challenges"),
     )
 
     operator fun get(key: String): String =

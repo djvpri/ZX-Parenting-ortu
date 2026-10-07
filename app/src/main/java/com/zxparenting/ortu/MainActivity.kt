@@ -59,6 +59,9 @@ import com.zxparenting.ortu.ui.layar.LayarLogin
 import com.zxparenting.ortu.ui.layar.LayarMarketplace
 import com.zxparenting.ortu.ui.layar.LayarPesan
 import com.zxparenting.ortu.ui.layar.LayarPinjam
+import com.zxparenting.ortu.ui.layar.LayarReferral
+import com.zxparenting.ortu.ui.layar.LayarLeaderboard
+import com.zxparenting.ortu.ui.layar.LayarChallenges
 import com.zxparenting.ortu.ui.layar.LayarInsights
 import com.zxparenting.ortu.ui.layar.LayarProfil
 import com.zxparenting.ortu.ui.layar.LayarQuest
@@ -219,6 +222,28 @@ class MainActivity : ComponentActivity() {
                                     loading = state.loading,
                                     onPilihAnak = { id -> vm.muatPinjam(state.token, id) },
                                 )
+                                11 -> LayarReferral(
+                                    referral = state.referral,
+                                    onKlaim = { kode -> vm.klaimReferral(state.token, kode) { msg -> /* display */ } },
+                                )
+                                12 -> LayarLeaderboard(
+                                    leaderboard = state.leaderboard,
+                                    scope = state.leaderboard?.scope ?: "global",
+                                    onScope = { s -> vm.muatLeaderboard(state.token, s) },
+                                )
+                                13 -> LayarChallenges(
+                                    anakList = state.anakList,
+                                    challenges = state.challenges,
+                                    loading = state.loading,
+                                    hasilMsg = state.claimResult,
+                                    onPilihAnak = { id -> vm.muatChallenges(state.token, id) },
+                                    onKlaim = { cid ->
+                                        val aid = state.anakList.firstOrNull()?.id
+                                        if (aid != null) vm.klaimChallenge(state.token, aid, cid) { msg ->
+                                            vm.setClaimResult(msg)
+                                        }
+                                    },
+                                )
                             }
                             return@Box
                         }
@@ -252,6 +277,9 @@ class MainActivity : ComponentActivity() {
                                 onKlikPesan = { subLayar = 8 },
                                 onKlikInsights = { subLayar = 9 },
                                 onKlikPinjam = { subLayar = 10 },
+                                onKlikReferral = { subLayar = 11 },
+                                onKlikLeaderboard = { subLayar = 12 },
+                                onKlikChallenges = { subLayar = 13 },
                                 onKlikProfil = { tab = 4 },
                             )
                             1 -> LayarAnak(
