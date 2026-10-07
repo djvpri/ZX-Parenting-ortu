@@ -29,6 +29,8 @@ android {
         targetSdk = 35
         versionCode = bacaAlamat("versiKode").toInt()
         versionName = bacaAlamat("versiNama")
+        buildConfigField("String", "VERSI_NAMA", "\"${bacaAlamat("versiNama")}\"")
+        buildConfigField("int", "VERSI_KODE", bacaAlamat("versiKode"))
     }
 
     signingConfigs {
@@ -55,7 +57,7 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
     kotlin { compilerOptions { jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17) } }
-    buildFeatures { compose = true }
+    buildFeatures { compose = true; buildConfig = true }
 }
 
 dependencies {

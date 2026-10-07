@@ -14,6 +14,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.zxparenting.ortu.BuildConfig
 import com.zxparenting.ortu.ui.tema.*
 
 @Composable
@@ -34,7 +35,7 @@ fun LayarProfil(nama: String?, onLogout: () -> Unit) {
             }
         }
         KartuClay(kecil = true) {
-            Text("ZX Parenting v2.0.0", fontSize = 11.sp, color = MutedFg)
+            Text("ZX Parenting v${BuildConfig.VERSI_NAMA} (${BuildConfig.VERSI_KODE})", fontSize = 11.sp, color = MutedFg)
         }
         Spacer(Modifier.weight(1f))
         Button(
