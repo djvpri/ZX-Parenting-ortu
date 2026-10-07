@@ -169,6 +169,18 @@ class ZxVm(val simpanan: Simpanan) : ViewModel() {
         }
     }
 
+    fun muatAktivitas(token: String?, anakId: String) {
+        if (token == null) return
+        viewModelScope.launch {
+            try {
+                val res = api.aktivitas("Bearer $token", anakId)
+                if (res.isSuccessful) {
+                    state.value = state.value.copy(aktivitas = res.body())
+                }
+            } catch (_: Exception) {}
+        }
+    }
+
     fun buatAnak(
         nama: String,
         username: String,

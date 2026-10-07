@@ -64,6 +64,8 @@ private fun KartuAturanDevice(
     var curfewSelesai by remember(dev.id) { mutableStateOf(dev.curfewSelesai ?: "") }
     var masterUnlock by remember(dev.id) { mutableStateOf(dev.masterUnlock ?: false) }
     var gps by remember(dev.id) { mutableStateOf(dev.gpsAktif ?: false) }
+    var appBlokir by remember(dev.id) { mutableStateOf(dev.appBlokir ?: emptyList()) }
+    var appBaru by remember(dev.id) { mutableStateOf("") }
     var tanyaHapus by remember { mutableStateOf(false) }
 
     KartuClay {
@@ -131,6 +133,41 @@ private fun KartuAturanDevice(
                     masterUnlock = it
                     onPatch(dev.id, DevicePatch(masterUnlock = it))
                 })
+            }
+
+            // App blocker
+            Text("App Diblokir", fontSize = 11.sp, color = MutedFg, fontWeight = FontWeight.Bold)
+            Text("Nama paket Android (mis. com.roblox)", fontSize = 9.sp, color = MutedFg)
+            appBlokir.forEach { pkg ->
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(pkg, fontSize = 11.sp, modifier = Modifier.weight(1f))
+                    TextButton(onClick = {
+                        appBlokir = appBlokir.filter { it != pkg }
+                        onPatch(dev.id, DevicePatch(appBlokir = appBlokir.filter { it != pkg }))
+                    }) { Text("Hapus", fontSize = 10.sp, color = Merah) }
+                }
+            }
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                OutlinedTextField(
+                    value = appBaru,
+                    onValueChange = { appBaru = it },
+                    modifier = Modifier.weight(1f),
+                    singleLine = true,
+                    shape = RoundedCornerShape(12.dp),
+                    placeholder = { Text("com.nama.app", fontSize = 11.sp) },
+                )
+                Spacer(Modifier.width(8.dp))
+                Button(
+                    onClick = {
+                        if (appBaru.isNotBlank() && !appBlokir.contains(appBaru.trim())) {
+                            val baru = appBaru.trim()
+                            appBlokir = appBlokir + baru
+                            onPatch(dev.id, DevicePatch(appBlokir = appBlokir))
+                            appBaru = ""
+                        }
+                    },
+                    shape = RoundedCornerShape(12.dp),
+                ) { Text("+") }
             }
 
             // Tombol simpan batas waktu

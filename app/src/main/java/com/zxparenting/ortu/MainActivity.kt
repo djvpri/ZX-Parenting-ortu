@@ -15,6 +15,8 @@ import androidx.compose.material.icons.filled.Assignment
 import androidx.compose.material.icons.filled.ChildCare
 import androidx.compose.material.icons.filled.Devices
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Analytics
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
@@ -50,6 +52,8 @@ import com.zxparenting.ortu.ui.layar.LayarAnak
 import com.zxparenting.ortu.ui.layar.LayarAturan
 import com.zxparenting.ortu.ui.layar.LayarBeranda
 import com.zxparenting.ortu.ui.layar.LayarDaftar
+import com.zxparenting.ortu.ui.layar.LayarLaporan
+import com.zxparenting.ortu.ui.layar.LayarLokasi
 import com.zxparenting.ortu.ui.layar.LayarLogin
 import com.zxparenting.ortu.ui.layar.LayarProfil
 import com.zxparenting.ortu.ui.layar.LayarTugas
@@ -169,7 +173,16 @@ class MainActivity : ComponentActivity() {
                                 onPatch = { id, patch -> vm.patchDevice(id, patch) },
                                 onDelete = { id -> vm.hapusDevice(id) },
                             )
-                            4 -> LayarProfil(
+                            4 -> LayarLokasi(
+                                devices = state.devices,
+                                onPatch = { id, patch -> vm.patchDevice(id, patch) },
+                            )
+                            5 -> LayarLaporan(
+                                anakList = state.anakList,
+                                aktivitas = state.aktivitas,
+                                onPilihAnak = { id -> vm.muatAktivitas(state.token, id) },
+                            )
+                            6 -> LayarProfil(
                                 nama = state.nama,
                                 onLogout = vm::logout,
                                 onHapusAkun = { vm.hapusAkun {} },
@@ -257,5 +270,7 @@ enum class BottomTab(val label: String, val ikon: ImageVector) {
     Anak("Anak", Icons.Default.ChildCare),
     Tugas("Tugas", Icons.Default.Assignment),
     Aturan("Aturan", Icons.Default.Devices),
+    Lokasi("Lokasi", Icons.Default.LocationOn),
+    Laporan("Laporan", Icons.Default.Analytics),
     Profil("Profil", Icons.Default.Person),
 }

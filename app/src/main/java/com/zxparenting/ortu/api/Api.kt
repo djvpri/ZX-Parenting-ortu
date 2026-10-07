@@ -93,13 +93,17 @@ data class DevicePatch(
     val masterUnlock: Boolean? = null,
     val gpsAktif: Boolean? = null,
     val geoAktif: Boolean? = null,
+    val geoLat: Double? = null,
+    val geoLng: Double? = null,
+    val geoRadius: Int? = null,
     val appBlokir: List<String>? = null,
 )
 
 // ===== Aktivitas =====
 data class AktivitasRes(
+    val anak: AnakRef,
     val logs: List<ActivityLog>,
-    val ringkasan: Map<String, Int>?,
+    val ringkasan7hari: List<RingkasTipe>,
 )
 data class ActivityLog(
     val id: String,
@@ -107,6 +111,7 @@ data class ActivityLog(
     val detail: String?,
     val createdAt: String,
 )
+data class RingkasTipe(val tipe: String, val jumlah: Int)
 
 // ===== API =====
 interface ApiZx {
