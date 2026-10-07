@@ -6,13 +6,20 @@ import com.zxparenting.ortu.api.AktivitasRes
 import com.zxparenting.ortu.api.Anak
 import com.zxparenting.ortu.api.AnakCreateReq
 import com.zxparenting.ortu.api.ApiZx
+import com.zxparenting.ortu.api.CoinRes
+import com.zxparenting.ortu.api.CoinTopupReq
 import com.zxparenting.ortu.api.Device
 import com.zxparenting.ortu.api.DevicePatch
 import com.zxparenting.ortu.api.DaftarReq
 import com.zxparenting.ortu.api.GoogleReq
+import com.zxparenting.ortu.api.HadiahCreateReq
+import com.zxparenting.ortu.api.HadiahMarketRes
 import com.zxparenting.ortu.api.Klien
 import com.zxparenting.ortu.api.LoginReq
 import com.zxparenting.ortu.api.LoginRes
+import com.zxparenting.ortu.api.PesananProsesReq
+import com.zxparenting.ortu.api.Quest
+import com.zxparenting.ortu.api.QuestCreateReq
 import com.zxparenting.ortu.api.Tugas
 import com.zxparenting.ortu.api.TugasCreateReq
 import com.zxparenting.ortu.api.TugasValidasiReq
@@ -32,6 +39,9 @@ data class UiState(
     val anakList: List<Anak> = emptyList(),
     val tugasList: List<Tugas> = emptyList(),
     val aktivitas: AktivitasRes? = null,
+    val market: HadiahMarketRes? = null,
+    val coin: CoinRes? = null,
+    val quests: List<Quest> = emptyList(),
 )
 
 class ZxVm(val simpanan: Simpanan) : ViewModel() {
@@ -123,13 +133,16 @@ class ZxVm(val simpanan: Simpanan) : ViewModel() {
         muatSemua(body.token)
     }
 
-    // Muat semua data awal: devices + anak + tugas.
+    // Muat semua data awal: devices + anak + tugas + market + coin + quest.
     fun muatSemua(token: String?) {
         if (token == null) return
         viewModelScope.launch {
             muatDevices(token)
             muatAnak(token)
             muatTugas(token)
+            muatMarket(token)
+            muatCoin(token)
+            muatQuest(token)
         }
     }
 
@@ -178,6 +191,114 @@ class ZxVm(val simpanan: Simpanan) : ViewModel() {
                     state.value = state.value.copy(aktivitas = res.body())
                 }
             } catch (_: Exception) {}
+        }
+    }
+
+    // ===== F3: Marketplace / Coin / Quest =====
+
+    fun muatMarket(token: String?) {
+        if (token == null) return
+        viewModelScope.launch {
+            try {
+                val res = api.hadiahList("Bearer $token")
+                if (res.isSuccessful) {
+                    state.value = state.value.copy(market = res.body())
+                }
+            } catch (_: Exception) {}
+        }
+    }
+
+    fun buatHadiah(judul: String, deskripsi: String?, hargaCoin: Int, stok: Int) {
+        val token = state.value.token ?: return
+        state.value = state.value.copy(loading = true, error = null)
+        viewModelScope.launch {
+            try {
+                val res = api.hadiahCreate("Bearer $token", HadiahCreateReq(judul, deskripsi, hargaCoin, stok))
+                state.value = state.value.copy(loading = false)
+                if (res.isSuccessful) muatMarket(token)
+                else state.value = state.value.copy(error = "Gagal buat hadiah (${res.code()})")
+            } catch (e: Exception) {
+                state.value = state.value.copy(loading = false, error = "Jaringan error: ${e.message}")
+            }
+        }
+    }
+
+    fun hapusHadiah(id: String) {
+        val token = state.value.token ?: return
+        viewModelScope.launch {
+            try {
+                api.hadiahDelete("Bearer $token", id)
+                muatMarket(token)
+            } catch (_: Exception) {}
+        }
+    }
+
+    fun prosesPesanan(pesananId: String, aksi: String) {
+        val token = state.value.token ?: return
+        viewModelScope.launch {
+            try {
+                val res = api.pesananProses("Bearer $token", PesananProsesReq(pesananId, aksi))
+                if (res.isSuccessful) {
+                    muatMarket(token)
+                    muatCoin(token) // saldo berubah kalau beli
+                } else if (res.code() == 400) {
+                    state.value = state.value.copy(error = "Saldo Coin tidak cukup")
+                }
+            } catch (_: Exception) {}
+        }
+    }
+
+    fun muatCoin(token: String?) {
+        if (token == null) return
+        viewModelScope.launch {
+            try {
+                val res = api.coinGet("Bearer $token")
+                if (res.isSuccessful) {
+                    state.value = state.value.copy(coin = res.body())
+                }
+            } catch (_: Exception) {}
+        }
+    }
+
+    fun topupCoin(jumlah: Int) {
+        val token = state.value.token ?: return
+        state.value = state.value.copy(loading = true, error = null)
+        viewModelScope.launch {
+            try {
+                val res = api.coinPost("Bearer $token", CoinTopupReq("topup", jumlah))
+                state.value = state.value.copy(loading = false)
+                if (res.isSuccessful) muatCoin(token)
+                else state.value = state.value.copy(error = "Gagal topup (${res.code()})")
+            } catch (e: Exception) {
+                state.value = state.value.copy(loading = false, error = "Jaringan error: ${e.message}")
+            }
+        }
+    }
+
+    fun muatQuest(token: String?) {
+        if (token == null) return
+        viewModelScope.launch {
+            try {
+                val res = api.questList("Bearer $token")
+                if (res.isSuccessful) {
+                    state.value = state.value.copy(quests = res.body() ?: emptyList())
+                }
+            } catch (_: Exception) {}
+        }
+    }
+
+    fun buatQuest(judul: String, deskripsi: String?, tokenReward: Int, deadline: String? = null) {
+        val token = state.value.token ?: return
+        state.value = state.value.copy(loading = true, error = null)
+        viewModelScope.launch {
+            try {
+                val res = api.questCreate("Bearer $token", QuestCreateReq(judul, deskripsi, tokenReward, deadline))
+                state.value = state.value.copy(loading = false)
+                if (res.isSuccessful) muatQuest(token)
+                else state.value = state.value.copy(error = "Gagal buat quest (${res.code()})")
+            } catch (e: Exception) {
+                state.value = state.value.copy(loading = false, error = "Jaringan error: ${e.message}")
+            }
         }
     }
 

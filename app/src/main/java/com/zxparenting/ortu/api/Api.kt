@@ -99,6 +99,60 @@ data class DevicePatch(
     val appBlokir: List<String>? = null,
 )
 
+// ===== Hadiah / Marketplace =====
+data class Hadiah(
+    val id: String,
+    val judul: String,
+    val deskripsi: String?,
+    val hargaCoin: Int,
+    val stok: Int,
+    val aktif: Boolean,
+)
+data class HadiahCreateReq(
+    val judul: String,
+    val deskripsi: String? = null,
+    val hargaCoin: Int,
+    val stok: Int = 1,
+)
+data class PesananHadiah(
+    val id: String,
+    val status: String,
+    val createdAt: String,
+    val anak: AnakRef,
+    val hadiah: HadiahRef,
+)
+data class HadiahRef(val judul: String, val hargaCoin: Int)
+data class HadiahMarketRes(val hadiah: List<Hadiah>, val pesanan: List<PesananHadiah>)
+data class PesananProsesReq(val id: String, val aksi: String) // "beli" | "tolak"
+
+// ===== Coin =====
+data class CoinRes(val saldo: Int, val ledger: List<CoinLedgerEntry>)
+data class CoinLedgerEntry(
+    val id: String,
+    val tipe: String,
+    val jumlah: Int,
+    val catatan: String?,
+    val createdAt: String,
+)
+data class CoinTopupReq(val aksi: String, val jumlah: Int)
+
+// ===== Family Quest =====
+data class Quest(
+    val id: String,
+    val judul: String,
+    val deskripsi: String?,
+    val tokenReward: Int,
+    val deadline: String?,
+    val anggota: List<QuestAnggota>,
+)
+data class QuestAnggota(val anakId: String, val selesai: Boolean, val anak: AnakRef?)
+data class QuestCreateReq(
+    val judul: String,
+    val deskripsi: String? = null,
+    val tokenReward: Int,
+    val deadline: String? = null,
+)
+
 // ===== Aktivitas =====
 data class AktivitasRes(
     val anak: AnakRef,
@@ -179,8 +233,59 @@ interface ApiZx {
         @Query("anakId") anakId: String,
         @Query("limit") limit: Int = 50,
     ): Response<AktivitasRes>
+
+    // Hadiah / Marketplace
+    @GET("hadiah")
+    suspend fun hadiahList(@Header("Authorization") bearer: String): Response<HadiahMarketRes>
+
+    @POST("hadiah")
+    suspend fun hadiahCreate(
+        @Header("Authorization") bearer: String,
+        @Body req: HadiahCreateReq,
+    ): Response<Hadiah>
+
+    @PATCH("hadiah")
+    suspend fun hadiahPatch(
+        @Header("Authorization") bearer: String,
+        @Body req: HadiahPatchReq,
+    ): Response<Hadiah>
+
+    @DELETE("hadiah")
+    suspend fun hadiahDelete(
+        @Header("Authorization") bearer: String,
+        @Query("id") id: String,
+    ): Response<TugasOkRes>
+
+    @POST("hadiah/pesanan")
+    suspend fun pesananProses(
+        @Header("Authorization") bearer: String,
+        @Body req: PesananProsesReq,
+    ): Response<PesananProsesRes>
+
+    // Coin
+    @GET("coin")
+    suspend fun coinGet(@Header("Authorization") bearer: String): Response<CoinRes>
+
+    @POST("coin")
+    suspend fun coinPost(
+        @Header("Authorization") bearer: String,
+        @Body req: CoinTopupReq,
+    ): Response<CoinSaldoRes>
+
+    // Quest
+    @GET("quests")
+    suspend fun questList(@Header("Authorization") bearer: String): Response<List<Quest>>
+
+    @POST("quests")
+    suspend fun questCreate(
+        @Header("Authorization") bearer: String,
+        @Body req: QuestCreateReq,
+    ): Response<Quest>
 }
 
 data class AnakCreateRes(val ok: Boolean, val anakId: String)
 data class TugasCreateRes(val ok: Boolean, val tugasId: String)
 data class TugasOkRes(val ok: Boolean)
+data class HadiahPatchReq(val id: String, val aktif: Boolean? = null, val stok: Int? = null, val hargaCoin: Int? = null)
+data class PesananProsesRes(val ok: Boolean, val status: String, val saldo: Int? = null)
+data class CoinSaldoRes(val saldo: Int)

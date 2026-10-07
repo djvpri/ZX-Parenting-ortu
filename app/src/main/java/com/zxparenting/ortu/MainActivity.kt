@@ -13,11 +13,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Assignment
 import androidx.compose.material.icons.filled.ChildCare
-import androidx.compose.material.icons.filled.Devices
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material.icons.filled.Analytics
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.ShoppingBag
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -51,11 +49,14 @@ import com.zxparenting.ortu.ui.ZxVmFactory
 import com.zxparenting.ortu.ui.layar.LayarAnak
 import com.zxparenting.ortu.ui.layar.LayarAturan
 import com.zxparenting.ortu.ui.layar.LayarBeranda
+import com.zxparenting.ortu.ui.layar.LayarCoin
 import com.zxparenting.ortu.ui.layar.LayarDaftar
 import com.zxparenting.ortu.ui.layar.LayarLaporan
 import com.zxparenting.ortu.ui.layar.LayarLokasi
 import com.zxparenting.ortu.ui.layar.LayarLogin
+import com.zxparenting.ortu.ui.layar.LayarMarketplace
 import com.zxparenting.ortu.ui.layar.LayarProfil
+import com.zxparenting.ortu.ui.layar.LayarQuest
 import com.zxparenting.ortu.ui.layar.LayarTugas
 import com.zxparenting.ortu.ui.tema.Bg
 import com.zxparenting.ortu.ui.tema.TemaZX
@@ -122,14 +123,18 @@ class MainActivity : ComponentActivity() {
                     return@TemaZX
                 }
 
+                // Navigasi: 5 bottom tab + sub-layar dari Beranda
                 var tab by remember { mutableIntStateOf(0) }
+                // subLayar: 0=none, 1=Aturan, 2=Lokasi, 3=Laporan, 4=Coin, 5=Quest
+                var subLayar by remember { mutableIntStateOf(0) }
+
                 Scaffold(
                     bottomBar = {
                         NavigationBar {
                             BottomTab.entries.forEachIndexed { i, t ->
                                 NavigationBarItem(
-                                    selected = tab == i,
-                                    onClick = { tab = i },
+                                    selected = tab == i && subLayar == 0,
+                                    onClick = { tab = i; subLayar = 0 },
                                     icon = { Icon(t.ikon, contentDescription = t.label) },
                                     label = { Text(t.label) },
                                 )
@@ -143,15 +148,52 @@ class MainActivity : ComponentActivity() {
                             .background(Bg)
                             .padding(pad),
                     ) {
+                        // Sub-layar override bottom tab
+                        if (tab == 0 && subLayar > 0) {
+                            when (subLayar) {
+                                1 -> LayarAturan(
+                                    devices = state.devices,
+                                    onPatch = { id, patch -> vm.patchDevice(id, patch) },
+                                    onDelete = { id -> vm.hapusDevice(id) },
+                                )
+                                2 -> LayarLokasi(
+                                    devices = state.devices,
+                                    onPatch = { id, patch -> vm.patchDevice(id, patch) },
+                                )
+                                3 -> LayarLaporan(
+                                    anakList = state.anakList,
+                                    aktivitas = state.aktivitas,
+                                    onPilihAnak = { id -> vm.muatAktivitas(state.token, id) },
+                                )
+                                4 -> LayarCoin(
+                                    coin = state.coin,
+                                    loading = state.loading,
+                                    onTopup = { j -> vm.topupCoin(j) },
+                                )
+                                5 -> LayarQuest(
+                                    quests = state.quests,
+                                    loading = state.loading,
+                                    onBuat = { j, d, r -> vm.buatQuest(j, d, r) },
+                                )
+                            }
+                            return@Box
+                        }
+
                         when (tab) {
                             0 -> LayarBeranda(
                                 nama = state.nama,
                                 devices = state.devices,
                                 anakList = state.anakList,
                                 tugasList = state.tugasList,
+                                coinSaldo = state.coin?.saldo ?: 0,
                                 onKlikAnak = { tab = 1 },
                                 onKlikTugas = { tab = 2 },
-                                onKlikAturan = { tab = 3 },
+                                onKlikAturan = { subLayar = 1 },
+                                onKlikLokasi = { subLayar = 2 },
+                                onKlikLaporan = { subLayar = 3 },
+                                onKlikMarket = { tab = 3 },
+                                onKlikCoin = { subLayar = 4 },
+                                onKlikQuest = { subLayar = 5 },
                                 onKlikProfil = { tab = 4 },
                             )
                             1 -> LayarAnak(
@@ -168,21 +210,15 @@ class MainActivity : ComponentActivity() {
                                 onBuat = { aId, j, d, r -> vm.buatTugas(aId, j, d, r, null) {} },
                                 onValidasi = { id, aksi -> vm.validasiTugas(id, aksi) },
                             )
-                            3 -> LayarAturan(
-                                devices = state.devices,
-                                onPatch = { id, patch -> vm.patchDevice(id, patch) },
-                                onDelete = { id -> vm.hapusDevice(id) },
+                            3 -> LayarMarketplace(
+                                market = state.market,
+                                coinSaldo = state.coin?.saldo ?: 0,
+                                loading = state.loading,
+                                onBuatHadiah = { j, d, h, s -> vm.buatHadiah(j, d, h, s) },
+                                onHapusHadiah = { id -> vm.hapusHadiah(id) },
+                                onProsesPesanan = { id, aksi -> vm.prosesPesanan(id, aksi) },
                             )
-                            4 -> LayarLokasi(
-                                devices = state.devices,
-                                onPatch = { id, patch -> vm.patchDevice(id, patch) },
-                            )
-                            5 -> LayarLaporan(
-                                anakList = state.anakList,
-                                aktivitas = state.aktivitas,
-                                onPilihAnak = { id -> vm.muatAktivitas(state.token, id) },
-                            )
-                            6 -> LayarProfil(
+                            4 -> LayarProfil(
                                 nama = state.nama,
                                 onLogout = vm::logout,
                                 onHapusAkun = { vm.hapusAkun {} },
@@ -269,8 +305,6 @@ enum class BottomTab(val label: String, val ikon: ImageVector) {
     Beranda("Beranda", Icons.Default.Home),
     Anak("Anak", Icons.Default.ChildCare),
     Tugas("Tugas", Icons.Default.Assignment),
-    Aturan("Aturan", Icons.Default.Devices),
-    Lokasi("Lokasi", Icons.Default.LocationOn),
-    Laporan("Laporan", Icons.Default.Analytics),
+    Market("Market", Icons.Default.ShoppingBag),
     Profil("Profil", Icons.Default.Person),
 }

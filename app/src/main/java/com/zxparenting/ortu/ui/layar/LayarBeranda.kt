@@ -29,9 +29,15 @@ fun LayarBeranda(
     devices: List<Device>,
     anakList: List<Anak>,
     tugasList: List<Tugas>,
+    coinSaldo: Int,
     onKlikAnak: () -> Unit,
     onKlikTugas: () -> Unit,
     onKlikAturan: () -> Unit,
+    onKlikLokasi: () -> Unit,
+    onKlikLaporan: () -> Unit,
+    onKlikMarket: () -> Unit,
+    onKlikCoin: () -> Unit,
+    onKlikQuest: () -> Unit,
     onKlikProfil: () -> Unit,
 ) {
     Column(
@@ -54,7 +60,7 @@ fun LayarBeranda(
                 Text("Halo, $nama", style = MaterialTheme.typography.titleLarge)
                 Text("ZX Parenting", fontSize = 12.sp, color = MutedFg)
             }
-            BadgePill(teks = "Aktif", bg = Color(0xFFDCFCE7), fg = Color(0xFF166534))
+            BadgePill(teks = "$coinSaldo ZX", bg = Color(0xFFDCFCE7), fg = Color(0xFF166534))
         }
 
         // Ringkasan anak
@@ -89,48 +95,71 @@ fun LayarBeranda(
             }
         }
 
-        // Grid menu 2x2
+        // Grid menu 3x3
         Spacer(Modifier.height(4.dp))
+        Text("Menu", fontSize = 11.sp, color = MutedFg, fontWeight = FontWeight.Bold)
+
+        // Row 1: Anak, Tugas, Market
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
         ) {
-            TileMenu(
-                judul = "Anak",
-                sub = "${anakList.size} profil",
-                warnaBg = Color(0xFFEFF6FF),
-                ikon = { IkonTinted(Icons.Default.ChildCare, Biru) },
-                modifier = Modifier.weight(1f).clip(RoundedCornerShape(18.dp)),
-            )
-            TileMenu(
-                judul = "Tugas",
-                sub = "${tugasList.size} tugas",
-                warnaBg = Color(0xFFECFDF5),
-                ikon = { IkonTinted(Icons.Default.Assignment, Hijau) },
-                modifier = Modifier.weight(1f).clip(RoundedCornerShape(18.dp)),
-            )
+            TileMenu("Anak", "${anakList.size} profil", Biru, Icons.Default.ChildCare, Modifier.weight(1f), onKlikAnak)
+            TileMenu("Tugas", "${tugasList.size} tugas", Hijau, Icons.Default.Assignment, Modifier.weight(1f), onKlikTugas)
+            TileMenu("Market", "Hadiah", Pink, Icons.Default.ShoppingBag, Modifier.weight(1f), onKlikMarket)
         }
+
+        // Row 2: Aturan, Lokasi, Laporan
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
         ) {
-            TileMenu(
-                judul = "Aturan",
-                sub = "${devices.size} perangkat",
-                warnaBg = Color(0xFFFCE7F3),
-                ikon = { IkonTinted(Icons.Default.Tune, Pink) },
-                modifier = Modifier.weight(1f).clip(RoundedCornerShape(18.dp)),
-            )
-            TileMenu(
-                judul = "Profil",
-                sub = "Pengaturan",
-                warnaBg = Color(0xFFFEF3C7),
-                ikon = { IkonTinted(Icons.Default.Person, Amber) },
-                modifier = Modifier.weight(1f).clip(RoundedCornerShape(18.dp)),
-            )
+            TileMenu("Aturan", "${devices.size} perangkat", Ungu, Icons.Default.Tune, Modifier.weight(1f), onKlikAturan)
+            TileMenu("Lokasi", "GPS", Merah, Icons.Default.LocationOn, Modifier.weight(1f), onKlikLokasi)
+            TileMenu("Laporan", "Aktivitas", Amber, Icons.Default.Analytics, Modifier.weight(1f), onKlikLaporan)
+        }
+
+        // Row 3: Coin, Quest, Profil
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+        ) {
+            TileMenu("Coin", "$coinSaldo ZX", Hijau, Icons.Default.AccountBalanceWallet, Modifier.weight(1f), onKlikCoin)
+            TileMenu("Quest", "Keluarga", Ungu, Icons.Default.Flag, Modifier.weight(1f), onKlikQuest)
+            TileMenu("Profil", "Akun", Amber, Icons.Default.Person, Modifier.weight(1f), onKlikProfil)
         }
 
         Spacer(Modifier.height(16.dp))
+    }
+}
+
+@Composable
+private fun TileMenu(
+    judul: String,
+    sub: String,
+    warna: Color,
+    ikon: ImageVector,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit,
+) {
+    Card(
+        modifier = modifier
+            .height(90.dp)
+            .clip(RoundedCornerShape(16.dp)),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = warna.copy(alpha = 0.08f)),
+        onClick = onClick,
+    ) {
+        Column(
+            modifier = Modifier.padding(10.dp),
+            verticalArrangement = Arrangement.SpaceBetween,
+        ) {
+            Icon(ikon, contentDescription = null, tint = warna, modifier = Modifier.size(20.dp))
+            Column {
+                Text(judul, fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                Text(sub, fontSize = 9.sp, color = MutedFg)
+            }
+        }
     }
 }
 
@@ -183,9 +212,4 @@ private fun KartuTugasSingkat(tugas: Tugas) {
             BadgePill(teks = "${tugas.tokenReward}", bg = Color(0xFFDCFCE7), fg = Color(0xFF166534))
         }
     }
-}
-
-@Composable
-fun IkonTinted(ikon: ImageVector, warna: Color) {
-    Icon(ikon, contentDescription = null, tint = warna, modifier = Modifier.size(18.dp))
 }
