@@ -81,6 +81,12 @@ object Teks {
         "upgrade" to mapOf(Bahasa.ID to "Upgrade", Bahasa.EN to "Upgrade"),
         "paket" to mapOf(Bahasa.ID to "Paket", Bahasa.EN to "Plan"),
         "limit_anak" to mapOf(Bahasa.ID to "Limit Anak", Bahasa.EN to "Child Limit"),
+        // Pinjam Waktu
+        "sumber_ai" to mapOf(Bahasa.ID to "Sumber", Bahasa.EN to "Source"),
+        "pinjam_waktu" to mapOf(Bahasa.ID to "Pinjam Waktu", Bahasa.EN to "Borrow Time"),
+        "hutang" to mapOf(Bahasa.ID to "Hutang Token", Bahasa.EN to "Token Debt"),
+        "riwayat_pinjam" to mapOf(Bahasa.ID to "Riwayat", Bahasa.EN to "History"),
+        "belum_riwayat" to mapOf(Bahasa.ID to "Belum ada riwayat pinjaman.", Bahasa.EN to "No loan history yet."),
     )
 
     operator fun get(key: String): String =

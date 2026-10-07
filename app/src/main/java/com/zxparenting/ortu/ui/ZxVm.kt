@@ -22,6 +22,7 @@ import com.zxparenting.ortu.api.LanggananRes
 import com.zxparenting.ortu.api.PesanKirimReq
 import com.zxparenting.ortu.api.PesanRingkas
 import com.zxparenting.ortu.api.InsightsRes
+import com.zxparenting.ortu.api.PinjamRes
 import com.zxparenting.ortu.api.LoginReq
 import com.zxparenting.ortu.api.LoginRes
 import com.zxparenting.ortu.api.PesananProsesReq
@@ -57,6 +58,7 @@ data class UiState(
     val pesanList: List<PesanRingkas> = emptyList(),
     val pesanThread: List<Pesan> = emptyList(),
     val insights: InsightsRes? = null,
+    val pinjam: PinjamRes? = null,
 )
 
 class ZxVm(val simpanan: Simpanan) : ViewModel() {
@@ -560,6 +562,20 @@ class ZxVm(val simpanan: Simpanan) : ViewModel() {
                 val res = api.insights("Bearer $token", anakId)
                 if (res.isSuccessful) {
                     state.value = state.value.copy(insights = res.body())
+                }
+            } catch (_: Exception) {}
+        }
+    }
+
+    // ===== F9: Pinjam Waktu =====
+
+    fun muatPinjam(token: String?, anakId: String) {
+        if (token == null) return
+        viewModelScope.launch {
+            try {
+                val res = api.pinjamRiwayat("Bearer $token", anakId)
+                if (res.isSuccessful) {
+                    state.value = state.value.copy(pinjam = res.body())
                 }
             } catch (_: Exception) {}
         }

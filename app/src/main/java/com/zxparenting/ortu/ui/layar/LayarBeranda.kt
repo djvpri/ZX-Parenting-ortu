@@ -43,6 +43,7 @@ fun LayarBeranda(
     onKlikLangganan: () -> Unit,
     onKlikPesan: () -> Unit,
     onKlikInsights: () -> Unit,
+    onKlikPinjam: () -> Unit,
     onKlikProfil: () -> Unit,
 ) {
     Column(
@@ -143,6 +144,15 @@ fun LayarBeranda(
             TileMenu(Teks["langganan"], tierLabel, Amber, Icons.Default.Star, Modifier.weight(1f), onKlikLangganan)
             TileMenu(Teks["pesan"], Teks["chat"], Hijau, Icons.Default.Chat, Modifier.weight(1f), onKlikPesan)
             TileMenu(Teks["insights"], Teks["ai"], Ungu, Icons.Default.Insights, Modifier.weight(1f), onKlikInsights)
+        }
+
+        // Row 5: Pinjam Waktu
+        Spacer(Modifier.height(10.dp))
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+        ) {
+            TileMenu(Teks["pinjam_waktu"], Teks["hutang"], Amber, Icons.Default.Schedule, Modifier.weight(1f), onKlikPinjam)
         }
 
         Spacer(Modifier.height(16.dp))

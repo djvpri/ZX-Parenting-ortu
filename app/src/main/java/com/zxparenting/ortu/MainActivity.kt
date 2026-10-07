@@ -58,6 +58,7 @@ import com.zxparenting.ortu.ui.layar.LayarLokasi
 import com.zxparenting.ortu.ui.layar.LayarLogin
 import com.zxparenting.ortu.ui.layar.LayarMarketplace
 import com.zxparenting.ortu.ui.layar.LayarPesan
+import com.zxparenting.ortu.ui.layar.LayarPinjam
 import com.zxparenting.ortu.ui.layar.LayarInsights
 import com.zxparenting.ortu.ui.layar.LayarProfil
 import com.zxparenting.ortu.ui.layar.LayarQuest
@@ -212,6 +213,12 @@ class MainActivity : ComponentActivity() {
                                     loading = state.loading,
                                     onPilihAnak = { id -> vm.muatInsights(state.token, id) },
                                 )
+                                10 -> LayarPinjam(
+                                    anakList = state.anakList,
+                                    pinjam = state.pinjam,
+                                    loading = state.loading,
+                                    onPilihAnak = { id -> vm.muatPinjam(state.token, id) },
+                                )
                             }
                             return@Box
                         }
@@ -244,6 +251,7 @@ class MainActivity : ComponentActivity() {
                                 onKlikLangganan = { subLayar = 7 },
                                 onKlikPesan = { subLayar = 8 },
                                 onKlikInsights = { subLayar = 9 },
+                                onKlikPinjam = { subLayar = 10 },
                                 onKlikProfil = { tab = 4 },
                             )
                             1 -> LayarAnak(

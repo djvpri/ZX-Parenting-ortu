@@ -67,6 +67,17 @@ fun LayarInsights(
         }
 
         if (insights != null) {
+            // Sumber badge
+            if (insights.sumber != null) {
+                KartuClay(kecil = true) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(Teks["sumber_ai"], fontSize = 11.sp, color = MutedFg)
+                        Spacer(Modifier.width(8.dp))
+                        Text(if (insights.sumber == "gemini") "✨ Gemini AI" else "📊 Rule-based", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = if (insights.sumber == "gemini") Ungu else MutedFg)
+                    }
+                }
+            }
+
             // Ringkasan
             KartuClay(kecil = true) {
                 Column {

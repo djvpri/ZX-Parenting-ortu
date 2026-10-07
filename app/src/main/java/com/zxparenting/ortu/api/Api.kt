@@ -185,6 +185,7 @@ data class InsightsRes(
     val periode: String,
     val insights: List<Insight>,
     val ringkasan: InsightRingkasan,
+    val sumber: String? = null, // gemini | rule-based
 )
 
 data class InsightRingkasan(
@@ -193,6 +194,20 @@ data class InsightRingkasan(
     val tugasPending: Int,
     val tugasDitolak: Int,
     val saldoToken: Int,
+)
+
+// ===== Pinjam Waktu =====
+data class PinjamRiwayatItem(
+    val id: String,
+    val tipe: String,
+    val jumlah: Int,
+    val catatan: String? = null,
+    val createdAt: String,
+)
+
+data class PinjamRes(
+    val riwayat: List<PinjamRiwayatItem>,
+    val hutang: Int,
 )
 
 // ===== Langganan =====
@@ -389,6 +404,13 @@ interface ApiZx {
         @Header("Authorization") bearer: String,
         @Query("anakId") anakId: String,
     ): Response<InsightsRes>
+
+    // Pinjam Waktu
+    @GET("pinjam")
+    suspend fun pinjamRiwayat(
+        @Header("Authorization") bearer: String,
+        @Query("anakId") anakId: String,
+    ): Response<PinjamRes>
 
     // Forum
     @GET("forum")
