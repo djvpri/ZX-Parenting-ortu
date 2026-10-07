@@ -8,14 +8,14 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Assignment
+import androidx.compose.material.icons.filled.ChildCare
 import androidx.compose.material.icons.filled.Devices
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -46,12 +46,13 @@ import com.google.android.play.core.install.model.UpdateAvailability
 import com.zxparenting.ortu.data.Simpanan
 import com.zxparenting.ortu.ui.ZxVm
 import com.zxparenting.ortu.ui.ZxVmFactory
+import com.zxparenting.ortu.ui.layar.LayarAnak
+import com.zxparenting.ortu.ui.layar.LayarAturan
 import com.zxparenting.ortu.ui.layar.LayarBeranda
 import com.zxparenting.ortu.ui.layar.LayarDaftar
 import com.zxparenting.ortu.ui.layar.LayarLogin
-import com.zxparenting.ortu.ui.layar.LayarNotif
-import com.zxparenting.ortu.ui.layar.LayarPerangkat
 import com.zxparenting.ortu.ui.layar.LayarProfil
+import com.zxparenting.ortu.ui.layar.LayarTugas
 import com.zxparenting.ortu.ui.tema.Bg
 import com.zxparenting.ortu.ui.tema.TemaZX
 import kotlinx.coroutines.Dispatchers
@@ -73,7 +74,6 @@ class MainActivity : ComponentActivity() {
                 val state by vm.state.collectAsState()
                 val scope = rememberCoroutineScope()
 
-                // Dialog update tersedia
                 if (tanyaUpdate) {
                     AlertDialog(
                         onDismissRequest = { tanyaUpdate = false },
@@ -143,14 +143,37 @@ class MainActivity : ComponentActivity() {
                             0 -> LayarBeranda(
                                 nama = state.nama,
                                 devices = state.devices,
-                                onKlikPerangkat = { tab = 1 },
-                                onKlikNotif = { tab = 2 },
-                                onKlikLaporan = { tab = 3 },
-                                onKlikProfil = { tab = 3 },
+                                anakList = state.anakList,
+                                tugasList = state.tugasList,
+                                onKlikAnak = { tab = 1 },
+                                onKlikTugas = { tab = 2 },
+                                onKlikAturan = { tab = 3 },
+                                onKlikProfil = { tab = 4 },
                             )
-                            1 -> LayarPerangkat(state.devices)
-                            2 -> LayarNotif()
-                            3 -> LayarProfil(state.nama, vm::logout)
+                            1 -> LayarAnak(
+                                anakList = state.anakList,
+                                loading = state.loading,
+                                onBuat = { n, u, p, um, k, g, a ->
+                                    vm.buatAnak(n, u, p, um, k, g, a) {}
+                                },
+                            )
+                            2 -> LayarTugas(
+                                tugasList = state.tugasList,
+                                anakList = state.anakList,
+                                loading = state.loading,
+                                onBuat = { aId, j, d, r -> vm.buatTugas(aId, j, d, r, null) {} },
+                                onValidasi = { id, aksi -> vm.validasiTugas(id, aksi) },
+                            )
+                            3 -> LayarAturan(
+                                devices = state.devices,
+                                onPatch = { id, patch -> vm.patchDevice(id, patch) },
+                                onDelete = { id -> vm.hapusDevice(id) },
+                            )
+                            4 -> LayarProfil(
+                                nama = state.nama,
+                                onLogout = vm::logout,
+                                onHapusAkun = { vm.hapusAkun {} },
+                            )
                         }
                     }
                 }
@@ -158,9 +181,6 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    // In-App Update — cek Play Store saat app dibuka.
-    // Flexible: download di background, dialog tanya install ulang.
-    // Kalau Play Core tak tersedia (sideload), fallback buka halaman Play Store.
     private var tanyaUpdate by mutableStateOf(false)
 
     private fun cekUpdate() {
@@ -195,15 +215,9 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    // Credential Manager — dapatkan Google ID token untuk login native.
-    // Web Client ID = AUTH_GOOGLE_ID server (audience yang diverifikasi backend).
-    // Strategi: GetGoogleIdOption dulu; kalau "no credentials available"
-    // (akun Google tak ter-link ke Credential Manager), fallback ke
-    // GetSignInWithGoogleOption yang langsung tampilkan account picker.
     private suspend fun ambilGoogleIdToken(errorMsg: (String) -> Unit): String? {
         val cm = CredentialManager.create(this)
 
-        // 1. Credential Manager standar
         try {
             val googleIdOption = GetGoogleIdOption.Builder()
                 .setFilterByAuthorizedAccounts(false)
@@ -216,7 +230,6 @@ class MainActivity : ComponentActivity() {
             return GoogleIdTokenCredential.createFrom(res.credential.data).idToken
         } catch (_: Exception) { /* lanjut fallback */ }
 
-        // 2. Fallback: GetSignInWithGoogleOption (account picker eksplisit)
         try {
             val signInOption = GetSignInWithGoogleOption.Builder(GOOGLE_WEB_ID)
                 .build()
@@ -226,9 +239,6 @@ class MainActivity : ComponentActivity() {
             val res2 = cm.getCredential(this, req2)
             return GoogleIdTokenCredential.createFrom(res2.credential.data).idToken
         } catch (e: Exception) {
-            // Error code 16 = "account reauth failed" — SHA-1 signing key belum
-            // terdaftar di Google Cloud Android OAuth Client, atau google-services.json
-            // belum ada. Tampilkan error mentah agar user tahu penyebabnya.
             val msg = e.message ?: e.toString()
             errorMsg("Google gagal [$msg]. Pastikan app terinstall dari Play Store atau hubungi developer.")
             return null
@@ -236,7 +246,6 @@ class MainActivity : ComponentActivity() {
     }
 
     companion object {
-        // Web Client ID Google = AUTH_GOOGLE_ID di Coolify app 9.
         private const val GOOGLE_WEB_ID =
             "117197293834-5do5mam50v62vn5d4rc8mpj80rfm97gh.apps.googleusercontent.com"
         private const val KODE_UPDATE = 1001
@@ -245,7 +254,8 @@ class MainActivity : ComponentActivity() {
 
 enum class BottomTab(val label: String, val ikon: ImageVector) {
     Beranda("Beranda", Icons.Default.Home),
-    Perangkat("Perangkat", Icons.Default.Devices),
-    Notifikasi("Notifikasi", Icons.Default.Notifications),
+    Anak("Anak", Icons.Default.ChildCare),
+    Tugas("Tugas", Icons.Default.Assignment),
+    Aturan("Aturan", Icons.Default.Devices),
     Profil("Profil", Icons.Default.Person),
 }

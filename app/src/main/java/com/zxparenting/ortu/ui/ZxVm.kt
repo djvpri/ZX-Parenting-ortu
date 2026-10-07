@@ -3,13 +3,19 @@ package com.zxparenting.ortu.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.zxparenting.ortu.api.AktivitasRes
+import com.zxparenting.ortu.api.Anak
+import com.zxparenting.ortu.api.AnakCreateReq
 import com.zxparenting.ortu.api.ApiZx
 import com.zxparenting.ortu.api.Device
+import com.zxparenting.ortu.api.DevicePatch
 import com.zxparenting.ortu.api.DaftarReq
 import com.zxparenting.ortu.api.GoogleReq
 import com.zxparenting.ortu.api.Klien
 import com.zxparenting.ortu.api.LoginReq
 import com.zxparenting.ortu.api.LoginRes
+import com.zxparenting.ortu.api.Tugas
+import com.zxparenting.ortu.api.TugasCreateReq
+import com.zxparenting.ortu.api.TugasValidasiReq
 import com.zxparenting.ortu.data.Simpanan
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -21,7 +27,10 @@ data class UiState(
     val error: String? = null,
     val loginOk: Boolean = false,
     val nama: String? = null,
+    val token: String? = null,
     val devices: List<Device> = emptyList(),
+    val anakList: List<Anak> = emptyList(),
+    val tugasList: List<Tugas> = emptyList(),
     val aktivitas: AktivitasRes? = null,
 )
 
@@ -31,12 +40,11 @@ class ZxVm(val simpanan: Simpanan) : ViewModel() {
     val s: StateFlow<UiState> get() = state
 
     init {
-        // cek token tersimpan
         viewModelScope.launch {
             val t = simpanan.token.first()
             if (t != null) {
-                state.value = state.value.copy(loginOk = true, nama = simpanan.nama.first())
-                muatDevices(t)
+                state.value = state.value.copy(loginOk = true, nama = simpanan.nama.first(), token = t)
+                muatSemua(t)
             }
         }
     }
@@ -110,8 +118,19 @@ class ZxVm(val simpanan: Simpanan) : ViewModel() {
             loading = false,
             loginOk = true,
             nama = body.user.nama,
+            token = body.token,
         )
-        muatDevices(body.token)
+        muatSemua(body.token)
+    }
+
+    // Muat semua data awal: devices + anak + tugas.
+    fun muatSemua(token: String?) {
+        if (token == null) return
+        viewModelScope.launch {
+            muatDevices(token)
+            muatAnak(token)
+            muatTugas(token)
+        }
     }
 
     fun muatDevices(token: String?) {
@@ -122,6 +141,142 @@ class ZxVm(val simpanan: Simpanan) : ViewModel() {
                 if (res.isSuccessful) {
                     state.value = state.value.copy(devices = res.body() ?: emptyList())
                 }
+            } catch (_: Exception) {}
+        }
+    }
+
+    fun muatAnak(token: String?) {
+        if (token == null) return
+        viewModelScope.launch {
+            try {
+                val res = api.anakList("Bearer $token")
+                if (res.isSuccessful) {
+                    state.value = state.value.copy(anakList = res.body() ?: emptyList())
+                }
+            } catch (_: Exception) {}
+        }
+    }
+
+    fun muatTugas(token: String?) {
+        if (token == null) return
+        viewModelScope.launch {
+            try {
+                val res = api.tugasList("Bearer $token")
+                if (res.isSuccessful) {
+                    state.value = state.value.copy(tugasList = res.body() ?: emptyList())
+                }
+            } catch (_: Exception) {}
+        }
+    }
+
+    fun buatAnak(
+        nama: String,
+        username: String,
+        pin: String,
+        umur: Int,
+        kelas: String?,
+        gender: String?,
+        agama: String?,
+        onSelesai: () -> Unit,
+    ) {
+        val token = state.value.token ?: return
+        state.value = state.value.copy(loading = true, error = null)
+        viewModelScope.launch {
+            try {
+                val res = api.anakCreate(
+                    "Bearer $token",
+                    AnakCreateReq(nama, username, pin, umur, kelas, gender, agama),
+                )
+                state.value = state.value.copy(loading = false)
+                if (res.isSuccessful) {
+                    muatAnak(token)
+                    onSelesai()
+                } else {
+                    val msg = when (res.code()) {
+                        409 -> "Username sudah dipakai"
+                        402 -> "Kuota anak aktif penuh. Upgrade ke ZX Elite."
+                        400 -> "Data tidak valid"
+                        else -> "Gagal (${res.code()})"
+                    }
+                    state.value = state.value.copy(error = msg)
+                }
+            } catch (e: Exception) {
+                state.value = state.value.copy(loading = false, error = "Jaringan error: ${e.message}")
+            }
+        }
+    }
+
+    fun buatTugas(
+        anakId: String,
+        judul: String,
+        deskripsi: String?,
+        tokenReward: Int,
+        deadline: String?,
+        onSelesai: () -> Unit,
+    ) {
+        val token = state.value.token ?: return
+        state.value = state.value.copy(loading = true, error = null)
+        viewModelScope.launch {
+            try {
+                val res = api.tugasCreate(
+                    "Bearer $token",
+                    TugasCreateReq(anakId, judul, deskripsi, tokenReward, deadline),
+                )
+                state.value = state.value.copy(loading = false)
+                if (res.isSuccessful) {
+                    muatTugas(token)
+                    onSelesai()
+                } else {
+                    state.value = state.value.copy(error = "Gagal buat tugas (${res.code()})")
+                }
+            } catch (e: Exception) {
+                state.value = state.value.copy(loading = false, error = "Jaringan error: ${e.message}")
+            }
+        }
+    }
+
+    fun validasiTugas(tugasId: String, aksi: String) {
+        val token = state.value.token ?: return
+        viewModelScope.launch {
+            try {
+                val res = api.tugasValidasi("Bearer $token", tugasId, TugasValidasiReq(aksi))
+                if (res.isSuccessful) {
+                    muatTugas(token)
+                    muatAnak(token) // token balance berubah kalau "selesai"
+                }
+            } catch (_: Exception) {}
+        }
+    }
+
+    fun patchDevice(deviceId: String, patch: DevicePatch) {
+        val token = state.value.token ?: return
+        viewModelScope.launch {
+            try {
+                val res = api.devicePatch("Bearer $token", deviceId, patch)
+                if (res.isSuccessful) {
+                    muatDevices(token)
+                }
+            } catch (_: Exception) {}
+        }
+    }
+
+    fun hapusDevice(deviceId: String) {
+        val token = state.value.token ?: return
+        viewModelScope.launch {
+            try {
+                api.deviceDelete("Bearer $token", deviceId)
+                muatDevices(token)
+            } catch (_: Exception) {}
+        }
+    }
+
+    fun hapusAkun(onSelesai: () -> Unit) {
+        val token = state.value.token ?: return
+        viewModelScope.launch {
+            try {
+                api.akunHapus("Bearer $token")
+                logout()
+                onSelesai()
             } catch (_: Exception) {}
         }
     }
