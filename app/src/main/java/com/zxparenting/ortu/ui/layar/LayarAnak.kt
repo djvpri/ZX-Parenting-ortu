@@ -38,7 +38,7 @@ fun LayarAnak(
     onBuat: (nama: String, username: String, pin: String, tanggalLahir: String?, kelas: String?, gender: String?, agama: String?) -> Unit,
     onEdit: (id: String, nama: String, username: String?, tanggalLahir: String?, kelas: String?, gender: String?, agama: String?) -> Unit,
     onHapus: (id: String) -> Unit,
-    onResetPin: (id: String, pin: String, onSelesai: (sukses: Boolean) -> Unit) -> Unit,
+    onResetPin: (id: String, pin: String, onSelesai: (sukses: Boolean, pesan: String?) -> Unit) -> Unit,
 ) {
     var tampilForm by remember { mutableStateOf(false) }
     var editAnak by remember { mutableStateOf<Anak?>(null) }
@@ -224,7 +224,7 @@ private fun DialogEditAnak(
     error: String? = null,
     onBatal: () -> Unit,
     onSimpan: (nama: String, username: String?, tanggalLahir: String?, kelas: String?, gender: String?, agama: String?) -> Unit,
-    onResetPin: (pin: String, onSelesai: (sukses: Boolean) -> Unit) -> Unit,
+    onResetPin: (pin: String, onSelesai: (sukses: Boolean, pesan: String?) -> Unit) -> Unit,
 ) {
     var nama by remember { mutableStateOf(anak.nama) }
     var username by remember { mutableStateOf(anak.username ?: "") }
@@ -293,12 +293,12 @@ private fun DialogEditAnak(
                             if (pinBaru.length in 4..6) {
                                 simpanPinLoading = true
                                 pesanPin = null
-                                onResetPin(pinBaru) { sukses ->
+                                onResetPin(pinBaru) { sukses, pesan ->
                                     simpanPinLoading = false
+                                    pesanPin = pesan
                                     if (sukses) {
                                         pinBaru = ""
                                         tampilResetPin = false
-                                        pesanPin = "PIN berhasil disimpan"
                                     }
                                 }
                             }
@@ -313,10 +313,11 @@ private fun DialogEditAnak(
                         }
                     }
                     if (pesanPin != null) {
-                        Text(pesanPin!!, fontSize = 12.sp, color = MaterialTheme.colorScheme.primary)
-                    }
-                    if (error != null) {
-                        Text(error, fontSize = 12.sp, color = MaterialTheme.colorScheme.error)
+                        Text(
+                            pesanPin!!,
+                            fontSize = 12.sp,
+                            color = MaterialTheme.colorScheme.error,
+                        )
                     }
                 }
             }
