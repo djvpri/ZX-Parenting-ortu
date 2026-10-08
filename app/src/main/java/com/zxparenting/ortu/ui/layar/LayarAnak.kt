@@ -291,15 +291,21 @@ private fun FieldBiasa(
 }
 
 @Composable
+private fun fmtTgl(iso: String): String {
+    // Server kirim ISO 8601 (2019-04-19T00:00:00.000Z) → tampilkan yyyy-MM-dd
+    return if (iso.length >= 10) iso.substring(0, 10) else iso
+}
+
 private fun FieldTanggal(label: String, value: String, onubah: (String) -> Unit) {
     val context = LocalContext.current
     val cal = Calendar.getInstance()
+    val tampil = fmtTgl(value)
 
     Column {
         Text(label, fontSize = 10.sp, color = MutedFg, fontWeight = FontWeight.Bold)
         Spacer(Modifier.height(4.dp))
         OutlinedTextField(
-            value = value,
+            value = tampil,
             onValueChange = {},
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,
@@ -313,9 +319,9 @@ private fun FieldTanggal(label: String, value: String, onubah: (String) -> Unit)
         // Fallback: small clickable Text below field to open picker.
         TextButton(
             onClick = {
-                val tahun = if (value.isNotBlank()) value.substring(0, 4).toIntOrNull() ?: cal.get(Calendar.YEAR) else cal.get(Calendar.YEAR)
-                val bulan = if (value.length >= 7) (value.substring(5, 7).toIntOrNull() ?: 1) - 1 else cal.get(Calendar.MONTH)
-                val hari = if (value.length >= 10) value.substring(8, 10).toIntOrNull() ?: 1 else cal.get(Calendar.DAY_OF_MONTH)
+                val tahun = if (tampil.isNotBlank()) tampil.substring(0, 4).toIntOrNull() ?: cal.get(Calendar.YEAR) else cal.get(Calendar.YEAR)
+                val bulan = if (tampil.length >= 7) (tampil.substring(5, 7).toIntOrNull() ?: 1) - 1 else cal.get(Calendar.MONTH)
+                val hari = if (tampil.length >= 10) tampil.substring(8, 10).toIntOrNull() ?: 1 else cal.get(Calendar.DAY_OF_MONTH)
                 DatePickerDialog(
                     context,
                     { _, y, m, d ->
@@ -328,7 +334,7 @@ private fun FieldTanggal(label: String, value: String, onubah: (String) -> Unit)
             },
             modifier = Modifier.fillMaxWidth(),
         ) {
-            Text(if (value.isBlank()) "Pilih tanggal lahir" else value, fontSize = 12.sp)
+            Text(if (tampil.isBlank()) "Pilih tanggal lahir" else tampil, fontSize = 12.sp)
         }
     }
 }
