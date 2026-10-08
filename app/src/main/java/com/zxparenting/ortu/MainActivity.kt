@@ -288,11 +288,14 @@ class MainActivity : ComponentActivity() {
                                 onBuat = { n, u, p, tl, k, g, a ->
                                     vm.buatAnak(n, u, p, tl, k, g, a) {}
                                 },
-                                onEdit = { id, n, tl, k, g, a ->
-                                    vm.editAnak(id, n, tl, k, g, a) {}
+                                onEdit = { id, n, u, tl, k, g, a ->
+                                    vm.editAnak(id, n, u, tl, k, g, a) {}
                                 },
                                 onHapus = { id ->
                                     vm.hapusAnak(id) {}
+                                },
+                                onResetPin = { id, pin ->
+                                    vm.resetPinAnak(id, pin)
                                 },
                             )
                             2 -> LayarTugas(

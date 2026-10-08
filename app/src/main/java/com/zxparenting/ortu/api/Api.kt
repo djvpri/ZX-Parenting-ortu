@@ -25,6 +25,7 @@ data class Anak(
     val nama: String,
     val umur: Int?,
     val tanggalLahir: String? = null,
+    val username: String? = null,
     val kelas: String? = null,
     val gender: String? = null,
     val agama: String? = null,
@@ -58,6 +59,7 @@ data class AnakUserRes(val username: String)
 
 data class AnakUpdateReq(
     val nama: String? = null,
+    val username: String? = null,
     val tanggalLahir: String? = null,
     val kelas: String? = null,
     val gender: String? = null,
@@ -388,6 +390,13 @@ interface ApiZx {
         @Path("id") id: String,
     ): Response<AnakOkRes>
 
+    @PATCH("anak/{id}/pin")
+    suspend fun anakResetPin(
+        @Header("Authorization") bearer: String,
+        @Path("id") id: String,
+        @Body req: AnakResetPinReq,
+    ): Response<AnakOkRes>
+
     // Tugas
     @GET("tugas")
     suspend fun tugasList(@Header("Authorization") bearer: String): Response<List<Tugas>>
@@ -582,6 +591,7 @@ interface ApiZx {
 
 data class AnakCreateRes(val ok: Boolean, val anakId: String)
 data class AnakOkRes(val ok: Boolean)
+data class AnakResetPinReq(val pin: String)
 data class TugasCreateRes(val ok: Boolean, val tugasId: String)
 data class TugasOkRes(val ok: Boolean)
 data class HadiahPatchReq(val id: String, val aktif: Boolean? = null, val stok: Int? = null, val hargaCoin: Int? = null)

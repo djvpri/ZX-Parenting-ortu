@@ -13,6 +13,7 @@ import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.ChildCare
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -34,8 +35,9 @@ fun LayarAnak(
     anakList: List<Anak>,
     loading: Boolean,
     onBuat: (nama: String, username: String, pin: String, tanggalLahir: String?, kelas: String?, gender: String?, agama: String?) -> Unit,
-    onEdit: (id: String, nama: String, tanggalLahir: String?, kelas: String?, gender: String?, agama: String?) -> Unit,
+    onEdit: (id: String, nama: String, username: String?, tanggalLahir: String?, kelas: String?, gender: String?, agama: String?) -> Unit,
     onHapus: (id: String) -> Unit,
+    onResetPin: (id: String, pin: String) -> Unit,
 ) {
     var tampilForm by remember { mutableStateOf(false) }
     var editAnak by remember { mutableStateOf<Anak?>(null) }
@@ -90,9 +92,12 @@ fun LayarAnak(
             anak = anak,
             loading = loading,
             onBatal = { editAnak = null },
-            onSimpan = { nama, tl, k, g, a ->
-                onEdit(anak.id, nama, tl, k, g, a)
+            onSimpan = { nama, username, tl, k, g, a ->
+                onEdit(anak.id, nama, username, tl, k, g, a)
                 editAnak = null
+            },
+            onResetPin = { pin ->
+                onResetPin(anak.id, pin)
             },
         )
     }
@@ -215,13 +220,17 @@ private fun DialogEditAnak(
     anak: Anak,
     loading: Boolean,
     onBatal: () -> Unit,
-    onSimpan: (nama: String, tanggalLahir: String?, kelas: String?, gender: String?, agama: String?) -> Unit,
+    onSimpan: (nama: String, username: String?, tanggalLahir: String?, kelas: String?, gender: String?, agama: String?) -> Unit,
+    onResetPin: (pin: String) -> Unit,
 ) {
     var nama by remember { mutableStateOf(anak.nama) }
+    var username by remember { mutableStateOf(anak.username ?: "") }
     var tanggalLahir by remember { mutableStateOf(anak.tanggalLahir ?: "") }
     var kelas by remember { mutableStateOf(anak.kelas ?: "") }
     var gender by remember { mutableStateOf(anak.gender ?: "") }
     var agama by remember { mutableStateOf(anak.agama ?: "") }
+    var tampilResetPin by remember { mutableStateOf(false) }
+    var pinBaru by remember { mutableStateOf("") }
 
     AlertDialog(
         onDismissRequest = onBatal,
@@ -232,6 +241,14 @@ private fun DialogEditAnak(
                     value = nama,
                     onValueChange = { nama = it },
                     label = { Text("Nama") },
+                    singleLine = true,
+                    shape = RoundedCornerShape(12.dp),
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                OutlinedTextField(
+                    value = username,
+                    onValueChange = { username = it.lowercase().trim() },
+                    label = { Text("Username (login anak)") },
                     singleLine = true,
                     shape = RoundedCornerShape(12.dp),
                     modifier = Modifier.fillMaxWidth(),
@@ -247,6 +264,37 @@ private fun DialogEditAnak(
                 )
                 FieldDropdown("Gender", gender, GENDER_OPSI) { gender = it }
                 FieldBiasa("Agama", agama) { agama = it }
+                Spacer(Modifier.height(4.dp))
+                TextButton(
+                    onClick = { tampilResetPin = !tampilResetPin },
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Icon(Icons.Default.Lock, contentDescription = null, modifier = Modifier.size(16.dp))
+                    Spacer(Modifier.width(4.dp))
+                    Text("Reset PIN", fontSize = 12.sp)
+                }
+                if (tampilResetPin) {
+                    OutlinedTextField(
+                        value = pinBaru,
+                        onValueChange = { pinBaru = it.filter { c -> c.isDigit() }.take(6) },
+                        label = { Text("PIN baru (4-6 digit)") },
+                        singleLine = true,
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
+                        shape = RoundedCornerShape(12.dp),
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                    TextButton(
+                        onClick = {
+                            if (pinBaru.length in 4..6) {
+                                onResetPin(pinBaru)
+                                pinBaru = ""
+                                tampilResetPin = false
+                            }
+                        },
+                        enabled = pinBaru.length in 4..6,
+                        modifier = Modifier.fillMaxWidth(),
+                    ) { Text("Simpan PIN Baru") }
+                }
             }
         },
         confirmButton = {
@@ -254,6 +302,7 @@ private fun DialogEditAnak(
                 onClick = {
                     onSimpan(
                         nama.trim(),
+                        username.ifBlank { null },
                         tanggalLahir.ifBlank { null },
                         kelas.ifBlank { null },
                         gender.ifBlank { null },

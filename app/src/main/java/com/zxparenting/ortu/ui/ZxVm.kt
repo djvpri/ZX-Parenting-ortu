@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.zxparenting.ortu.api.AktivitasRes
 import com.zxparenting.ortu.api.Anak
 import com.zxparenting.ortu.api.AnakCreateReq
+import com.zxparenting.ortu.api.AnakResetPinReq
 import com.zxparenting.ortu.api.AnakUpdateReq
 import com.zxparenting.ortu.api.ApiZx
 import com.zxparenting.ortu.api.CoinRes
@@ -384,6 +385,7 @@ class ZxVm(val simpanan: Simpanan) : ViewModel() {
     fun editAnak(
         id: String,
         nama: String,
+        username: String?,
         tanggalLahir: String?,
         kelas: String?,
         gender: String?,
@@ -397,14 +399,40 @@ class ZxVm(val simpanan: Simpanan) : ViewModel() {
                 val res = api.anakUpdate(
                     "Bearer $token",
                     id,
-                    AnakUpdateReq(nama = nama, tanggalLahir = tanggalLahir, kelas = kelas, gender = gender, agama = agama),
+                    AnakUpdateReq(nama = nama, username = username, tanggalLahir = tanggalLahir, kelas = kelas, gender = gender, agama = agama),
                 )
                 state.value = state.value.copy(loading = false)
                 if (res.isSuccessful) {
                     muatAnak(token)
                     onSelesai()
                 } else {
-                    state.value = state.value.copy(error = "Gagal (${res.code()})")
+                    val msg = when (res.code()) {
+                        409 -> "Username sudah dipakai"
+                        400 -> "Data tidak valid"
+                        else -> "Gagal (${res.code()})"
+                    }
+                    state.value = state.value.copy(error = msg)
+                }
+            } catch (e: Exception) {
+                state.value = state.value.copy(loading = false, error = "Jaringan error: ${e.message}")
+            }
+        }
+    }
+
+    fun resetPinAnak(id: String, pin: String) {
+        val token = state.value.token ?: return
+        state.value = state.value.copy(loading = true, error = null)
+        viewModelScope.launch {
+            try {
+                val res = api.anakResetPin("Bearer $token", id, AnakResetPinReq(pin))
+                state.value = state.value.copy(loading = false)
+                if (!res.isSuccessful) {
+                    val msg = when (res.code()) {
+                        400 -> "PIN tidak valid (4-6 digit, hindari 1234/0000)"
+                        404 -> "Anak tidak ditemukan"
+                        else -> "Gagal (${res.code()})"
+                    }
+                    state.value = state.value.copy(error = msg)
                 }
             } catch (e: Exception) {
                 state.value = state.value.copy(loading = false, error = "Jaringan error: ${e.message}")
