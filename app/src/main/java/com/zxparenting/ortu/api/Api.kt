@@ -33,7 +33,28 @@ data class AnakCreateReq(
     val nama: String,
     val username: String,
     val pin: String,
-    val umur: Int,
+    val tanggalLahir: String? = null,
+    val kelas: String? = null,
+    val gender: String? = null,
+    val agama: String? = null,
+)
+
+data class AnakDetailRes(
+    val id: String,
+    val nama: String,
+    val tanggalLahir: String?,
+    val kelas: String?,
+    val gender: String?,
+    val agama: String?,
+    val dormant: Boolean,
+    val user: AnakUserRes,
+    val umur: Int?,
+)
+data class AnakUserRes(val username: String)
+
+data class AnakUpdateReq(
+    val nama: String? = null,
+    val tanggalLahir: String? = null,
     val kelas: String? = null,
     val gender: String? = null,
     val agama: String? = null,
@@ -344,6 +365,25 @@ interface ApiZx {
         @Body req: AnakCreateReq,
     ): Response<AnakCreateRes>
 
+    @GET("anak/{id}")
+    suspend fun anakDetail(
+        @Header("Authorization") bearer: String,
+        @Path("id") id: String,
+    ): Response<AnakDetailRes>
+
+    @PATCH("anak/{id}")
+    suspend fun anakUpdate(
+        @Header("Authorization") bearer: String,
+        @Path("id") id: String,
+        @Body req: AnakUpdateReq,
+    ): Response<AnakOkRes>
+
+    @DELETE("anak/{id}")
+    suspend fun anakHapus(
+        @Header("Authorization") bearer: String,
+        @Path("id") id: String,
+    ): Response<AnakOkRes>
+
     // Tugas
     @GET("tugas")
     suspend fun tugasList(@Header("Authorization") bearer: String): Response<List<Tugas>>
@@ -537,6 +577,7 @@ interface ApiZx {
 }
 
 data class AnakCreateRes(val ok: Boolean, val anakId: String)
+data class AnakOkRes(val ok: Boolean)
 data class TugasCreateRes(val ok: Boolean, val tugasId: String)
 data class TugasOkRes(val ok: Boolean)
 data class HadiahPatchReq(val id: String, val aktif: Boolean? = null, val stok: Int? = null, val hargaCoin: Int? = null)

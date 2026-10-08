@@ -9,6 +9,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ChildCare
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -25,9 +27,13 @@ import com.zxparenting.ortu.ui.tema.*
 fun LayarAnak(
     anakList: List<Anak>,
     loading: Boolean,
-    onBuat: (nama: String, username: String, pin: String, umur: Int, kelas: String?, gender: String?, agama: String?) -> Unit,
+    onBuat: (nama: String, username: String, pin: String, tanggalLahir: String?, kelas: String?, gender: String?, agama: String?) -> Unit,
+    onEdit: (id: String, nama: String, tanggalLahir: String?, kelas: String?, gender: String?, agama: String?) -> Unit,
+    onHapus: (id: String) -> Unit,
 ) {
     var tampilForm by remember { mutableStateOf(false) }
+    var editAnak by remember { mutableStateOf<Anak?>(null) }
+    var hapusAnak by remember { mutableStateOf<Anak?>(null) }
 
     Column(
         modifier = Modifier
@@ -52,8 +58,8 @@ fun LayarAnak(
         }
 
         if (tampilForm) {
-            FormAnak(loading = loading, onBuat = { n, u, p, um, k, g, a ->
-                onBuat(n, u, p, um, k, g, a)
+            FormAnak(loading = loading, onBuat = { n, u, p, tl, k, g, a ->
+                onBuat(n, u, p, tl, k, g, a)
                 tampilForm = false
             })
         }
@@ -65,13 +71,53 @@ fun LayarAnak(
         }
 
         anakList.forEach { anak ->
-            KartuAnak(anak)
+            KartuAnak(
+                anak = anak,
+                onEdit = { editAnak = anak },
+                onHapus = { hapusAnak = anak },
+            )
         }
+    }
+
+    // Dialog edit
+    editAnak?.let { anak ->
+        DialogEditAnak(
+            anak = anak,
+            loading = loading,
+            onBatal = { editAnak = null },
+            onSimpan = { nama, tl, k, g, a ->
+                onEdit(anak.id, nama, tl, k, g, a)
+                editAnak = null
+            },
+        )
+    }
+
+    // Dialog hapus
+    hapusAnak?.let { anak ->
+        AlertDialog(
+            onDismissRequest = { hapusAnak = null },
+            title = { Text("Hapus Anak") },
+            text = {
+                Text("Yakin hapus \"${anak.nama}\"? Semua data (tugas, token, riwayat) akan dihapus permanen.")
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        onHapus(anak.id)
+                        hapusAnak = null
+                    },
+                    colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error),
+                ) { Text("Hapus") }
+            },
+            dismissButton = {
+                TextButton(onClick = { hapusAnak = null }) { Text("Batal") }
+            },
+        )
     }
 }
 
 @Composable
-private fun KartuAnak(anak: Anak) {
+private fun KartuAnak(anak: Anak, onEdit: () -> Unit, onHapus: () -> Unit) {
     KartuClay(kecil = true) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Box(
@@ -97,6 +143,13 @@ private fun KartuAnak(anak: Anak) {
                 )
                 Text("Token", fontSize = 9.sp, color = MutedFg)
             }
+            Spacer(Modifier.width(8.dp))
+            IconButton(onClick = onEdit, modifier = Modifier.size(32.dp)) {
+                Icon(Icons.Default.Edit, contentDescription = "Edit", modifier = Modifier.size(18.dp), tint = MutedFg)
+            }
+            IconButton(onClick = onHapus, modifier = Modifier.size(32.dp)) {
+                Icon(Icons.Default.Delete, contentDescription = "Hapus", modifier = Modifier.size(18.dp), tint = MaterialTheme.colorScheme.error)
+            }
         }
         if (anak.dormant) {
             Spacer(Modifier.height(8.dp))
@@ -108,12 +161,12 @@ private fun KartuAnak(anak: Anak) {
 @Composable
 private fun FormAnak(
     loading: Boolean,
-    onBuat: (nama: String, username: String, pin: String, umur: Int, kelas: String?, gender: String?, agama: String?) -> Unit,
+    onBuat: (nama: String, username: String, pin: String, tanggalLahir: String?, kelas: String?, gender: String?, agama: String?) -> Unit,
 ) {
     var nama by remember { mutableStateOf("") }
     var username by remember { mutableStateOf("") }
     var pin by remember { mutableStateOf("") }
-    var umur by remember { mutableStateOf("") }
+    var tanggalLahir by remember { mutableStateOf("") }
     var kelas by remember { mutableStateOf("") }
     var gender by remember { mutableStateOf("") }
     var agama by remember { mutableStateOf("") }
@@ -124,19 +177,22 @@ private fun FormAnak(
             FieldBiasa("Nama", nama) { nama = it }
             FieldBiasa("Username (3-20 huruf/angka)", username) { username = it }
             FieldBiasa("PIN (4-6 digit)", pin, KeyboardType.NumberPassword) { pin = it }
-            FieldBiasa("Umur (1-25)", umur, KeyboardType.Number) { umur = it }
+            FieldTanggal("Tanggal Lahir", tanggalLahir) { tanggalLahir = it }
             FieldBiasa("Kelas (opsional)", kelas) { kelas = it }
             FieldBiasa("Gender (opsional)", gender) { gender = it }
             FieldBiasa("Agama (opsional)", agama) { agama = it }
 
             Button(
                 onClick = {
-                    val um = umur.toIntOrNull()
-                    if (nama.isNotBlank() && username.isNotBlank() && pin.isNotBlank() && um != null) {
-                        onBuat(nama.trim(), username.trim(), pin.trim(), um, kelas.ifBlank { null }, gender.ifBlank { null }, agama.ifBlank { null })
+                    if (nama.isNotBlank() && username.isNotBlank() && pin.isNotBlank()) {
+                        onBuat(
+                            nama.trim(), username.trim(), pin.trim(),
+                            tanggalLahir.ifBlank { null },
+                            kelas.ifBlank { null }, gender.ifBlank { null }, agama.ifBlank { null },
+                        )
                     }
                 },
-                enabled = !loading && nama.isNotBlank() && username.isNotBlank() && pin.isNotBlank() && umur.isNotBlank(),
+                enabled = !loading && nama.isNotBlank() && username.isNotBlank() && pin.isNotBlank(),
                 modifier = Modifier.fillMaxWidth().height(46.dp),
                 shape = RoundedCornerShape(14.dp),
             ) {
@@ -148,6 +204,88 @@ private fun FormAnak(
             }
         }
     }
+}
+
+@Composable
+private fun DialogEditAnak(
+    anak: Anak,
+    loading: Boolean,
+    onBatal: () -> Unit,
+    onSimpan: (nama: String, tanggalLahir: String?, kelas: String?, gender: String?, agama: String?) -> Unit,
+) {
+    var nama by remember { mutableStateOf(anak.nama) }
+    var tanggalLahir by remember { mutableStateOf("") }
+    var kelas by remember { mutableStateOf("") }
+    var gender by remember { mutableStateOf("") }
+    var agama by remember { mutableStateOf("") }
+
+    AlertDialog(
+        onDismissRequest = onBatal,
+        title = { Text("Edit Anak") },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                OutlinedTextField(
+                    value = nama,
+                    onValueChange = { nama = it },
+                    label = { Text("Nama") },
+                    singleLine = true,
+                    shape = RoundedCornerShape(12.dp),
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                Text("Tanggal Lahir", fontSize = 10.sp, color = MutedFg, fontWeight = FontWeight.Bold)
+                OutlinedTextField(
+                    value = tanggalLahir,
+                    onValueChange = { tanggalLahir = it },
+                    placeholder = { Text("YYYY-MM-DD") },
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    shape = RoundedCornerShape(12.dp),
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                OutlinedTextField(
+                    value = kelas,
+                    onValueChange = { kelas = it },
+                    label = { Text("Kelas") },
+                    singleLine = true,
+                    shape = RoundedCornerShape(12.dp),
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                OutlinedTextField(
+                    value = gender,
+                    onValueChange = { gender = it },
+                    label = { Text("Gender (L/P)") },
+                    singleLine = true,
+                    shape = RoundedCornerShape(12.dp),
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                OutlinedTextField(
+                    value = agama,
+                    onValueChange = { agama = it },
+                    label = { Text("Agama") },
+                    singleLine = true,
+                    shape = RoundedCornerShape(12.dp),
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            }
+        },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    onSimpan(
+                        nama.trim(),
+                        tanggalLahir.ifBlank { null },
+                        kelas.ifBlank { null },
+                        gender.ifBlank { null },
+                        agama.ifBlank { null },
+                    )
+                },
+                enabled = !loading && nama.isNotBlank(),
+            ) { Text("Simpan") }
+        },
+        dismissButton = {
+            TextButton(onClick = onBatal) { Text("Batal") }
+        },
+    )
 }
 
 @Composable
@@ -166,6 +304,23 @@ private fun FieldBiasa(
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,
             keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
+            shape = RoundedCornerShape(12.dp),
+        )
+    }
+}
+
+@Composable
+private fun FieldTanggal(label: String, value: String, onubah: (String) -> Unit) {
+    Column {
+        Text(label, fontSize = 10.sp, color = MutedFg, fontWeight = FontWeight.Bold)
+        Spacer(Modifier.height(4.dp))
+        OutlinedTextField(
+            value = value,
+            onValueChange = onubah,
+            modifier = Modifier.fillMaxWidth(),
+            singleLine = true,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            placeholder = { Text("YYYY-MM-DD") },
             shape = RoundedCornerShape(12.dp),
         )
     }

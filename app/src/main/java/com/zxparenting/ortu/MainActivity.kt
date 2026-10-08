@@ -285,8 +285,14 @@ class MainActivity : ComponentActivity() {
                             1 -> LayarAnak(
                                 anakList = state.anakList,
                                 loading = state.loading,
-                                onBuat = { n, u, p, um, k, g, a ->
-                                    vm.buatAnak(n, u, p, um, k, g, a) {}
+                                onBuat = { n, u, p, tl, k, g, a ->
+                                    vm.buatAnak(n, u, p, tl, k, g, a) {}
+                                },
+                                onEdit = { id, n, tl, k, g, a ->
+                                    vm.editAnak(id, n, tl, k, g, a) {}
+                                },
+                                onHapus = { id ->
+                                    vm.hapusAnak(id) {}
                                 },
                             )
                             2 -> LayarTugas(

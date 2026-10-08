@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.zxparenting.ortu.api.AktivitasRes
 import com.zxparenting.ortu.api.Anak
 import com.zxparenting.ortu.api.AnakCreateReq
+import com.zxparenting.ortu.api.AnakUpdateReq
 import com.zxparenting.ortu.api.ApiZx
 import com.zxparenting.ortu.api.CoinRes
 import com.zxparenting.ortu.api.CoinTopupReq
@@ -347,7 +348,7 @@ class ZxVm(val simpanan: Simpanan) : ViewModel() {
         nama: String,
         username: String,
         pin: String,
-        umur: Int,
+        tanggalLahir: String?,
         kelas: String?,
         gender: String?,
         agama: String?,
@@ -359,7 +360,7 @@ class ZxVm(val simpanan: Simpanan) : ViewModel() {
             try {
                 val res = api.anakCreate(
                     "Bearer $token",
-                    AnakCreateReq(nama, username, pin, umur, kelas, gender, agama),
+                    AnakCreateReq(nama, username, pin, tanggalLahir, kelas, gender, agama),
                 )
                 state.value = state.value.copy(loading = false)
                 if (res.isSuccessful) {
@@ -373,6 +374,56 @@ class ZxVm(val simpanan: Simpanan) : ViewModel() {
                         else -> "Gagal (${res.code()})"
                     }
                     state.value = state.value.copy(error = msg)
+                }
+            } catch (e: Exception) {
+                state.value = state.value.copy(loading = false, error = "Jaringan error: ${e.message}")
+            }
+        }
+    }
+
+    fun editAnak(
+        id: String,
+        nama: String,
+        tanggalLahir: String?,
+        kelas: String?,
+        gender: String?,
+        agama: String?,
+        onSelesai: () -> Unit,
+    ) {
+        val token = state.value.token ?: return
+        state.value = state.value.copy(loading = true, error = null)
+        viewModelScope.launch {
+            try {
+                val res = api.anakUpdate(
+                    "Bearer $token",
+                    id,
+                    AnakUpdateReq(nama = nama, tanggalLahir = tanggalLahir, kelas = kelas, gender = gender, agama = agama),
+                )
+                state.value = state.value.copy(loading = false)
+                if (res.isSuccessful) {
+                    muatAnak(token)
+                    onSelesai()
+                } else {
+                    state.value = state.value.copy(error = "Gagal (${res.code()})")
+                }
+            } catch (e: Exception) {
+                state.value = state.value.copy(loading = false, error = "Jaringan error: ${e.message}")
+            }
+        }
+    }
+
+    fun hapusAnak(id: String, onSelesai: () -> Unit) {
+        val token = state.value.token ?: return
+        state.value = state.value.copy(loading = true, error = null)
+        viewModelScope.launch {
+            try {
+                val res = api.anakHapus("Bearer $token", id)
+                state.value = state.value.copy(loading = false)
+                if (res.isSuccessful) {
+                    muatAnak(token)
+                    onSelesai()
+                } else {
+                    state.value = state.value.copy(error = "Gagal (${res.code()})")
                 }
             } catch (e: Exception) {
                 state.value = state.value.copy(loading = false, error = "Jaringan error: ${e.message}")
