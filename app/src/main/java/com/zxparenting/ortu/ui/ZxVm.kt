@@ -419,23 +419,27 @@ class ZxVm(val simpanan: Simpanan) : ViewModel() {
         }
     }
 
-    fun resetPinAnak(id: String, pin: String) {
+    fun resetPinAnak(id: String, pin: String, onSelesai: (sukses: Boolean) -> Unit) {
         val token = state.value.token ?: return
         state.value = state.value.copy(loading = true, error = null)
         viewModelScope.launch {
             try {
                 val res = api.anakResetPin("Bearer $token", id, AnakResetPinReq(pin))
                 state.value = state.value.copy(loading = false)
-                if (!res.isSuccessful) {
+                if (res.isSuccessful) {
+                    onSelesai(true)
+                } else {
                     val msg = when (res.code()) {
                         400 -> "PIN tidak valid (4-6 digit, hindari 1234/0000)"
                         404 -> "Anak tidak ditemukan"
                         else -> "Gagal (${res.code()})"
                     }
                     state.value = state.value.copy(error = msg)
+                    onSelesai(false)
                 }
             } catch (e: Exception) {
                 state.value = state.value.copy(loading = false, error = "Jaringan error: ${e.message}")
+                onSelesai(false)
             }
         }
     }

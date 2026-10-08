@@ -285,6 +285,7 @@ class MainActivity : ComponentActivity() {
                             1 -> LayarAnak(
                                 anakList = state.anakList,
                                 loading = state.loading,
+                                error = state.error,
                                 onBuat = { n, u, p, tl, k, g, a ->
                                     vm.buatAnak(n, u, p, tl, k, g, a) {}
                                 },
@@ -294,8 +295,8 @@ class MainActivity : ComponentActivity() {
                                 onHapus = { id ->
                                     vm.hapusAnak(id) {}
                                 },
-                                onResetPin = { id, pin ->
-                                    vm.resetPinAnak(id, pin)
+                                onResetPin = { id, pin, onSelesai ->
+                                    vm.resetPinAnak(id, pin, onSelesai)
                                 },
                             )
                             2 -> LayarTugas(

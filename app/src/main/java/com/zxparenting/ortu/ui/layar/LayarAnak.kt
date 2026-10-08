@@ -34,10 +34,11 @@ private val GENDER_OPSI = listOf("Laki-laki", "Perempuan")
 fun LayarAnak(
     anakList: List<Anak>,
     loading: Boolean,
+    error: String? = null,
     onBuat: (nama: String, username: String, pin: String, tanggalLahir: String?, kelas: String?, gender: String?, agama: String?) -> Unit,
     onEdit: (id: String, nama: String, username: String?, tanggalLahir: String?, kelas: String?, gender: String?, agama: String?) -> Unit,
     onHapus: (id: String) -> Unit,
-    onResetPin: (id: String, pin: String) -> Unit,
+    onResetPin: (id: String, pin: String, onSelesai: (sukses: Boolean) -> Unit) -> Unit,
 ) {
     var tampilForm by remember { mutableStateOf(false) }
     var editAnak by remember { mutableStateOf<Anak?>(null) }
@@ -91,13 +92,14 @@ fun LayarAnak(
         DialogEditAnak(
             anak = anak,
             loading = loading,
+            error = error,
             onBatal = { editAnak = null },
             onSimpan = { nama, username, tl, k, g, a ->
                 onEdit(anak.id, nama, username, tl, k, g, a)
                 editAnak = null
             },
-            onResetPin = { pin ->
-                onResetPin(anak.id, pin)
+            onResetPin = { pin, onSelesai ->
+                onResetPin(anak.id, pin, onSelesai)
             },
         )
     }
@@ -219,9 +221,10 @@ private fun FormAnak(
 private fun DialogEditAnak(
     anak: Anak,
     loading: Boolean,
+    error: String? = null,
     onBatal: () -> Unit,
     onSimpan: (nama: String, username: String?, tanggalLahir: String?, kelas: String?, gender: String?, agama: String?) -> Unit,
-    onResetPin: (pin: String) -> Unit,
+    onResetPin: (pin: String, onSelesai: (sukses: Boolean) -> Unit) -> Unit,
 ) {
     var nama by remember { mutableStateOf(anak.nama) }
     var username by remember { mutableStateOf(anak.username ?: "") }
@@ -231,6 +234,8 @@ private fun DialogEditAnak(
     var agama by remember { mutableStateOf(anak.agama ?: "") }
     var tampilResetPin by remember { mutableStateOf(false) }
     var pinBaru by remember { mutableStateOf("") }
+    var simpanPinLoading by remember { mutableStateOf(false) }
+    var pesanPin by remember { mutableStateOf<String?>(null) }
 
     AlertDialog(
         onDismissRequest = onBatal,
@@ -286,14 +291,33 @@ private fun DialogEditAnak(
                     TextButton(
                         onClick = {
                             if (pinBaru.length in 4..6) {
-                                onResetPin(pinBaru)
-                                pinBaru = ""
-                                tampilResetPin = false
+                                simpanPinLoading = true
+                                pesanPin = null
+                                onResetPin(pinBaru) { sukses ->
+                                    simpanPinLoading = false
+                                    if (sukses) {
+                                        pinBaru = ""
+                                        tampilResetPin = false
+                                        pesanPin = "PIN berhasil disimpan"
+                                    }
+                                }
                             }
                         },
-                        enabled = pinBaru.length in 4..6,
+                        enabled = !simpanPinLoading && pinBaru.length in 4..6,
                         modifier = Modifier.fillMaxWidth(),
-                    ) { Text("Simpan PIN Baru") }
+                    ) {
+                        if (simpanPinLoading) {
+                            CircularProgressIndicator(modifier = Modifier.size(16.dp), strokeWidth = 2.dp)
+                        } else {
+                            Text("Simpan PIN Baru")
+                        }
+                    }
+                    if (pesanPin != null) {
+                        Text(pesanPin!!, fontSize = 12.sp, color = MaterialTheme.colorScheme.primary)
+                    }
+                    if (error != null) {
+                        Text(error, fontSize = 12.sp, color = MaterialTheme.colorScheme.error)
+                    }
                 }
             }
         },
