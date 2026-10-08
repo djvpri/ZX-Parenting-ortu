@@ -232,10 +232,15 @@ private fun DialogEditAnak(
     var kelas by remember { mutableStateOf(anak.kelas ?: "") }
     var gender by remember { mutableStateOf(anak.gender ?: "") }
     var agama by remember { mutableStateOf(anak.agama ?: "") }
-    var tampilResetPin by remember { mutableStateOf(false) }
-    var pinBaru by remember { mutableStateOf("") }
-    var simpanPinLoading by remember { mutableStateOf(false) }
-    var pesanPin by remember { mutableStateOf<String?>(null) }
+    var tampilDialogPin by remember { mutableStateOf(false) }
+
+    if (tampilDialogPin) {
+        DialogResetPin(
+            namaAnak = anak.nama,
+            onBatal = { tampilDialogPin = false },
+            onResetPin = onResetPin,
+        )
+    }
 
     AlertDialog(
         onDismissRequest = onBatal,
@@ -271,54 +276,12 @@ private fun DialogEditAnak(
                 FieldBiasa("Agama", agama) { agama = it }
                 Spacer(Modifier.height(4.dp))
                 TextButton(
-                    onClick = { tampilResetPin = !tampilResetPin },
+                    onClick = { tampilDialogPin = true },
                     modifier = Modifier.fillMaxWidth(),
                 ) {
                     Icon(Icons.Default.Lock, contentDescription = null, modifier = Modifier.size(16.dp))
                     Spacer(Modifier.width(4.dp))
                     Text("Reset PIN", fontSize = 12.sp)
-                }
-                if (tampilResetPin) {
-                    OutlinedTextField(
-                        value = pinBaru,
-                        onValueChange = { pinBaru = it.filter { c -> c.isDigit() }.take(6) },
-                        label = { Text("PIN baru (4-6 digit)") },
-                        singleLine = true,
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
-                        shape = RoundedCornerShape(12.dp),
-                        modifier = Modifier.fillMaxWidth(),
-                    )
-                    TextButton(
-                        onClick = {
-                            if (pinBaru.length in 4..6) {
-                                simpanPinLoading = true
-                                pesanPin = null
-                                onResetPin(pinBaru) { sukses, pesan ->
-                                    simpanPinLoading = false
-                                    pesanPin = pesan
-                                    if (sukses) {
-                                        pinBaru = ""
-                                        tampilResetPin = false
-                                    }
-                                }
-                            }
-                        },
-                        enabled = !simpanPinLoading && pinBaru.length in 4..6,
-                        modifier = Modifier.fillMaxWidth(),
-                    ) {
-                        if (simpanPinLoading) {
-                            CircularProgressIndicator(modifier = Modifier.size(16.dp), strokeWidth = 2.dp)
-                        } else {
-                            Text("Simpan PIN Baru")
-                        }
-                    }
-                    if (pesanPin != null) {
-                        Text(
-                            pesanPin!!,
-                            fontSize = 12.sp,
-                            color = MaterialTheme.colorScheme.error,
-                        )
-                    }
                 }
             }
         },
@@ -339,6 +302,69 @@ private fun DialogEditAnak(
         },
         dismissButton = {
             TextButton(onClick = onBatal) { Text("Batal") }
+        },
+    )
+}
+
+@Composable
+private fun DialogResetPin(
+    namaAnak: String,
+    onBatal: () -> Unit,
+    onResetPin: (pin: String, onSelesai: (sukses: Boolean, pesan: String?) -> Unit) -> Unit,
+) {
+    var pinBaru by remember { mutableStateOf("") }
+    var simpanPinLoading by remember { mutableStateOf(false) }
+    var pesanPin by remember { mutableStateOf<String?>(null) }
+
+    AlertDialog(
+        onDismissRequest = { if (!simpanPinLoading) onBatal() },
+        title = { Text("Reset PIN — $namaAnak") },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                OutlinedTextField(
+                    value = pinBaru,
+                    onValueChange = { pinBaru = it.filter { c -> c.isDigit() }.take(6) },
+                    label = { Text("PIN baru (4-6 digit)") },
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
+                    shape = RoundedCornerShape(12.dp),
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                if (pesanPin != null) {
+                    Text(
+                        pesanPin!!,
+                        fontSize = 12.sp,
+                        color = MaterialTheme.colorScheme.error,
+                    )
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    if (pinBaru.length in 4..6) {
+                        simpanPinLoading = true
+                        pesanPin = null
+                        onResetPin(pinBaru) { sukses, pesan ->
+                            simpanPinLoading = false
+                            pesanPin = pesan
+                            if (sukses) {
+                                onBatal()
+                            }
+                        }
+                    }
+                },
+                enabled = !simpanPinLoading && pinBaru.length in 4..6,
+            ) {
+                if (simpanPinLoading) {
+                    CircularProgressIndicator(modifier = Modifier.size(16.dp), strokeWidth = 2.dp)
+                } else {
+                    Text("Simpan PIN Baru")
+                }
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onBatal, enabled = !simpanPinLoading) { Text("Batal") }
         },
     )
 }
