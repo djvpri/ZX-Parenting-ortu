@@ -290,12 +290,12 @@ private fun FieldBiasa(
     }
 }
 
-@Composable
 private fun fmtTgl(iso: String): String {
     // Server kirim ISO 8601 (2019-04-19T00:00:00.000Z) → tampilkan yyyy-MM-dd
     return if (iso.length >= 10) iso.substring(0, 10) else iso
 }
 
+@Composable
 private fun FieldTanggal(label: String, value: String, onubah: (String) -> Unit) {
     val context = LocalContext.current
     val cal = Calendar.getInstance()
