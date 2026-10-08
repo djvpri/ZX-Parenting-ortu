@@ -24,6 +24,10 @@ data class Anak(
     val id: String,
     val nama: String,
     val umur: Int?,
+    val tanggalLahir: String? = null,
+    val kelas: String? = null,
+    val gender: String? = null,
+    val agama: String? = null,
     @SerializedName("tokenBalance") val tokenBalance: TokenBalanceRes?,
     val dormant: Boolean = false,
 )

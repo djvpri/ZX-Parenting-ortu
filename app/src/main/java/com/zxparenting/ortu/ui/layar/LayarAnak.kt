@@ -1,5 +1,6 @@
 package com.zxparenting.ortu.ui.layar
 
+import android.app.DatePickerDialog
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -8,6 +9,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.ChildCare
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
@@ -16,12 +18,16 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.zxparenting.ortu.api.Anak
 import com.zxparenting.ortu.ui.tema.*
+import java.util.Calendar
+
+private val GENDER_OPSI = listOf("Laki-laki", "Perempuan")
 
 @Composable
 fun LayarAnak(
@@ -79,7 +85,6 @@ fun LayarAnak(
         }
     }
 
-    // Dialog edit
     editAnak?.let { anak ->
         DialogEditAnak(
             anak = anak,
@@ -92,7 +97,6 @@ fun LayarAnak(
         )
     }
 
-    // Dialog hapus
     hapusAnak?.let { anak ->
         AlertDialog(
             onDismissRequest = { hapusAnak = null },
@@ -179,7 +183,7 @@ private fun FormAnak(
             FieldBiasa("PIN (4-6 digit)", pin, KeyboardType.NumberPassword) { pin = it }
             FieldTanggal("Tanggal Lahir", tanggalLahir) { tanggalLahir = it }
             FieldBiasa("Kelas (opsional)", kelas) { kelas = it }
-            FieldBiasa("Gender (opsional)", gender) { gender = it }
+            FieldDropdown("Gender (opsional)", gender, GENDER_OPSI) { gender = it }
             FieldBiasa("Agama (opsional)", agama) { agama = it }
 
             Button(
@@ -214,10 +218,10 @@ private fun DialogEditAnak(
     onSimpan: (nama: String, tanggalLahir: String?, kelas: String?, gender: String?, agama: String?) -> Unit,
 ) {
     var nama by remember { mutableStateOf(anak.nama) }
-    var tanggalLahir by remember { mutableStateOf("") }
-    var kelas by remember { mutableStateOf("") }
-    var gender by remember { mutableStateOf("") }
-    var agama by remember { mutableStateOf("") }
+    var tanggalLahir by remember { mutableStateOf(anak.tanggalLahir ?: "") }
+    var kelas by remember { mutableStateOf(anak.kelas ?: "") }
+    var gender by remember { mutableStateOf(anak.gender ?: "") }
+    var agama by remember { mutableStateOf(anak.agama ?: "") }
 
     AlertDialog(
         onDismissRequest = onBatal,
@@ -232,16 +236,7 @@ private fun DialogEditAnak(
                     shape = RoundedCornerShape(12.dp),
                     modifier = Modifier.fillMaxWidth(),
                 )
-                Text("Tanggal Lahir", fontSize = 10.sp, color = MutedFg, fontWeight = FontWeight.Bold)
-                OutlinedTextField(
-                    value = tanggalLahir,
-                    onValueChange = { tanggalLahir = it },
-                    placeholder = { Text("YYYY-MM-DD") },
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    shape = RoundedCornerShape(12.dp),
-                    modifier = Modifier.fillMaxWidth(),
-                )
+                FieldTanggal("Tanggal Lahir", tanggalLahir) { tanggalLahir = it }
                 OutlinedTextField(
                     value = kelas,
                     onValueChange = { kelas = it },
@@ -250,22 +245,8 @@ private fun DialogEditAnak(
                     shape = RoundedCornerShape(12.dp),
                     modifier = Modifier.fillMaxWidth(),
                 )
-                OutlinedTextField(
-                    value = gender,
-                    onValueChange = { gender = it },
-                    label = { Text("Gender (L/P)") },
-                    singleLine = true,
-                    shape = RoundedCornerShape(12.dp),
-                    modifier = Modifier.fillMaxWidth(),
-                )
-                OutlinedTextField(
-                    value = agama,
-                    onValueChange = { agama = it },
-                    label = { Text("Agama") },
-                    singleLine = true,
-                    shape = RoundedCornerShape(12.dp),
-                    modifier = Modifier.fillMaxWidth(),
-                )
+                FieldDropdown("Gender", gender, GENDER_OPSI) { gender = it }
+                FieldBiasa("Agama", agama) { agama = it }
             }
         },
         confirmButton = {
@@ -311,17 +292,88 @@ private fun FieldBiasa(
 
 @Composable
 private fun FieldTanggal(label: String, value: String, onubah: (String) -> Unit) {
+    val context = LocalContext.current
+    val cal = Calendar.getInstance()
+
     Column {
         Text(label, fontSize = 10.sp, color = MutedFg, fontWeight = FontWeight.Bold)
         Spacer(Modifier.height(4.dp))
         OutlinedTextField(
             value = value,
-            onValueChange = onubah,
+            onValueChange = {},
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            placeholder = { Text("YYYY-MM-DD") },
+            readOnly = true,
+            enabled = false,
+            placeholder = { Text("Pilih tanggal") },
+            leadingIcon = { Icon(Icons.Default.CalendarMonth, contentDescription = null, modifier = Modifier.size(18.dp)) },
             shape = RoundedCornerShape(12.dp),
         )
+        // ponytail: OutlinedTextField readOnly+enabled=false is not clickable in all Compose versions.
+        // Fallback: small clickable Text below field to open picker.
+        TextButton(
+            onClick = {
+                val tahun = if (value.isNotBlank()) value.substring(0, 4).toIntOrNull() ?: cal.get(Calendar.YEAR) else cal.get(Calendar.YEAR)
+                val bulan = if (value.length >= 7) (value.substring(5, 7).toIntOrNull() ?: 1) - 1 else cal.get(Calendar.MONTH)
+                val hari = if (value.length >= 10) value.substring(8, 10).toIntOrNull() ?: 1 else cal.get(Calendar.DAY_OF_MONTH)
+                DatePickerDialog(
+                    context,
+                    { _, y, m, d ->
+                        val mm = (m + 1).toString().padStart(2, '0')
+                        val dd = d.toString().padStart(2, '0')
+                        onubah("$y-$mm-$dd")
+                    },
+                    tahun, bulan, hari,
+                ).show()
+            },
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            Text(if (value.isBlank()) "Pilih tanggal lahir" else value, fontSize = 12.sp)
+        }
+    }
+}
+
+@Composable
+private fun FieldDropdown(
+    label: String,
+    value: String,
+    opsi: List<String>,
+    onubah: (String) -> Unit,
+) {
+    var expanded by remember { mutableStateOf(false) }
+
+    Column {
+        Text(label, fontSize = 10.sp, color = MutedFg, fontWeight = FontWeight.Bold)
+        Spacer(Modifier.height(4.dp))
+        Box {
+            OutlinedTextField(
+                value = value,
+                onValueChange = {},
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true,
+                readOnly = true,
+                placeholder = { Text("Pilih") },
+                shape = RoundedCornerShape(12.dp),
+                trailingIcon = {
+                    TextButton(onClick = { expanded = true }) {
+                        Text("▼", fontSize = 10.sp)
+                    }
+                },
+            )
+            DropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false },
+            ) {
+                opsi.forEach { opsiItem ->
+                    DropdownMenuItem(
+                        text = { Text(opsiItem) },
+                        onClick = {
+                            onubah(opsiItem)
+                            expanded = false
+                        },
+                    )
+                }
+            }
+        }
     }
 }
