@@ -8,6 +8,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Inventory2
@@ -22,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.zxparenting.ortu.api.Anak
 import com.zxparenting.ortu.api.Tugas
+import com.zxparenting.ortu.api.TugasSaran
 import com.zxparenting.ortu.ui.tema.*
 
 @Composable
@@ -29,10 +31,15 @@ fun LayarTugas(
     tugasList: List<Tugas>,
     anakList: List<Anak>,
     loading: Boolean,
+    saranTugas: List<TugasSaran>,
+    generateLoading: Boolean,
     onBuat: (anakId: String, judul: String, deskripsi: String?, tokenReward: Int) -> Unit,
     onValidasi: (tugasId: String, aksi: String) -> Unit,
+    onGenerate: (anakId: String, kategori: String, jumlah: Int) -> Unit,
+    onBatch: (anakId: String, tugas: List<TugasSaran>) -> Unit,
 ) {
     var tampilForm by remember { mutableStateOf(false) }
+    var tampilGenerate by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -49,10 +56,15 @@ fun LayarTugas(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text("Tugas", style = MaterialTheme.typography.titleLarge)
-            TextButton(onClick = { tampilForm = !tampilForm }) {
-                Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(18.dp))
-                Spacer(Modifier.width(4.dp))
-                Text("Buat")
+            Row {
+                TextButton(onClick = { tampilGenerate = !tampilGenerate }) {
+                    Text("Generate")
+                }
+                TextButton(onClick = { tampilForm = !tampilForm }) {
+                    Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(18.dp))
+                    Spacer(Modifier.width(4.dp))
+                    Text("Buat")
+                }
             }
         }
 
@@ -61,6 +73,18 @@ fun LayarTugas(
                 onBuat(a, j, d, r)
                 tampilForm = false
             }
+        }
+        if (tampilGenerate && anakList.isNotEmpty()) {
+            PanelGenerate(
+                anakList = anakList,
+                saran = saranTugas,
+                loading = generateLoading,
+                onGenerate = onGenerate,
+                onBatch = { anakId, terpilih ->
+                    onBatch(anakId, terpilih)
+                    tampilGenerate = false
+                },
+            )
         }
         if (anakList.isEmpty()) {
             KartuClay { Text("Tambah anak dulu sebelum buat tugas.", fontSize = 12.sp, color = MutedFg) }
@@ -230,5 +254,127 @@ private fun FieldBiasa(
             keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
             shape = RoundedCornerShape(12.dp),
         )
+    }
+}
+
+private val KATEGORI_TUGAS = listOf("Belajar", "Rumah", "Olahraga", "Kreatif", "Akhlak", "Umum")
+
+@Composable
+private fun PanelGenerate(
+    anakList: List<Anak>,
+    saran: List<TugasSaran>,
+    loading: Boolean,
+    onGenerate: (anakId: String, kategori: String, jumlah: Int) -> Unit,
+    onBatch: (anakId: String, tugas: List<TugasSaran>) -> Unit,
+) {
+    var anakTerpilih by remember { mutableStateOf(0) }
+    var kategoriIdx by remember { mutableStateOf(0) }
+    var jumlah by remember { mutableStateOf("3") }
+    var dropdownAnak by remember { mutableStateOf(false) }
+    var dropdownKat by remember { mutableStateOf(false) }
+    val terpilih = remember(saran) { mutableStateMapOf<Int, Boolean>() }
+
+    KartuClay {
+        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Default.AutoAwesome, contentDescription = null, tint = Ungu, modifier = Modifier.size(18.dp))
+                Spacer(Modifier.width(6.dp))
+                Text("Generate Tugas AI", fontSize = 14.sp, fontWeight = FontWeight.Bold)
+            }
+
+            // Dropdown anak
+            Box {
+                OutlinedButton(
+                    onClick = { dropdownAnak = true },
+                    modifier = Modifier.fillMaxWidth().height(48.dp),
+                    shape = RoundedCornerShape(12.dp),
+                ) {
+                    Text(anakList[anakTerpilih].nama)
+                }
+                DropdownMenu(expanded = dropdownAnak, onDismissRequest = { dropdownAnak = false }) {
+                    anakList.forEachIndexed { i, a ->
+                        DropdownMenuItem(text = { Text(a.nama) }, onClick = { anakTerpilih = i; dropdownAnak = false })
+                    }
+                }
+            }
+
+            // Dropdown kategori
+            Box {
+                OutlinedButton(
+                    onClick = { dropdownKat = true },
+                    modifier = Modifier.fillMaxWidth().height(48.dp),
+                    shape = RoundedCornerShape(12.dp),
+                ) {
+                    Text(KATEGORI_TUGAS[kategoriIdx])
+                }
+                DropdownMenu(expanded = dropdownKat, onDismissRequest = { dropdownKat = false }) {
+                    KATEGORI_TUGAS.forEachIndexed { i, k ->
+                        DropdownMenuItem(text = { Text(k) }, onClick = { kategoriIdx = i; dropdownKat = false })
+                    }
+                }
+            }
+
+            FieldBiasa("Jumlah (1-10)", jumlah, KeyboardType.Number) { jumlah = it }
+
+            Button(
+                onClick = {
+                    val n = (jumlah.toIntOrNull() ?: 3).coerceIn(1, 10)
+                    onGenerate(anakList[anakTerpilih].id, KATEGORI_TUGAS[kategoriIdx], n)
+                },
+                enabled = !loading && anakList.isNotEmpty(),
+                modifier = Modifier.fillMaxWidth().height(46.dp),
+                shape = RoundedCornerShape(14.dp),
+            ) {
+                if (loading) {
+                    CircularProgressIndicator(modifier = Modifier.size(18.dp), strokeWidth = 2.dp)
+                } else {
+                    Text("Generate Saran")
+                }
+            }
+
+            // Preview saran
+            if (saran.isNotEmpty()) {
+                Spacer(Modifier.height(4.dp))
+                Text("Pilih tugas untuk dibuat:", fontSize = 11.sp, color = MutedFg, fontWeight = FontWeight.Bold)
+                saran.forEachIndexed { i, s ->
+                    KartuSaran(
+                        saran = s,
+                        dipilih = terpilih[i] ?: true,
+                        onToggle = { terpilih[i] = !(terpilih[i] ?: true) },
+                    )
+                }
+
+                val terpilihList = saran.filterIndexed { i, _ -> terpilih[i] ?: true }
+                Button(
+                    onClick = { onBatch(anakList[anakTerpilih].id, terpilihList) },
+                    enabled = terpilihList.isNotEmpty(),
+                    modifier = Modifier.fillMaxWidth().height(46.dp),
+                    shape = RoundedCornerShape(14.dp),
+                ) {
+                    Text("Buat ${terpilihList.size} Tugas Terpilih")
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun KartuSaran(
+    saran: TugasSaran,
+    dipilih: Boolean,
+    onToggle: () -> Unit,
+) {
+    KartuClay(kecil = true) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.Top,
+        ) {
+            Checkbox(checked = dipilih, onCheckedChange = { onToggle() })
+            Column(modifier = Modifier.weight(1f)) {
+                Text(saran.judul, fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                Text(saran.deskripsi, fontSize = 11.sp, color = MutedFg)
+                Text("+${saran.tokenReward} token", fontSize = 11.sp, color = Hijau, fontWeight = FontWeight.Bold)
+            }
+        }
     }
 }

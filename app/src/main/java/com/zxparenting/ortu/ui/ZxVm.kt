@@ -40,6 +40,9 @@ import com.zxparenting.ortu.api.Quest
 import com.zxparenting.ortu.api.QuestCreateReq
 import com.zxparenting.ortu.api.Tugas
 import com.zxparenting.ortu.api.TugasCreateReq
+import com.zxparenting.ortu.api.TugasGenerateReq
+import com.zxparenting.ortu.api.TugasSaran
+import com.zxparenting.ortu.api.TugasBatchReq
 import com.zxparenting.ortu.api.TugasValidasiReq
 import com.zxparenting.ortu.data.Simpanan
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -71,6 +74,8 @@ data class UiState(
     val leaderboard: LeaderboardRes? = null,
     val challenges: ChallengesRes? = null,
     val claimResult: String? = null,
+    val saranTugas: List<TugasSaran> = emptyList(),
+    val generateLoading: Boolean = false,
 )
 
 class ZxVm(val simpanan: Simpanan) : ViewModel() {
@@ -502,6 +507,44 @@ class ZxVm(val simpanan: Simpanan) : ViewModel() {
                     muatAnak(token) // token balance berubah kalau "selesai"
                 }
             } catch (_: Exception) {}
+        }
+    }
+
+    fun generateTugas(anakId: String, kategori: String, jumlah: Int) {
+        val token = state.value.token ?: return
+        state.value = state.value.copy(generateLoading = true, error = null, saranTugas = emptyList())
+        viewModelScope.launch {
+            try {
+                val res = api.tugasGenerate("Bearer $token", TugasGenerateReq(anakId, kategori, jumlah))
+                state.value = state.value.copy(generateLoading = false)
+                if (res.isSuccessful) {
+                    state.value = state.value.copy(saranTugas = res.body()?.saran ?: emptyList())
+                } else {
+                    state.value = state.value.copy(error = "Gagal generate (${res.code()})")
+                }
+            } catch (e: Exception) {
+                state.value = state.value.copy(generateLoading = false, error = "Jaringan error: ${e.message}")
+            }
+        }
+    }
+
+    fun batchTugas(anakId: String, tugas: List<TugasSaran>, onSelesai: () -> Unit) {
+        val token = state.value.token ?: return
+        state.value = state.value.copy(loading = true, error = null)
+        viewModelScope.launch {
+            try {
+                val res = api.tugasBatch("Bearer $token", TugasBatchReq(anakId, tugas))
+                state.value = state.value.copy(loading = false)
+                if (res.isSuccessful) {
+                    state.value = state.value.copy(saranTugas = emptyList())
+                    muatTugas(token)
+                    onSelesai()
+                } else {
+                    state.value = state.value.copy(error = "Gagal simpan (${res.code()})")
+                }
+            } catch (e: Exception) {
+                state.value = state.value.copy(loading = false, error = "Jaringan error: ${e.message}")
+            }
         }
     }
 

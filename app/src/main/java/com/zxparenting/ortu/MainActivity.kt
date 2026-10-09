@@ -303,8 +303,12 @@ class MainActivity : ComponentActivity() {
                                 tugasList = state.tugasList,
                                 anakList = state.anakList,
                                 loading = state.loading,
+                                saranTugas = state.saranTugas,
+                                generateLoading = state.generateLoading,
                                 onBuat = { aId, j, d, r -> vm.buatTugas(aId, j, d, r, null) {} },
                                 onValidasi = { id, aksi -> vm.validasiTugas(id, aksi) },
+                                onGenerate = { aId, kat, n -> vm.generateTugas(aId, kat, n) },
+                                onBatch = { aId, tugas -> vm.batchTugas(aId, tugas) {} },
                             )
                             3 -> LayarMarketplace(
                                 market = state.market,

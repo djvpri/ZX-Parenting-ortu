@@ -88,6 +88,13 @@ data class TugasCreateReq(
 )
 data class TugasValidasiReq(val aksi: String) // "selesai" | "tolak"
 
+// ===== Generate Tugas (AI) =====
+data class TugasGenerateReq(val anakId: String, val kategori: String = "Umum", val jumlah: Int = 3)
+data class TugasSaran(val judul: String, val deskripsi: String, val tokenReward: Int)
+data class TugasGenerateRes(val ok: Boolean, val saran: List<TugasSaran>)
+data class TugasBatchReq(val anakId: String, val tugas: List<TugasSaran>)
+data class TugasBatchRes(val ok: Boolean, val dibuat: Int)
+
 // ===== Device =====
 data class Device(
     val id: String,
@@ -406,6 +413,18 @@ interface ApiZx {
         @Header("Authorization") bearer: String,
         @Body req: TugasCreateReq,
     ): Response<TugasCreateRes>
+
+    @POST("tugas/generate")
+    suspend fun tugasGenerate(
+        @Header("Authorization") bearer: String,
+        @Body req: TugasGenerateReq,
+    ): Response<TugasGenerateRes>
+
+    @POST("tugas/batch")
+    suspend fun tugasBatch(
+        @Header("Authorization") bearer: String,
+        @Body req: TugasBatchReq,
+    ): Response<TugasBatchRes>
 
     @PATCH("tugas/{id}")
     suspend fun tugasValidasi(
