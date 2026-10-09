@@ -257,6 +257,8 @@ data class InsightRingkasan(
     val totalAktivitas: Int,
     val tugasSelesai: Int,
     val tugasPending: Int,
+    val tugasDitolak: Int,
+    val saldoToken: Int,
 )
 
 // ===== Laporan Ringkasan =====
