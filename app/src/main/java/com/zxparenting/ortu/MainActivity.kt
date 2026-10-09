@@ -317,6 +317,7 @@ class MainActivity : ComponentActivity() {
                                 loading = state.loading,
                                 onBuat = { aId, j, d, r -> vm.buatTugas(aId, j, d, r, null) {} },
                                 onValidasi = { id, aksi -> vm.validasiTugas(id, aksi) },
+                                onJadwalAi = { subLayar = 14 },
                             )
                             3 -> LayarMarketplace(
                                 market = state.market,

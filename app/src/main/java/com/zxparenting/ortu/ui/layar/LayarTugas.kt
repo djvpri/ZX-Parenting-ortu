@@ -8,6 +8,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Inventory2
@@ -31,6 +32,7 @@ fun LayarTugas(
     loading: Boolean,
     onBuat: (anakId: String, judul: String, deskripsi: String?, tokenReward: Int) -> Unit,
     onValidasi: (tugasId: String, aksi: String) -> Unit,
+    onJadwalAi: () -> Unit = {},
 ) {
     var tampilForm by remember { mutableStateOf(false) }
 
@@ -49,10 +51,17 @@ fun LayarTugas(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text("Tugas", style = MaterialTheme.typography.titleLarge)
-            TextButton(onClick = { tampilForm = !tampilForm }) {
-                Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(18.dp))
-                Spacer(Modifier.width(4.dp))
-                Text("Buat")
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                TextButton(onClick = onJadwalAi) {
+                    Icon(Icons.Default.AutoAwesome, contentDescription = null, modifier = Modifier.size(18.dp))
+                    Spacer(Modifier.width(4.dp))
+                    Text("Jadwal AI")
+                }
+                TextButton(onClick = { tampilForm = !tampilForm }) {
+                    Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(18.dp))
+                    Spacer(Modifier.width(4.dp))
+                    Text("Buat")
+                }
             }
         }
 
