@@ -257,9 +257,30 @@ data class InsightRingkasan(
     val totalAktivitas: Int,
     val tugasSelesai: Int,
     val tugasPending: Int,
-    val tugasDitolak: Int,
-    val saldoToken: Int,
 )
+
+// ===== Laporan Ringkasan =====
+data class LaporanRingkasanRes(
+    val anakNama: String,
+    val kartu: KartuStat,
+    val tugasTerbaru: List<TugasRingkas>,
+    val laporanKuis: List<KuisRingkas>,
+    val tokenStat: TokenStat,
+)
+data class KartuStat(
+    val tugasSelesai: Int,
+    val tugasTotal: Int,
+    val completionRate: Int,
+    val skorKuis: Int,
+    val trenSkor: Int? = null,
+    val streakCurrent: Int,
+    val streakTerbaik: Int,
+    val saldoToken: Int,
+    val trenToken: Int? = null,
+)
+data class TugasRingkas(val judul: String, val status: String)
+data class KuisRingkas(val tugasId: String, val rataSkor: Int, val coba: Int)
+data class TokenStat(val masuk: Int, val keluar: Int)
 
 // ===== Pinjam Waktu =====
 data class PinjamRiwayatItem(
@@ -577,6 +598,13 @@ interface ApiZx {
         @Header("Authorization") bearer: String,
         @Query("anakId") anakId: String,
     ): Response<InsightsRes>
+
+    // Laporan Ringkasan
+    @GET("laporan/ringkasan")
+    suspend fun laporanRingkasan(
+        @Header("Authorization") bearer: String,
+        @Query("anakId") anakId: String,
+    ): Response<LaporanRingkasanRes>
 
     // Pinjam Waktu
     @GET("pinjam")

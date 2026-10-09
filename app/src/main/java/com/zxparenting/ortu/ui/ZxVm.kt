@@ -24,6 +24,7 @@ import com.zxparenting.ortu.api.LanggananRes
 import com.zxparenting.ortu.api.PesanKirimReq
 import com.zxparenting.ortu.api.PesanRingkas
 import com.zxparenting.ortu.api.InsightsRes
+import com.zxparenting.ortu.api.LaporanRingkasanRes
 import com.zxparenting.ortu.api.PinjamRes
 import com.zxparenting.ortu.api.ReferralRes
 import com.zxparenting.ortu.api.LeaderboardRes
@@ -73,6 +74,7 @@ data class UiState(
     val pesanList: List<PesanRingkas> = emptyList(),
     val pesanThread: List<Pesan> = emptyList(),
     val insights: InsightsRes? = null,
+    val laporanRingkasan: LaporanRingkasanRes? = null,
     val pinjam: PinjamRes? = null,
     val referral: ReferralRes? = null,
     val leaderboard: LeaderboardRes? = null,
@@ -784,6 +786,20 @@ class ZxVm(val simpanan: Simpanan) : ViewModel() {
                 val res = api.insights("Bearer $token", anakId)
                 if (res.isSuccessful) {
                     state.value = state.value.copy(insights = res.body())
+                }
+            } catch (_: Exception) {}
+        }
+    }
+
+    // ===== Laporan Ringkasan =====
+
+    fun muatLaporan(token: String?, anakId: String) {
+        if (token == null) return
+        viewModelScope.launch {
+            try {
+                val res = api.laporanRingkasan("Bearer $token", anakId)
+                if (res.isSuccessful) {
+                    state.value = state.value.copy(laporanRingkasan = res.body())
                 }
             } catch (_: Exception) {}
         }

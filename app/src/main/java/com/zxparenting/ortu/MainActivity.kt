@@ -177,7 +177,13 @@ class MainActivity : ComponentActivity() {
                                 3 -> LayarLaporan(
                                     anakList = state.anakList,
                                     aktivitas = state.aktivitas,
-                                    onPilihAnak = { id -> vm.muatAktivitas(state.token, id) },
+                                    ringkasan = state.laporanRingkasan,
+                                    insights = state.insights,
+                                    onPilihAnak = { id ->
+                                        vm.muatAktivitas(state.token, id)
+                                        vm.muatLaporan(state.token, id)
+                                        vm.muatInsights(state.token, id)
+                                    },
                                 )
                                 4 -> LayarCoin(
                                     coin = state.coin,
