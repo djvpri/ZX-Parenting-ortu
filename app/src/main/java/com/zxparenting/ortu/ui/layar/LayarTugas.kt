@@ -12,6 +12,7 @@ import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Inventory2
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -33,6 +34,7 @@ fun LayarTugas(
     onBuat: (anakId: String, judul: String, deskripsi: String?, tokenReward: Int) -> Unit,
     onValidasi: (tugasId: String, aksi: String) -> Unit,
     onJadwalAi: () -> Unit = {},
+    onChallenges: () -> Unit = {},
 ) {
     var tampilForm by remember { mutableStateOf(false) }
 
@@ -52,6 +54,11 @@ fun LayarTugas(
         ) {
             Text("Tugas", style = MaterialTheme.typography.titleLarge)
             Row(verticalAlignment = Alignment.CenterVertically) {
+                TextButton(onClick = onChallenges) {
+                    Icon(Icons.Default.Star, contentDescription = null, modifier = Modifier.size(18.dp))
+                    Spacer(Modifier.width(4.dp))
+                    Text("Misi")
+                }
                 TextButton(onClick = onJadwalAi) {
                     Icon(Icons.Default.AutoAwesome, contentDescription = null, modifier = Modifier.size(18.dp))
                     Spacer(Modifier.width(4.dp))

@@ -290,8 +290,6 @@ class MainActivity : ComponentActivity() {
                                 onKlikPinjam = { subLayar = 10 },
                                 onKlikReferral = { subLayar = 11 },
                                 onKlikLeaderboard = { subLayar = 12 },
-                                onKlikChallenges = { subLayar = 13 },
-                                onKlikJadwalAi = { subLayar = 14 },
                                 onKlikProfil = { tab = 4 },
                             )
                             1 -> LayarAnak(
@@ -318,6 +316,7 @@ class MainActivity : ComponentActivity() {
                                 onBuat = { aId, j, d, r -> vm.buatTugas(aId, j, d, r, null) {} },
                                 onValidasi = { id, aksi -> vm.validasiTugas(id, aksi) },
                                 onJadwalAi = { subLayar = 14 },
+                                onChallenges = { subLayar = 13 },
                             )
                             3 -> LayarMarketplace(
                                 market = state.market,
