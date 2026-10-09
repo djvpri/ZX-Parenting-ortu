@@ -78,6 +78,9 @@ data class Tugas(
     val deadline: String?,
     val createdAt: String,
     val anak: AnakRef,
+    val type: String? = "manual",
+    val tokenDiklaim: Int? = 0,
+    val waktuExpire: String? = null,
 )
 data class TugasCreateReq(
     val anakId: String,
@@ -414,6 +417,12 @@ interface ApiZx {
         @Body req: TugasValidasiReq,
     ): Response<TugasOkRes>
 
+    @GET("tugas/{id}/review")
+    suspend fun tugasReview(
+        @Header("Authorization") bearer: String,
+        @Path("id") id: String,
+    ): Response<TugasReviewRes>
+
     // Device
     @GET("device-session")
     suspend fun deviceList(@Header("Authorization") bearer: String): Response<List<Device>>
@@ -663,3 +672,26 @@ data class TugasOkRes(val ok: Boolean)
 data class HadiahPatchReq(val id: String, val aktif: Boolean? = null, val stok: Int? = null, val hargaCoin: Int? = null)
 data class PesananProsesRes(val ok: Boolean, val status: String, val saldo: Int? = null)
 data class CoinSaldoRes(val saldo: Int)
+
+// ===== Tugas Review (ortu lihat hasil jawaban anak) =====
+data class TugasReviewRes(
+    val adaReview: Boolean,
+    val sessionId: String? = null,
+    val skor: Int? = null,
+    val benarCount: Int? = null,
+    val totalSoal: Int? = null,
+    val durasiDetik: Int? = null,
+    val totalAttempt: Int? = null,
+    val tugas: TugasReviewTugas? = null,
+    val review: List<ReviewItem>? = null,
+)
+data class TugasReviewTugas(val judul: String, val anak: String, val type: String)
+data class ReviewItem(
+    val posisi: Int,
+    val question: String,
+    val options: List<String>,
+    val jawabanAnak: Int?,
+    val jawabanBenar: Int,
+    val benar: Boolean,
+    val explanation: String,
+)

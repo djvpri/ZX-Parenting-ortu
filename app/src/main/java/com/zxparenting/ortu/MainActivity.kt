@@ -313,6 +313,7 @@ class MainActivity : ComponentActivity() {
                                 tugasList = state.tugasList,
                                 anakList = state.anakList,
                                 loading = state.loading,
+                                jwt = state.token,
                                 onBuat = { aId, j, d, r -> vm.buatTugas(aId, j, d, r, null) {} },
                                 onValidasi = { id, aksi -> vm.validasiTugas(id, aksi) },
                                 onJadwalAi = { subLayar = 14 },
