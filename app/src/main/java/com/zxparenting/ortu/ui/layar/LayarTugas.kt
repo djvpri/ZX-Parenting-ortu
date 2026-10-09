@@ -26,7 +26,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.zxparenting.ortu.api.Anak
 import com.zxparenting.ortu.api.Tugas
-import com.zxparenting.ortu.api.TugasSaran
+import com.zxparenting.ortu.api.SoalItem
+import com.zxparenting.ortu.api.GenerateMeta
 import com.zxparenting.ortu.ui.tema.*
 
 @Composable
@@ -34,13 +35,14 @@ fun LayarTugas(
     tugasList: List<Tugas>,
     anakList: List<Anak>,
     loading: Boolean,
-    saranTugas: List<TugasSaran>,
+    saranTugas: List<SoalItem>,
+    generateMeta: GenerateMeta?,
     generateLoading: Boolean,
     jwt: String?,
     onBuat: (anakId: String, judul: String, deskripsi: String?, tokenReward: Int) -> Unit,
     onValidasi: (tugasId: String, aksi: String) -> Unit,
-    onGenerate: (anakId: String, kategori: String, jumlah: Int) -> Unit,
-    onBatch: (anakId: String, tugas: List<TugasSaran>) -> Unit,
+    onGenerate: (anakId: String, tema: String, kesulitan: Int, tokenReward: Int, maxRetry: Int, timerMenit: Int?, autoApprove: Boolean, jenisSoal: String, jumlahSoal: Int) -> Unit,
+    onBatch: (meta: GenerateMeta, soal: List<SoalItem>) -> Unit,
     onJadwalAi: () -> Unit = {},
     onChallenges: () -> Unit = {},
 ) {
@@ -107,10 +109,11 @@ fun LayarTugas(
             PanelGenerate(
                 anakList = anakList,
                 saran = saranTugas,
+                meta = generateMeta,
                 loading = generateLoading,
                 onGenerate = onGenerate,
-                onBatch = { anakId, terpilih ->
-                    onBatch(anakId, terpilih)
+                onBatch = { m, soal ->
+                    onBatch(m, soal)
                     tampilGenerate = false
                 },
             )
@@ -330,21 +333,27 @@ private fun FieldBiasa(
     }
 }
 
-private val KATEGORI_TUGAS = listOf("Belajar", "Rumah", "Olahraga", "Kreatif", "Akhlak", "Umum")
-
 @Composable
 private fun PanelGenerate(
     anakList: List<Anak>,
-    saran: List<TugasSaran>,
+    saran: List<SoalItem>,
+    meta: GenerateMeta?,
     loading: Boolean,
-    onGenerate: (anakId: String, kategori: String, jumlah: Int) -> Unit,
-    onBatch: (anakId: String, tugas: List<TugasSaran>) -> Unit,
+    onGenerate: (anakId: String, tema: String, kesulitan: Int, tokenReward: Int, maxRetry: Int, timerMenit: Int?, autoApprove: Boolean, jenisSoal: String, jumlahSoal: Int) -> Unit,
+    onBatch: (meta: GenerateMeta, soal: List<SoalItem>) -> Unit,
 ) {
     var anakTerpilih by remember { mutableStateOf(0) }
-    var kategoriIdx by remember { mutableStateOf(0) }
-    var jumlah by remember { mutableStateOf("3") }
+    var tema by remember { mutableStateOf("") }
+    var kesulitan by remember { mutableStateOf(3) }
+    var tokenReward by remember { mutableStateOf("10") }
+    var maxRetry by remember { mutableStateOf("0") }
+    var timerMenit by remember { mutableStateOf("") }
+    var autoApprove by remember { mutableStateOf(false) }
+    var jenisSoal by remember { mutableStateOf("pg") } // pg | essay
+    var jumlahSoal by remember { mutableStateOf("5") }
     var dropdownAnak by remember { mutableStateOf(false) }
-    var dropdownKat by remember { mutableStateOf(false) }
+    var dropdownKesulitan by remember { mutableStateOf(false) }
+    var dropdownJenis by remember { mutableStateOf(false) }
     val terpilih = remember(saran) { mutableStateMapOf<Int, Boolean>() }
 
     KartuClay {
@@ -352,16 +361,12 @@ private fun PanelGenerate(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(Icons.Default.AutoAwesome, contentDescription = null, tint = Ungu, modifier = Modifier.size(18.dp))
                 Spacer(Modifier.width(6.dp))
-                Text("Generate Tugas AI", fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                Text("Generate Soal AI", fontSize = 14.sp, fontWeight = FontWeight.Bold)
             }
 
             // Dropdown anak
             Box {
-                OutlinedButton(
-                    onClick = { dropdownAnak = true },
-                    modifier = Modifier.fillMaxWidth().height(48.dp),
-                    shape = RoundedCornerShape(12.dp),
-                ) {
+                OutlinedButton(onClick = { dropdownAnak = true }, modifier = Modifier.fillMaxWidth().height(48.dp), shape = RoundedCornerShape(12.dp)) {
                     Text(anakList[anakTerpilih].nama)
                 }
                 DropdownMenu(expanded = dropdownAnak, onDismissRequest = { dropdownAnak = false }) {
@@ -371,47 +376,78 @@ private fun PanelGenerate(
                 }
             }
 
-            // Dropdown kategori
+            FieldBiasa("Tema / Mata Pelajaran", tema, KeyboardType.Text) { tema = it }
+
+            // Jenis soal dropdown
             Box {
-                OutlinedButton(
-                    onClick = { dropdownKat = true },
-                    modifier = Modifier.fillMaxWidth().height(48.dp),
-                    shape = RoundedCornerShape(12.dp),
-                ) {
-                    Text(KATEGORI_TUGAS[kategoriIdx])
+                OutlinedButton(onClick = { dropdownJenis = true }, modifier = Modifier.fillMaxWidth().height(48.dp), shape = RoundedCornerShape(12.dp)) {
+                    Text(if (jenisSoal == "pg") "Pilihan Ganda" else "Essay")
                 }
-                DropdownMenu(expanded = dropdownKat, onDismissRequest = { dropdownKat = false }) {
-                    KATEGORI_TUGAS.forEachIndexed { i, k ->
-                        DropdownMenuItem(text = { Text(k) }, onClick = { kategoriIdx = i; dropdownKat = false })
+                DropdownMenu(expanded = dropdownJenis, onDismissRequest = { dropdownJenis = false }) {
+                    DropdownMenuItem(text = { Text("Pilihan Ganda") }, onClick = { jenisSoal = "pg"; dropdownJenis = false })
+                    DropdownMenuItem(text = { Text("Essay") }, onClick = { jenisSoal = "essay"; dropdownJenis = false })
+                }
+            }
+
+            // Kesulitan dropdown (1-5)
+            Box {
+                OutlinedButton(onClick = { dropdownKesulitan = true }, modifier = Modifier.fillMaxWidth().height(48.dp), shape = RoundedCornerShape(12.dp)) {
+                    Text("Kesulitan: $kesulitan/5")
+                }
+                DropdownMenu(expanded = dropdownKesulitan, onDismissRequest = { dropdownKesulitan = false }) {
+                    (1..5).forEach { k ->
+                        DropdownMenuItem(text = { Text("$k/5") }, onClick = { kesulitan = k; dropdownKesulitan = false })
                     }
                 }
             }
 
-            FieldBiasa("Jumlah (1-10)", jumlah, KeyboardType.Number) { jumlah = it }
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                FieldBiasa("Jumlah Soal", jumlahSoal, KeyboardType.Number) { jumlahSoal = it }
+                FieldBiasa("Token Reward", tokenReward, KeyboardType.Number) { tokenReward = it }
+            }
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                FieldBiasa("Max Retry (0=∞)", maxRetry, KeyboardType.Number) { maxRetry = it }
+                FieldBiasa("Timer (menit)", timerMenit, KeyboardType.Number) { timerMenit = it }
+            }
+
+            // Auto approve toggle
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text("Auto Approve Token", fontSize = 12.sp)
+                Switch(checked = autoApprove, onCheckedChange = { autoApprove = it })
+            }
 
             Button(
                 onClick = {
-                    val n = (jumlah.toIntOrNull() ?: 3).coerceIn(1, 10)
-                    onGenerate(anakList[anakTerpilih].id, KATEGORI_TUGAS[kategoriIdx], n)
+                    val n = (jumlahSoal.toIntOrNull() ?: 5).coerceIn(1, 20)
+                    val t = tema.ifBlank { "Umum" }
+                    val tr = (tokenReward.toIntOrNull() ?: 10).coerceIn(1, 100)
+                    val mr = (maxRetry.toIntOrNull() ?: 0).coerceAtLeast(0)
+                    val tm = timerMenit.toIntOrNull()
+                    onGenerate(anakList[anakTerpilih].id, t, kesulitan, tr, mr, tm, autoApprove, jenisSoal, n)
                 },
-                enabled = !loading && anakList.isNotEmpty(),
+                enabled = !loading && anakList.isNotEmpty() && tema.isNotBlank(),
                 modifier = Modifier.fillMaxWidth().height(46.dp),
                 shape = RoundedCornerShape(14.dp),
             ) {
                 if (loading) {
                     CircularProgressIndicator(modifier = Modifier.size(18.dp), strokeWidth = 2.dp)
                 } else {
-                    Text("Generate Saran")
+                    Text("Generate Soal")
                 }
             }
 
-            // Preview saran
-            if (saran.isNotEmpty()) {
+            // Preview soal
+            if (saran.isNotEmpty() && meta != null) {
                 Spacer(Modifier.height(4.dp))
-                Text("Pilih tugas untuk dibuat:", fontSize = 11.sp, color = MutedFg, fontWeight = FontWeight.Bold)
+                Text("Pilih soal untuk dibuat:", fontSize = 11.sp, color = MutedFg, fontWeight = FontWeight.Bold)
                 saran.forEachIndexed { i, s ->
                     KartuSaran(
-                        saran = s,
+                        soal = s,
+                        jenisSoal = meta.jenisSoal,
                         dipilih = terpilih[i] ?: true,
                         onToggle = { terpilih[i] = !(terpilih[i] ?: true) },
                     )
@@ -419,12 +455,12 @@ private fun PanelGenerate(
 
                 val terpilihList = saran.filterIndexed { i, _ -> terpilih[i] ?: true }
                 Button(
-                    onClick = { onBatch(anakList[anakTerpilih].id, terpilihList) },
+                    onClick = { onBatch(meta, terpilihList) },
                     enabled = terpilihList.isNotEmpty(),
                     modifier = Modifier.fillMaxWidth().height(46.dp),
                     shape = RoundedCornerShape(14.dp),
                 ) {
-                    Text("Buat ${terpilihList.size} Tugas Terpilih")
+                    Text("Buat ${terpilihList.size} Soal Terpilih")
                 }
             }
         }
@@ -433,20 +469,28 @@ private fun PanelGenerate(
 
 @Composable
 private fun KartuSaran(
-    saran: TugasSaran,
+    soal: SoalItem,
+    jenisSoal: String,
     dipilih: Boolean,
     onToggle: () -> Unit,
 ) {
     KartuClay(kecil = true) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.Top,
-        ) {
+        Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.Top) {
             Checkbox(checked = dipilih, onCheckedChange = { onToggle() })
             Column(modifier = Modifier.weight(1f)) {
-                Text(saran.judul, fontSize = 13.sp, fontWeight = FontWeight.Bold)
-                Text(saran.deskripsi, fontSize = 11.sp, color = MutedFg)
-                Text("+${saran.tokenReward} token", fontSize = 11.sp, color = Hijau, fontWeight = FontWeight.Bold)
+                Text(soal.question, fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                if (jenisSoal == "pg" && soal.options != null) {
+                    soal.options.forEachIndexed { idx, opt ->
+                        val marker = if (idx == soal.answer_index) "✓" else "•"
+                        Text("$marker $opt", fontSize = 11.sp, color = if (idx == soal.answer_index) Hijau else MutedFg)
+                    }
+                    soal.explanation?.let {
+                        Text("💡 $it", fontSize = 10.sp, color = MutedFg, fontStyle = androidx.compose.ui.text.font.FontStyle.Italic)
+                    }
+                } else {
+                    soal.modelAnswer?.let { Text("Jawaban: $it", fontSize = 11.sp, color = MutedFg) }
+                    soal.rubric?.let { Text("Rubrik: $it", fontSize = 10.sp, color = MutedFg) }
+                }
             }
         }
     }

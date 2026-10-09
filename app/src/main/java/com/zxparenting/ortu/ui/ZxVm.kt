@@ -41,7 +41,8 @@ import com.zxparenting.ortu.api.QuestCreateReq
 import com.zxparenting.ortu.api.Tugas
 import com.zxparenting.ortu.api.TugasCreateReq
 import com.zxparenting.ortu.api.TugasGenerateReq
-import com.zxparenting.ortu.api.TugasSaran
+import com.zxparenting.ortu.api.SoalItem
+import com.zxparenting.ortu.api.GenerateMeta
 import com.zxparenting.ortu.api.TugasBatchReq
 import com.zxparenting.ortu.api.TugasValidasiReq
 import com.zxparenting.ortu.api.JadwalTugasAI
@@ -77,7 +78,8 @@ data class UiState(
     val leaderboard: LeaderboardRes? = null,
     val challenges: ChallengesRes? = null,
     val claimResult: String? = null,
-    val saranTugas: List<TugasSaran> = emptyList(),
+    val saranTugas: List<SoalItem> = emptyList(),
+    val generateMeta: GenerateMeta? = null,
     val generateLoading: Boolean = false,
     val jadwalAiList: List<JadwalTugasAI> = emptyList(),
 )
@@ -584,15 +586,22 @@ class ZxVm(val simpanan: Simpanan) : ViewModel() {
         }
     }
 
-    fun generateTugas(anakId: String, kategori: String, jumlah: Int) {
+    fun generateTugas(
+        anakId: String, tema: String, kesulitan: Int, tokenReward: Int,
+        maxRetry: Int, timerMenit: Int?, autoApprove: Boolean,
+        jenisSoal: String, jumlahSoal: Int,
+    ) {
         val token = state.value.token ?: return
-        state.value = state.value.copy(generateLoading = true, error = null, saranTugas = emptyList())
+        state.value = state.value.copy(generateLoading = true, error = null, saranTugas = emptyList(), generateMeta = null)
         viewModelScope.launch {
             try {
-                val res = api.tugasGenerate("Bearer $token", TugasGenerateReq(anakId, kategori, jumlah))
+                val res = api.tugasGenerate("Bearer $token", TugasGenerateReq(
+                    anakId, tema, kesulitan, tokenReward, maxRetry, timerMenit, autoApprove, jenisSoal, jumlahSoal,
+                ))
                 state.value = state.value.copy(generateLoading = false)
                 if (res.isSuccessful) {
-                    state.value = state.value.copy(saranTugas = res.body()?.saran ?: emptyList())
+                    val body = res.body()
+                    state.value = state.value.copy(saranTugas = body?.saran ?: emptyList(), generateMeta = body?.meta)
                 } else {
                     state.value = state.value.copy(error = "Gagal generate (${res.code()})")
                 }
@@ -602,15 +611,18 @@ class ZxVm(val simpanan: Simpanan) : ViewModel() {
         }
     }
 
-    fun batchTugas(anakId: String, tugas: List<TugasSaran>, onSelesai: () -> Unit) {
+    fun batchTugas(meta: GenerateMeta, soal: List<SoalItem>, onSelesai: () -> Unit) {
         val token = state.value.token ?: return
         state.value = state.value.copy(loading = true, error = null)
         viewModelScope.launch {
             try {
-                val res = api.tugasBatch("Bearer $token", TugasBatchReq(anakId, tugas))
+                val res = api.tugasBatch("Bearer $token", TugasBatchReq(
+                    meta.anakId, meta.tema, meta.kesulitan, meta.tokenReward,
+                    meta.maxRetry, meta.timerMenit, meta.autoApprove, meta.jenisSoal, soal,
+                ))
                 state.value = state.value.copy(loading = false)
                 if (res.isSuccessful) {
-                    state.value = state.value.copy(saranTugas = emptyList())
+                    state.value = state.value.copy(saranTugas = emptyList(), generateMeta = null)
                     muatTugas(token)
                     onSelesai()
                 } else {

@@ -91,12 +91,40 @@ data class TugasCreateReq(
 )
 data class TugasValidasiReq(val aksi: String) // "selesai" | "tolak"
 
-// ===== Generate Tugas (AI) =====
-data class TugasGenerateReq(val anakId: String, val kategori: String = "Umum", val jumlah: Int = 3)
-data class TugasSaran(val judul: String, val deskripsi: String, val tokenReward: Int)
-data class TugasGenerateRes(val ok: Boolean, val saran: List<TugasSaran>)
-data class TugasBatchReq(val anakId: String, val tugas: List<TugasSaran>)
-data class TugasBatchRes(val ok: Boolean, val dibuat: Int)
+// ===== Generate Soal AI (PG / Essay) =====
+data class TugasGenerateReq(
+    val anakId: String,
+    val tema: String,
+    val kesulitan: Int = 3,
+    val tokenReward: Int = 10,
+    val maxRetry: Int = 0,
+    val timerMenit: Int? = null,
+    val autoApprove: Boolean = false,
+    val jenisSoal: String = "pg", // "pg" | "essay"
+    val jumlahSoal: Int = 5,
+)
+// Soal PG: question, options, answer_index, explanation
+// Soal Essay: question, modelAnswer, rubric
+// Pakai flexible map — parse di UI
+data class SoalItem(val question: String, val options: List<String>? = null,
+    val answer_index: Int? = null, val explanation: String? = null,
+    val modelAnswer: String? = null, val rubric: String? = null)
+data class TugasGenerateRes(val ok: Boolean, val saran: List<SoalItem>, val meta: GenerateMeta? = null)
+data class GenerateMeta(val anakId: String, val tema: String, val kesulitan: Int,
+    val tokenReward: Int, val maxRetry: Int, val timerMenit: Int? = null,
+    val autoApprove: Boolean, val jenisSoal: String, val jumlahSoal: Int)
+data class TugasBatchReq(
+    val anakId: String,
+    val tema: String,
+    val kesulitan: Int,
+    val tokenReward: Int,
+    val maxRetry: Int,
+    val timerMenit: Int? = null,
+    val autoApprove: Boolean,
+    val jenisSoal: String,
+    val soal: List<SoalItem>,
+)
+data class TugasBatchRes(val ok: Boolean, val id: String? = null)
 
 // ===== Device =====
 data class Device(

@@ -314,12 +314,15 @@ class MainActivity : ComponentActivity() {
                                 anakList = state.anakList,
                                 loading = state.loading,
                                 saranTugas = state.saranTugas,
+                                generateMeta = state.generateMeta,
                                 generateLoading = state.generateLoading,
                                 jwt = state.token,
                                 onBuat = { aId, j, d, r -> vm.buatTugas(aId, j, d, r, null) {} },
                                 onValidasi = { id, aksi -> vm.validasiTugas(id, aksi) },
-                                onGenerate = { aId, kat, n -> vm.generateTugas(aId, kat, n) },
-                                onBatch = { aId, tugas -> vm.batchTugas(aId, tugas) {} },
+                                onGenerate = { aId, tema, kesulitan, tr, mr, tm, aa, js, n ->
+                                    vm.generateTugas(aId, tema, kesulitan, tr, mr, tm, aa, js, n)
+                                },
+                                onBatch = { m, soal -> vm.batchTugas(m, soal) {} },
                                 onJadwalAi = { subLayar = 14 },
                                 onChallenges = { subLayar = 13 },
                             )
