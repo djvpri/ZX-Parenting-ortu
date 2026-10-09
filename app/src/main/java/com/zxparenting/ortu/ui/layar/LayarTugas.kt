@@ -33,7 +33,7 @@ fun LayarTugas(
     tugasList: List<Tugas>,
     anakList: List<Anak>,
     loading: Boolean,
-    jwt: String,
+    jwt: String?,
     onBuat: (anakId: String, judul: String, deskripsi: String?, tokenReward: Int) -> Unit,
     onValidasi: (tugasId: String, aksi: String) -> Unit,
     onJadwalAi: () -> Unit = {},

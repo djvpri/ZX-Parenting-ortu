@@ -22,6 +22,7 @@ import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -52,7 +53,7 @@ import kotlinx.coroutines.withContext
 @Composable
 fun DetailRiwayatSheet(
     tugas: Tugas,
-    jwt: String,
+    jwt: String?,
     onDismiss: () -> Unit,
     onBuatUlang: (Tugas) -> Unit,
 ) {
@@ -69,7 +70,7 @@ fun DetailRiwayatSheet(
             scope.launch {
                 try {
                     val res = withContext(Dispatchers.IO) {
-                        Klien.api.tugasReview("Bearer $jwt", tugas.id)
+                        Klien.api.tugasReview("Bearer ${jwt ?: ""}", tugas.id)
                     }
                     if (res.isSuccessful) {
                         review = res.body()
@@ -89,7 +90,7 @@ fun DetailRiwayatSheet(
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
-        containerColor = KartuBg,
+        containerColor = Kartu,
     ) {
         LazyColumn(
             modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
@@ -112,7 +113,7 @@ fun DetailRiwayatSheet(
                     }
                     Spacer(Modifier.width(10.dp))
                     Column(modifier = Modifier.weight(1f)) {
-                        Text(tugas.judul, fontSize = 15.sp, fontWeight = FontWeight.Bold, color = TeksFg)
+                        Text(tugas.judul, fontSize = 15.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
                         Text(tugas.anak.nama, fontSize = 11.sp, color = MutedFg)
                     }
                 }
@@ -152,7 +153,7 @@ fun DetailRiwayatSheet(
                     KartuClay {
                         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
-                                Text("Hasil Kuis", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = TeksFg)
+                                Text("Hasil Kuis", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
                                 Spacer(Modifier.weight(1f))
                                 Text(
                                     "Skor: ${review!!.skor ?: 0}/100",
@@ -217,7 +218,7 @@ fun DetailRiwayatSheet(
 private fun InfoChip(label: String, value: String, modifier: Modifier = Modifier) {
     KartuClay(kecil = true, modifier = modifier) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(value, fontSize = 13.sp, fontWeight = FontWeight.Bold, color = TeksFg)
+            Text(value, fontSize = 13.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
             Text(label, fontSize = 9.sp, color = MutedFg)
         }
     }
@@ -235,7 +236,7 @@ private fun KartuSoalReview(item: ReviewItem) {
                     color = if (item.benar) Hijau else Merah,
                 )
                 Spacer(Modifier.width(6.dp))
-                Text(item.question, fontSize = 12.sp, fontWeight = FontWeight.Medium, color = TeksFg, modifier = Modifier.weight(1f))
+                Text(item.question, fontSize = 12.sp, fontWeight = FontWeight.Medium, color = MaterialTheme.colorScheme.onSurface, modifier = Modifier.weight(1f))
                 Icon(
                     if (item.benar) Icons.Default.Check else Icons.Default.Close,
                     contentDescription = null,
