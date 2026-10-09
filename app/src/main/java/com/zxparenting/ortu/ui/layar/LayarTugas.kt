@@ -318,9 +318,8 @@ private fun FieldBiasa(
     value: String,
     keyboardType: KeyboardType = KeyboardType.Text,
     onubah: (String) -> Unit,
-    modifier: Modifier = Modifier,
 ) {
-    Column(modifier = modifier) {
+    Column {
         Text(label, fontSize = 10.sp, color = MutedFg, fontWeight = FontWeight.Bold)
         Spacer(Modifier.height(4.dp))
         OutlinedTextField(
@@ -403,12 +402,20 @@ private fun PanelGenerate(
             }
 
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                FieldBiasa("Jumlah Soal", jumlahSoal, KeyboardType.Number, { jumlahSoal = it }, Modifier.weight(1f))
-                FieldBiasa("Token Reward", tokenReward, KeyboardType.Number, { tokenReward = it }, Modifier.weight(1f))
+                Box(modifier = Modifier.weight(1f)) {
+                    FieldBiasa("Jumlah Soal", jumlahSoal, KeyboardType.Number) { jumlahSoal = it }
+                }
+                Box(modifier = Modifier.weight(1f)) {
+                    FieldBiasa("Token Reward", tokenReward, KeyboardType.Number) { tokenReward = it }
+                }
             }
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                FieldBiasa("Max Retry (0=∞)", maxRetry, KeyboardType.Number, { maxRetry = it }, Modifier.weight(1f))
-                FieldBiasa("Timer (menit)", timerMenit, KeyboardType.Number, { timerMenit = it }, Modifier.weight(1f))
+                Box(modifier = Modifier.weight(1f)) {
+                    FieldBiasa("Max Retry (0=∞)", maxRetry, KeyboardType.Number) { maxRetry = it }
+                }
+                Box(modifier = Modifier.weight(1f)) {
+                    FieldBiasa("Timer (menit)", timerMenit, KeyboardType.Number) { timerMenit = it }
+                }
             }
 
             // Auto approve toggle
