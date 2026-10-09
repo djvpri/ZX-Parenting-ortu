@@ -63,6 +63,7 @@ import com.zxparenting.ortu.ui.layar.LayarReferral
 import com.zxparenting.ortu.ui.layar.LayarLeaderboard
 import com.zxparenting.ortu.ui.layar.LayarChallenges
 import com.zxparenting.ortu.ui.layar.LayarInsights
+import com.zxparenting.ortu.ui.layar.LayarJadwalAi
 import com.zxparenting.ortu.ui.layar.LayarProfil
 import com.zxparenting.ortu.ui.layar.LayarQuest
 import com.zxparenting.ortu.ui.layar.LayarTugas
@@ -162,7 +163,7 @@ class MainActivity : ComponentActivity() {
                             .padding(pad),
                     ) {
                         // Sub-layar override bottom tab
-                        if (tab == 0 && subLayar > 0) {
+                        if ((tab == 0 || tab == 2) && subLayar > 0) {
                             when (subLayar) {
                                 1 -> LayarAturan(
                                     devices = state.devices,
@@ -244,6 +245,16 @@ class MainActivity : ComponentActivity() {
                                         }
                                     },
                                 )
+                                14 -> LayarJadwalAi(
+                                    jadwalList = state.jadwalAiList,
+                                    anakList = state.anakList,
+                                    loading = state.loading,
+                                    onBuat = { ids, tema, k, jam, hari, reward, approve, retry, timer ->
+                                        vm.buatJadwalAi(ids, tema, k, jam, hari, reward, approve, retry, timer) {}
+                                    },
+                                    onToggle = { id, aktif -> vm.toggleJadwalAi(id, aktif) },
+                                    onHapus = { id -> vm.hapusJadwalAi(id) },
+                                )
                             }
                             return@Box
                         }
@@ -279,7 +290,6 @@ class MainActivity : ComponentActivity() {
                                 onKlikPinjam = { subLayar = 10 },
                                 onKlikReferral = { subLayar = 11 },
                                 onKlikLeaderboard = { subLayar = 12 },
-                                onKlikChallenges = { subLayar = 13 },
                                 onKlikProfil = { tab = 4 },
                             )
                             1 -> LayarAnak(
@@ -305,10 +315,13 @@ class MainActivity : ComponentActivity() {
                                 loading = state.loading,
                                 saranTugas = state.saranTugas,
                                 generateLoading = state.generateLoading,
+                                jwt = state.token,
                                 onBuat = { aId, j, d, r -> vm.buatTugas(aId, j, d, r, null) {} },
                                 onValidasi = { id, aksi -> vm.validasiTugas(id, aksi) },
                                 onGenerate = { aId, kat, n -> vm.generateTugas(aId, kat, n) },
                                 onBatch = { aId, tugas -> vm.batchTugas(aId, tugas) {} },
+                                onJadwalAi = { subLayar = 14 },
+                                onChallenges = { subLayar = 13 },
                             )
                             3 -> LayarMarketplace(
                                 market = state.market,

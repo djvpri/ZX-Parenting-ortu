@@ -44,6 +44,9 @@ import com.zxparenting.ortu.api.TugasGenerateReq
 import com.zxparenting.ortu.api.TugasSaran
 import com.zxparenting.ortu.api.TugasBatchReq
 import com.zxparenting.ortu.api.TugasValidasiReq
+import com.zxparenting.ortu.api.JadwalTugasAI
+import com.zxparenting.ortu.api.JadwalAiCreateReq
+import com.zxparenting.ortu.api.JadwalAiUpdateReq
 import com.zxparenting.ortu.data.Simpanan
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -76,6 +79,7 @@ data class UiState(
     val claimResult: String? = null,
     val saranTugas: List<TugasSaran> = emptyList(),
     val generateLoading: Boolean = false,
+    val jadwalAiList: List<JadwalTugasAI> = emptyList(),
 )
 
 class ZxVm(val simpanan: Simpanan) : ViewModel() {
@@ -174,6 +178,7 @@ class ZxVm(val simpanan: Simpanan) : ViewModel() {
             muatDevices(token)
             muatAnak(token)
             muatTugas(token)
+            muatJadwalAi(token)
             muatMarket(token)
             muatCoin(token)
             muatQuest(token)
@@ -225,6 +230,75 @@ class ZxVm(val simpanan: Simpanan) : ViewModel() {
                 val res = api.tugasList("Bearer $token")
                 if (res.isSuccessful) {
                     state.value = state.value.copy(tugasList = res.body() ?: emptyList())
+                }
+            } catch (_: Exception) {}
+        }
+    }
+
+    fun muatJadwalAi(token: String?) {
+        if (token == null) return
+        viewModelScope.launch {
+            try {
+                val res = api.jadwalAiList("Bearer $token")
+                if (res.isSuccessful) {
+                    state.value = state.value.copy(jadwalAiList = res.body() ?: emptyList())
+                }
+            } catch (_: Exception) {}
+        }
+    }
+
+    fun buatJadwalAi(
+        anakIds: List<String>,
+        tema: String,
+        kesulitan: Int,
+        jamKirim: String,
+        hariAktif: List<Int>,
+        tokenReward: Int,
+        autoApprove: Boolean,
+        maxRetry: Int,
+        timerMenit: Int?,
+        onSelesai: () -> Unit,
+    ) {
+        val token = state.value.token ?: return
+        state.value = state.value.copy(loading = true, error = null)
+        viewModelScope.launch {
+            try {
+                val res = api.jadwalAiCreate(
+                    "Bearer $token",
+                    JadwalAiCreateReq(anakIds, tema, kesulitan, jamKirim, hariAktif, tokenReward, autoApprove, maxRetry, timerMenit),
+                )
+                state.value = state.value.copy(loading = false)
+                if (res.isSuccessful) {
+                    muatJadwalAi(token)
+                    onSelesai()
+                } else {
+                    state.value = state.value.copy(error = "Gagal buat jadwal (${res.code()})")
+                }
+            } catch (e: Exception) {
+                state.value = state.value.copy(loading = false, error = "Jaringan error: ${e.message}")
+            }
+        }
+    }
+
+    fun toggleJadwalAi(id: String, aktif: Boolean) {
+        val token = state.value.token ?: return
+        viewModelScope.launch {
+            try {
+                val res = api.jadwalAiUpdate("Bearer $token", id, JadwalAiUpdateReq(aktif = aktif))
+                if (res.isSuccessful) {
+                    muatJadwalAi(token)
+                }
+            } catch (_: Exception) {}
+        }
+    }
+
+    fun hapusJadwalAi(id: String) {
+        val token = state.value.token ?: return
+        viewModelScope.launch {
+            try {
+                val res = api.jadwalAiHapus("Bearer $token", id)
+                if (res.isSuccessful) {
+                    muatJadwalAi(token)
                 }
             } catch (_: Exception) {}
         }

@@ -17,6 +17,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.zxparenting.ortu.BuildConfig
+import com.zxparenting.ortu.PemeriksaPembaruan
 import com.zxparenting.ortu.ui.tema.*
 
 @Composable
@@ -55,6 +56,43 @@ fun LayarProfil(
 
         KartuClay(kecil = true) {
             Text("ZX Parenting v${BuildConfig.VERSI_NAMA} (${BuildConfig.VERSI_KODE})", fontSize = 11.sp, color = MutedFg)
+        }
+
+        // Pembaruan otomatis
+        var statusUpdate by remember { mutableStateOf<String?>(null) }
+        var sedangCek by remember { mutableStateOf(false) }
+        LaunchedEffect(Unit) {
+            sedangCek = true
+            PemeriksaPembaruan.periksa(ctx) { tag ->
+                sedangCek = false
+                statusUpdate = if (tag != null) "Memasang v${tag.removePrefix("v")}…" else null
+            }
+        }
+        KartuClay(kecil = true) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    when {
+                        sedangCek -> "Memeriksa pembaruan…"
+                        statusUpdate != null -> statusUpdate!!
+                        else -> "App terbaru"
+                    },
+                    fontSize = 11.sp,
+                    color = MutedFg,
+                )
+                TextButton(onClick = {
+                    sedangCek = true
+                    PemeriksaPembaruan.periksa(ctx) { tag ->
+                        sedangCek = false
+                        statusUpdate = if (tag != null) "Memasang v${tag.removePrefix("v")}…" else null
+                    }
+                }) {
+                    Text("Periksa", fontSize = 11.sp)
+                }
+            }
         }
 
         // Toggle bahasa

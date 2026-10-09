@@ -31,6 +31,7 @@ android {
         versionName = bacaAlamat("versiNama")
         buildConfigField("String", "VERSI_NAMA", "\"${bacaAlamat("versiNama")}\"")
         buildConfigField("int", "VERSI_KODE", bacaAlamat("versiKode"))
+        buildConfigField("String", "REPO_API", "\"https://api.github.com/repos/djvpri/ZX-Parenting-ortu/releases/latest\"")
     }
 
     signingConfigs {

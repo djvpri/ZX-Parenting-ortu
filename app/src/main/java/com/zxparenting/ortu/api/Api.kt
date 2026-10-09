@@ -78,6 +78,9 @@ data class Tugas(
     val deadline: String?,
     val createdAt: String,
     val anak: AnakRef,
+    val type: String? = "manual",
+    val tokenDiklaim: Int? = 0,
+    val waktuExpire: String? = null,
 )
 data class TugasCreateReq(
     val anakId: String,
@@ -433,6 +436,12 @@ interface ApiZx {
         @Body req: TugasValidasiReq,
     ): Response<TugasOkRes>
 
+    @GET("tugas/{id}/review")
+    suspend fun tugasReview(
+        @Header("Authorization") bearer: String,
+        @Path("id") id: String,
+    ): Response<TugasReviewRes>
+
     // Device
     @GET("device-session")
     suspend fun deviceList(@Header("Authorization") bearer: String): Response<List<Device>>
@@ -606,7 +615,73 @@ interface ApiZx {
         @Path("id") id: String,
         @Body req: KomentarReq,
     ): Response<ForumKomentar>
+
+    // ============ JADWAL TUGAS AI ============
+
+    @GET("jadwal-tugas-ai")
+    suspend fun jadwalAiList(@Header("Authorization") bearer: String): Response<List<JadwalTugasAI>>
+
+    @POST("jadwal-tugas-ai")
+    suspend fun jadwalAiCreate(
+        @Header("Authorization") bearer: String,
+        @Body req: JadwalAiCreateReq,
+    ): Response<JadwalTugasAI>
+
+    @PATCH("jadwal-tugas-ai/{id}")
+    suspend fun jadwalAiUpdate(
+        @Header("Authorization") bearer: String,
+        @Path("id") id: String,
+        @Body req: JadwalAiUpdateReq,
+    ): Response<JadwalTugasAI>
+
+    @DELETE("jadwal-tugas-ai/{id}")
+    suspend fun jadwalAiHapus(
+        @Header("Authorization") bearer: String,
+        @Path("id") id: String,
+    ): Response<TugasOkRes>
 }
+
+data class JadwalTugasAI(
+    val id: String,
+    val ortuId: String,
+    val anakIds: String,
+    val tema: String,
+    val kesulitan: Int,
+    val jamKirim: String,
+    val hariAktif: String,
+    val tokenReward: Int,
+    val autoApprove: Boolean,
+    val maxRetry: Int,
+    val timerMenit: Int? = null,
+    val aktif: Boolean,
+    val lastRun: String? = null,
+    val createdAt: String,
+)
+
+data class JadwalAiCreateReq(
+    val anakIds: List<String>,
+    val tema: String,
+    val kesulitan: Int,
+    val jamKirim: String,
+    val hariAktif: List<Int>,
+    val tokenReward: Int,
+    val autoApprove: Boolean,
+    val maxRetry: Int,
+    val timerMenit: Int? = null,
+)
+
+data class JadwalAiUpdateReq(
+    val anakIds: List<String>? = null,
+    val tema: String? = null,
+    val kesulitan: Int? = null,
+    val jamKirim: String? = null,
+    val hariAktif: List<Int>? = null,
+    val tokenReward: Int? = null,
+    val autoApprove: Boolean? = null,
+    val maxRetry: Int? = null,
+    val timerMenit: Int? = null,
+    val aktif: Boolean? = null,
+)
 
 data class AnakCreateRes(val ok: Boolean, val anakId: String)
 data class AnakOkRes(val ok: Boolean)
@@ -616,3 +691,26 @@ data class TugasOkRes(val ok: Boolean)
 data class HadiahPatchReq(val id: String, val aktif: Boolean? = null, val stok: Int? = null, val hargaCoin: Int? = null)
 data class PesananProsesRes(val ok: Boolean, val status: String, val saldo: Int? = null)
 data class CoinSaldoRes(val saldo: Int)
+
+// ===== Tugas Review (ortu lihat hasil jawaban anak) =====
+data class TugasReviewRes(
+    val adaReview: Boolean,
+    val sessionId: String? = null,
+    val skor: Int? = null,
+    val benarCount: Int? = null,
+    val totalSoal: Int? = null,
+    val durasiDetik: Int? = null,
+    val totalAttempt: Int? = null,
+    val tugas: TugasReviewTugas? = null,
+    val review: List<ReviewItem>? = null,
+)
+data class TugasReviewTugas(val judul: String, val anak: String, val type: String)
+data class ReviewItem(
+    val posisi: Int,
+    val question: String,
+    val options: List<String>,
+    val jawabanAnak: Int?,
+    val jawabanBenar: Int,
+    val benar: Boolean,
+    val explanation: String,
+)
