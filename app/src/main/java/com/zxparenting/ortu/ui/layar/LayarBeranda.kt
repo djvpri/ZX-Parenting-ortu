@@ -47,6 +47,7 @@ fun LayarBeranda(
     onKlikReferral: () -> Unit,
     onKlikLeaderboard: () -> Unit,
     onKlikChallenges: () -> Unit,
+    onKlikJadwalAi: () -> Unit,
     onKlikProfil: () -> Unit,
 ) {
     Column(
@@ -167,6 +168,7 @@ fun LayarBeranda(
             TileMenu(Teks["referral"], Teks["bonus_coin"], Ungu, Icons.Default.Share, Modifier.weight(1f), onKlikReferral)
             TileMenu(Teks["leaderboard"], Teks["global"], Amber, Icons.Default.EmojiEvents, Modifier.weight(1f), onKlikLeaderboard)
             TileMenu(Teks["daily_challenges"], Teks["klaim"], Hijau, Icons.Default.Star, Modifier.weight(1f), onKlikChallenges)
+            TileMenu("Jadwal AI", "Auto Soal", Biru, Icons.Default.AutoAwesome, Modifier.weight(1f), onKlikJadwalAi)
         }
 
         Spacer(Modifier.height(16.dp))

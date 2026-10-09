@@ -587,7 +587,73 @@ interface ApiZx {
         @Path("id") id: String,
         @Body req: KomentarReq,
     ): Response<ForumKomentar>
+
+    // ============ JADWAL TUGAS AI ============
+
+    @GET("jadwal-tugas-ai")
+    suspend fun jadwalAiList(@Header("Authorization") bearer: String): Response<List<JadwalTugasAI>>
+
+    @POST("jadwal-tugas-ai")
+    suspend fun jadwalAiCreate(
+        @Header("Authorization") bearer: String,
+        @Body req: JadwalAiCreateReq,
+    ): Response<JadwalTugasAI>
+
+    @PATCH("jadwal-tugas-ai/{id}")
+    suspend fun jadwalAiUpdate(
+        @Header("Authorization") bearer: String,
+        @Path("id") id: String,
+        @Body req: JadwalAiUpdateReq,
+    ): Response<JadwalTugasAI>
+
+    @DELETE("jadwal-tugas-ai/{id}")
+    suspend fun jadwalAiHapus(
+        @Header("Authorization") bearer: String,
+        @Path("id") id: String,
+    ): Response<TugasOkRes>
 }
+
+data class JadwalTugasAI(
+    val id: String,
+    val ortuId: String,
+    val anakIds: String,
+    val tema: String,
+    val kesulitan: Int,
+    val jamKirim: String,
+    val hariAktif: String,
+    val tokenReward: Int,
+    val autoApprove: Boolean,
+    val maxRetry: Int,
+    val timerMenit: Int? = null,
+    val aktif: Boolean,
+    val lastRun: String? = null,
+    val createdAt: String,
+)
+
+data class JadwalAiCreateReq(
+    val anakIds: List<String>,
+    val tema: String,
+    val kesulitan: Int,
+    val jamKirim: String,
+    val hariAktif: List<Int>,
+    val tokenReward: Int,
+    val autoApprove: Boolean,
+    val maxRetry: Int,
+    val timerMenit: Int? = null,
+)
+
+data class JadwalAiUpdateReq(
+    val anakIds: List<String>? = null,
+    val tema: String? = null,
+    val kesulitan: Int? = null,
+    val jamKirim: String? = null,
+    val hariAktif: List<Int>? = null,
+    val tokenReward: Int? = null,
+    val autoApprove: Boolean? = null,
+    val maxRetry: Int? = null,
+    val timerMenit: Int? = null,
+    val aktif: Boolean? = null,
+)
 
 data class AnakCreateRes(val ok: Boolean, val anakId: String)
 data class AnakOkRes(val ok: Boolean)

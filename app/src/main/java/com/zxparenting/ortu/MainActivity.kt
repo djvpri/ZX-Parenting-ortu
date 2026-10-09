@@ -63,6 +63,7 @@ import com.zxparenting.ortu.ui.layar.LayarReferral
 import com.zxparenting.ortu.ui.layar.LayarLeaderboard
 import com.zxparenting.ortu.ui.layar.LayarChallenges
 import com.zxparenting.ortu.ui.layar.LayarInsights
+import com.zxparenting.ortu.ui.layar.LayarJadwalAi
 import com.zxparenting.ortu.ui.layar.LayarProfil
 import com.zxparenting.ortu.ui.layar.LayarQuest
 import com.zxparenting.ortu.ui.layar.LayarTugas
@@ -244,6 +245,16 @@ class MainActivity : ComponentActivity() {
                                         }
                                     },
                                 )
+                                14 -> LayarJadwalAi(
+                                    jadwalList = state.jadwalAiList,
+                                    anakList = state.anakList,
+                                    loading = state.loading,
+                                    onBuat = { ids, tema, k, jam, hari, reward, approve, retry, timer ->
+                                        vm.buatJadwalAi(ids, tema, k, jam, hari, reward, approve, retry, timer) {}
+                                    },
+                                    onToggle = { id, aktif -> vm.toggleJadwalAi(id, aktif) },
+                                    onHapus = { id -> vm.hapusJadwalAi(id) },
+                                )
                             }
                             return@Box
                         }
@@ -280,6 +291,7 @@ class MainActivity : ComponentActivity() {
                                 onKlikReferral = { subLayar = 11 },
                                 onKlikLeaderboard = { subLayar = 12 },
                                 onKlikChallenges = { subLayar = 13 },
+                                onKlikJadwalAi = { subLayar = 14 },
                                 onKlikProfil = { tab = 4 },
                             )
                             1 -> LayarAnak(
