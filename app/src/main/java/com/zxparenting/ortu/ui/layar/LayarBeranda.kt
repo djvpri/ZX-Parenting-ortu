@@ -86,8 +86,8 @@ fun LayarBeranda(
             }
         }
 
-        // Tugas menunggu validasi
-        val menunggu = tugasList.filter { it.status == "MENUNGGU" || it.status == "PENDING" }
+        // Tugas perlu validasi ortu (anak sudah kumpul)
+        val menunggu = tugasList.filter { it.status == "MENUNGGU" || it.status == "DIKUMPULKAN" }
         if (menunggu.isNotEmpty()) {
             Spacer(Modifier.height(4.dp))
             Row(

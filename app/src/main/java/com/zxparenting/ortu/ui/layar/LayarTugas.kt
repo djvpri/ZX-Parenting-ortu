@@ -122,13 +122,19 @@ fun LayarTugas(
             KartuClay { Text("Tambah anak dulu sebelum buat tugas.", fontSize = 12.sp, color = MutedFg) }
         }
 
-        // Tugas menunggu validasi di atas
-        val menunggu = tugasList.filter { it.status == "MENUNGGU" || it.status == "PENDING" }
-        val lainnya = tugasList.filter { it.status != "MENUNGGU" && it.status != "PENDING" }
+        // Tugas perlu validasi ortu (anak sudah kumpul) di atas
+        val perluValidasi = tugasList.filter { it.status == "MENUNGGU" || it.status == "DIKUMPULKAN" }
+        val aktif = tugasList.filter { it.status == "PENDING" }
+        val lainnya = tugasList.filter { it.status != "MENUNGGU" && it.status != "DIKUMPULKAN" && it.status != "PENDING" }
 
-        if (menunggu.isNotEmpty()) {
+        if (perluValidasi.isNotEmpty()) {
             Text("Perlu Validasi", fontSize = 11.sp, color = Amber, fontWeight = FontWeight.Bold)
-            menunggu.forEach { KartuTugas(it, onValidasi) }
+            perluValidasi.forEach { KartuTugas(it, onValidasi) }
+        }
+
+        if (aktif.isNotEmpty()) {
+            Text("Tugas Aktif", fontSize = 11.sp, color = Biru, fontWeight = FontWeight.Bold)
+            aktif.forEach { KartuTugas(it, onValidasi, onClick = { tugasDipilih = it }) }
         }
 
         if (lainnya.isNotEmpty()) {
@@ -178,14 +184,16 @@ private fun KartuTugas(
     val warnaStatus = when (tugas.status) {
         "SELESAI" -> Hijau
         "DITOLAK" -> Merah
-        "MENUNGGU", "PENDING" -> Amber
+        "MENUNGGU", "DIKUMPULKAN" -> Amber
+        "PENDING" -> Biru
         else -> MutedFg
     }
     val teksStatus = when (tugas.status) {
         "SELESAI" -> "Selesai"
         "DITOLAK" -> "Ditolak"
-        "MENUNGGU" -> "Menunggu"
-        "PENDING" -> "Menunggu"
+        "MENUNGGU" -> "Dikumpulkan"
+        "DIKUMPULKAN" -> "Dikumpulkan"
+        "PENDING" -> "Aktif"
         else -> tugas.status
     }
 
@@ -230,8 +238,8 @@ private fun KartuTugas(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text("+${tugas.tokenReward} token", fontSize = 11.sp, color = Hijau, fontWeight = FontWeight.Bold)
-                // Tombol validasi hanya untuk tugas menunggu
-                if (tugas.status == "MENUNGGU" || tugas.status == "PENDING") {
+                // Tombol validasi hanya untuk tugas yang sudah dikumpulkan anak
+                if (tugas.status == "MENUNGGU" || tugas.status == "DIKUMPULKAN") {
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         IconButton(
                             onClick = { onValidasi(tugas.id, "selesai") },
