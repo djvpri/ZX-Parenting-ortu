@@ -163,7 +163,7 @@ class MainActivity : ComponentActivity() {
                             .padding(pad),
                     ) {
                         // Sub-layar override bottom tab
-                        if (tab == 0 && subLayar > 0) {
+                        if ((tab == 0 || tab == 2) && subLayar > 0) {
                             when (subLayar) {
                                 1 -> LayarAturan(
                                     devices = state.devices,
