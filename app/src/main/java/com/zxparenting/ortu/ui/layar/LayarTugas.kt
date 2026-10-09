@@ -14,6 +14,7 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Inventory2
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -38,6 +39,7 @@ fun LayarTugas(
     saranTugas: List<SoalItem>,
     generateMeta: GenerateMeta?,
     generateLoading: Boolean,
+    error: String?,
     jwt: String?,
     onBuat: (anakId: String, judul: String, deskripsi: String?, tokenReward: Int) -> Unit,
     onValidasi: (tugasId: String, aksi: String) -> Unit,
@@ -111,6 +113,7 @@ fun LayarTugas(
                 saran = saranTugas,
                 meta = generateMeta,
                 loading = generateLoading,
+                error = error,
                 onGenerate = onGenerate,
                 onBatch = { m, soal ->
                     onBatch(m, soal)
@@ -347,6 +350,7 @@ private fun PanelGenerate(
     saran: List<SoalItem>,
     meta: GenerateMeta?,
     loading: Boolean,
+    error: String?,
     onGenerate: (anakId: String, tema: String, kesulitan: Int, tokenReward: Int, maxRetry: Int, timerMenit: Int?, autoApprove: Boolean, jenisSoal: String, jumlahSoal: Int) -> Unit,
     onBatch: (meta: GenerateMeta, soal: List<SoalItem>) -> Unit,
 ) {
@@ -453,6 +457,17 @@ private fun PanelGenerate(
                     CircularProgressIndicator(modifier = Modifier.size(18.dp), strokeWidth = 2.dp)
                 } else {
                     Text("Generate Soal")
+                }
+            }
+
+            // Error display
+            if (error != null && !loading) {
+                KartuClay(kecil = true) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(Icons.Default.Warning, contentDescription = null, tint = Merah, modifier = Modifier.size(16.dp))
+                        Spacer(Modifier.width(6.dp))
+                        Text(error, fontSize = 11.sp, color = Merah)
+                    }
                 }
             }
 

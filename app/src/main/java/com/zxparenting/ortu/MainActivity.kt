@@ -316,6 +316,7 @@ class MainActivity : ComponentActivity() {
                                 saranTugas = state.saranTugas,
                                 generateMeta = state.generateMeta,
                                 generateLoading = state.generateLoading,
+                                error = state.error,
                                 jwt = state.token,
                                 onBuat = { aId, j, d, r -> vm.buatTugas(aId, j, d, r, null) {} },
                                 onValidasi = { id, aksi -> vm.validasiTugas(id, aksi) },
