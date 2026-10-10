@@ -22,6 +22,7 @@ import com.zxparenting.ortu.api.Anak
 import com.zxparenting.ortu.api.Device
 import com.zxparenting.ortu.api.Tugas
 import com.zxparenting.ortu.ui.tema.*
+import androidx.compose.ui.res.stringResource
 
 @Composable
 fun LayarBeranda(
@@ -73,7 +74,7 @@ fun LayarBeranda(
 
         // Ringkasan anak
         if (anakList.isNotEmpty()) {
-            Text("Anak", fontSize = 11.sp, color = MutedFg, fontWeight = FontWeight.Bold)
+            Text(stringResource(R.string.anak), fontSize = 11.sp, color = MutedFg, fontWeight = FontWeight.Bold)
             anakList.take(3).forEach { anak ->
                 KartuRingkasanAnak(anak)
             }
@@ -105,7 +106,7 @@ fun LayarBeranda(
 
         // Grid menu 3x3
         Spacer(Modifier.height(4.dp))
-        Text("Menu", fontSize = 11.sp, color = MutedFg, fontWeight = FontWeight.Bold)
+        Text(stringResource(R.string.menu), fontSize = 11.sp, color = MutedFg, fontWeight = FontWeight.Bold)
 
         // Row 1: Anak, Tugas, Market
         Row(
@@ -231,7 +232,7 @@ private fun KartuRingkasanAnak(anak: Anak) {
                     fontWeight = FontWeight.Bold,
                     color = Hijau,
                 )
-                Text("Token", fontSize = 9.sp, color = MutedFg)
+                Text(stringResource(R.string.token), fontSize = 9.sp, color = MutedFg)
             }
         }
     }

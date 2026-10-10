@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.sp
 import com.zxparenting.ortu.api.Anak
 import com.zxparenting.ortu.ui.tema.*
 import java.util.Calendar
+import androidx.compose.ui.res.stringResource
 
 private val GENDER_OPSI = listOf("Laki-laki", "Perempuan")
 
@@ -58,11 +59,11 @@ fun LayarAnak(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Text("Anak", style = MaterialTheme.typography.titleLarge)
+            Text(stringResource(R.string.anak), style = MaterialTheme.typography.titleLarge)
             TextButton(onClick = { tampilForm = !tampilForm }) {
                 Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(18.dp))
                 Spacer(Modifier.width(4.dp))
-                Text("Tambah")
+                Text(stringResource(R.string.tambah))
             }
         }
 
@@ -118,10 +119,10 @@ fun LayarAnak(
                         hapusAnak = null
                     },
                     colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error),
-                ) { Text("Hapus") }
+                ) { Text(stringResource(R.string.hapus)) }
             },
             dismissButton = {
-                TextButton(onClick = { hapusAnak = null }) { Text("Batal") }
+                TextButton(onClick = { hapusAnak = null }) { Text(stringResource(R.string.batal)) }
             },
         )
     }
@@ -152,14 +153,14 @@ private fun KartuAnak(anak: Anak, onEdit: () -> Unit, onHapus: () -> Unit) {
                     fontWeight = FontWeight.Bold,
                     color = Hijau,
                 )
-                Text("Token", fontSize = 9.sp, color = MutedFg)
+                Text(stringResource(R.string.token), fontSize = 9.sp, color = MutedFg)
             }
             Spacer(Modifier.width(8.dp))
             IconButton(onClick = onEdit, modifier = Modifier.size(32.dp)) {
                 Icon(Icons.Default.Edit, contentDescription = "Edit", modifier = Modifier.size(18.dp), tint = MutedFg)
             }
             IconButton(onClick = onHapus, modifier = Modifier.size(32.dp)) {
-                Icon(Icons.Default.Delete, contentDescription = "Hapus", modifier = Modifier.size(18.dp), tint = MaterialTheme.colorScheme.error)
+                Icon(Icons.Default.Delete, contentDescription = stringResource(R.string.hapus), modifier = Modifier.size(18.dp), tint = MaterialTheme.colorScheme.error)
             }
         }
         if (anak.dormant) {
@@ -185,7 +186,7 @@ private fun FormAnak(
     KartuClay {
         Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
             Text("Tambah Anak", fontSize = 14.sp, fontWeight = FontWeight.Bold)
-            FieldBiasa("Nama", nama) { nama = it }
+            FieldBiasa(stringResource(R.string.nama), nama) { nama = it }
             FieldBiasa("Username (3-20 huruf/angka)", username) { username = it }
             FieldBiasa("PIN (4-6 digit)", pin, KeyboardType.NumberPassword) { pin = it }
             FieldTanggal("Tanggal Lahir", tanggalLahir) { tanggalLahir = it }
@@ -210,7 +211,7 @@ private fun FormAnak(
                 if (loading) {
                     CircularProgressIndicator(modifier = Modifier.size(18.dp), strokeWidth = 2.dp)
                 } else {
-                    Text("Simpan")
+                    Text(stringResource(R.string.simpan))
                 }
             }
         }
@@ -250,7 +251,7 @@ private fun DialogEditAnak(
                 OutlinedTextField(
                     value = nama,
                     onValueChange = { nama = it },
-                    label = { Text("Nama") },
+                    label = { Text(stringResource(R.string.nama)) },
                     singleLine = true,
                     shape = RoundedCornerShape(12.dp),
                     modifier = Modifier.fillMaxWidth(),
@@ -267,7 +268,7 @@ private fun DialogEditAnak(
                 OutlinedTextField(
                     value = kelas,
                     onValueChange = { kelas = it },
-                    label = { Text("Kelas") },
+                    label = { Text(stringResource(R.string.kelas)) },
                     singleLine = true,
                     shape = RoundedCornerShape(12.dp),
                     modifier = Modifier.fillMaxWidth(),
@@ -298,10 +299,10 @@ private fun DialogEditAnak(
                     )
                 },
                 enabled = !loading && nama.isNotBlank(),
-            ) { Text("Simpan") }
+            ) { Text(stringResource(R.string.simpan)) }
         },
         dismissButton = {
-            TextButton(onClick = onBatal) { Text("Batal") }
+            TextButton(onClick = onBatal) { Text(stringResource(R.string.batal)) }
         },
     )
 }
@@ -364,7 +365,7 @@ private fun DialogResetPin(
             }
         },
         dismissButton = {
-            TextButton(onClick = onBatal, enabled = !simpanPinLoading) { Text("Batal") }
+            TextButton(onClick = onBatal, enabled = !simpanPinLoading) { Text(stringResource(R.string.batal)) }
         },
     )
 }
@@ -458,7 +459,7 @@ private fun FieldDropdown(
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
                 readOnly = true,
-                placeholder = { Text("Pilih") },
+                placeholder = { Text(stringResource(R.string.pilih)) },
                 shape = RoundedCornerShape(12.dp),
                 trailingIcon = {
                     TextButton(onClick = { expanded = true }) {

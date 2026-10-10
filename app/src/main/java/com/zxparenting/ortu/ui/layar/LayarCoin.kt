@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.zxparenting.ortu.api.CoinRes
 import com.zxparenting.ortu.ui.tema.*
+import androidx.compose.ui.res.stringResource
 
 @Composable
 fun LayarCoin(
@@ -53,7 +54,7 @@ fun LayarCoin(
             contentAlignment = Alignment.Center,
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text("Saldo", color = Color.White.copy(alpha = 0.8f), fontSize = 12.sp)
+                Text(stringResource(R.string.saldo), color = Color.White.copy(alpha = 0.8f), fontSize = 12.sp)
                 Text(
                     "${coin?.saldo ?: 0}",
                     color = Color.White,
@@ -90,7 +91,7 @@ fun LayarCoin(
                             shape = RoundedCornerShape(12.dp),
                         )
                         Spacer(Modifier.width(8.dp))
-                        Text("ZX", fontWeight = FontWeight.Bold, color = Hijau)
+                        Text(stringResource(R.string.zx), fontWeight = FontWeight.Bold, color = Hijau)
                     }
                     // Quick preset
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -124,7 +125,7 @@ fun LayarCoin(
         }
 
         // Riwayat
-        Text("Riwayat", fontSize = 11.sp, color = MutedFg, fontWeight = FontWeight.Bold)
+        Text(stringResource(R.string.riwayat), fontSize = 11.sp, color = MutedFg, fontWeight = FontWeight.Bold)
         val ledger = coin?.ledger ?: emptyList()
         if (ledger.isEmpty()) {
             KartuClay { Text("Belum ada transaksi.", fontSize = 12.sp, color = MutedFg) }

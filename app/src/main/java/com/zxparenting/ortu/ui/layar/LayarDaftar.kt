@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.zxparenting.ortu.ui.UiState
 import com.zxparenting.ortu.ui.tema.*
+import androidx.compose.ui.res.stringResource
 
 @Composable
 fun LayarDaftar(state: UiState, onDaftar: (String, String, String) -> Unit, onKeLogin: () -> Unit) {
@@ -49,7 +50,7 @@ fun LayarDaftar(state: UiState, onDaftar: (String, String, String) -> Unit, onKe
                 .background(Brush.verticalGradient(listOf(Biru, Ungu))),
             contentAlignment = Alignment.Center,
         ) {
-            Text("ZX", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 24.sp)
+            Text(stringResource(R.string.zx), color = Color.White, fontWeight = FontWeight.Bold, fontSize = 24.sp)
         }
         Spacer(Modifier.height(16.dp))
         Text("Daftar Akun Ortu", style = MaterialTheme.typography.titleLarge, textAlign = TextAlign.Center)
@@ -59,7 +60,7 @@ fun LayarDaftar(state: UiState, onDaftar: (String, String, String) -> Unit, onKe
         OutlinedTextField(
             value = nama,
             onValueChange = { nama = it },
-            label = { Text("Nama") },
+            label = { Text(stringResource(R.string.nama)) },
             singleLine = true,
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(16.dp),
@@ -69,7 +70,7 @@ fun LayarDaftar(state: UiState, onDaftar: (String, String, String) -> Unit, onKe
         OutlinedTextField(
             value = email,
             onValueChange = { email = it },
-            label = { Text("Email") },
+            label = { Text(stringResource(R.string.email)) },
             singleLine = true,
             keyboardOptions = KeyboardOptions(keyboardType = androidx.compose.ui.text.input.KeyboardType.Email),
             modifier = Modifier.fillMaxWidth(),
@@ -130,7 +131,7 @@ fun LayarDaftar(state: UiState, onDaftar: (String, String, String) -> Unit, onKe
                     strokeWidth = 2.dp,
                 )
             } else {
-                Text("Daftar", fontWeight = FontWeight.Bold, fontSize = 14.5.sp)
+                Text(stringResource(R.string.daftar), fontWeight = FontWeight.Bold, fontSize = 14.5.sp)
             }
         }
         Spacer(Modifier.height(16.dp))

@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.sp
 import com.zxparenting.ortu.api.Device
 import com.zxparenting.ortu.api.DevicePatch
 import com.zxparenting.ortu.ui.tema.*
+import androidx.compose.ui.res.stringResource
 
 @Composable
 fun LayarAturan(
@@ -87,7 +88,7 @@ private fun KartuAturanDevice(
                     Text(dev.anak?.nama ?: "-", fontSize = 11.sp, color = MutedFg)
                 }
                 IconButton(onClick = { tanyaHapus = true }) {
-                    Icon(Icons.Default.Delete, contentDescription = "Hapus", tint = Merah)
+                    Icon(Icons.Default.Delete, contentDescription = stringResource(R.string.hapus), tint = Merah)
                 }
             }
 
@@ -144,7 +145,7 @@ private fun KartuAturanDevice(
                     TextButton(onClick = {
                         appBlokir = appBlokir.filter { it != pkg }
                         onPatch(dev.id, DevicePatch(appBlokir = appBlokir.filter { it != pkg }))
-                    }) { Text("Hapus", fontSize = 10.sp, color = Merah) }
+                    }) { Text(stringResource(R.string.hapus), fontSize = 10.sp, color = Merah) }
                 }
             }
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -195,10 +196,10 @@ private fun KartuAturanDevice(
             text = { Text("Pairing ${dev.nama} akan dicabut. HP anak tidak lagi terkontrol.") },
             confirmButton = {
                 TextButton(onClick = { tanyaHapus = false; onDelete(dev.id) }) {
-                    Text("Hapus", color = Merah)
+                    Text(stringResource(R.string.hapus), color = Merah)
                 }
             },
-            dismissButton = { TextButton(onClick = { tanyaHapus = false }) { Text("Batal") } },
+            dismissButton = { TextButton(onClick = { tanyaHapus = false }) { Text(stringResource(R.string.batal)) } },
         )
     }
 }

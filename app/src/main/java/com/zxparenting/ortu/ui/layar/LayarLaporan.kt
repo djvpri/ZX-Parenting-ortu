@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.zxparenting.ortu.api.*
 import com.zxparenting.ortu.ui.tema.*
+import androidx.compose.ui.res.stringResource
 
 @Composable
 fun LayarLaporan(
@@ -39,7 +40,7 @@ fun LayarLaporan(
         verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
         Spacer(Modifier.height(14.dp))
-        Text("Laporan", style = MaterialTheme.typography.titleLarge)
+        Text(stringResource(R.string.laporan), style = MaterialTheme.typography.titleLarge)
 
         // Dropdown pilih anak
         if (anakList.isNotEmpty()) {
@@ -100,7 +101,7 @@ fun LayarLaporan(
                     modifier = Modifier.weight(1f),
                     ikon = Icons.Default.LocalFireDepartment,
                     warnaIkon = Amber,
-                    label = "Streak",
+                    label = stringResource(R.string.streak),
                     nilai = "${ringkasan.kartu.streakCurrent} hari",
                     sub = "Terbaik: ${ringkasan.kartu.streakTerbaik}",
                 )
@@ -186,7 +187,7 @@ fun LayarLaporan(
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.SpaceBetween,
                             ) {
-                                Text("Kuis", fontSize = 12.sp, color = MutedFg)
+                                Text(stringResource(R.string.kuis), fontSize = 12.sp, color = MutedFg)
                                 Text("${k.rataSkor}", fontSize = 12.sp, fontWeight = FontWeight.Bold)
                             }
                             Spacer(Modifier.height(4.dp))
@@ -206,12 +207,12 @@ fun LayarLaporan(
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Icon(Icons.Default.ArrowDownward, contentDescription = null, tint = Hijau, modifier = Modifier.size(20.dp))
                         Text("+${ringkasan.tokenStat.masuk} mnt", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = Hijau)
-                        Text("Masuk", fontSize = 10.sp, color = MutedFg)
+                        Text(stringResource(R.string.masuk), fontSize = 10.sp, color = MutedFg)
                     }
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Icon(Icons.Default.ArrowUpward, contentDescription = null, tint = Merah, modifier = Modifier.size(20.dp))
                         Text("-${ringkasan.tokenStat.keluar} mnt", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = Merah)
-                        Text("Keluar", fontSize = 10.sp, color = MutedFg)
+                        Text(stringResource(R.string.keluar), fontSize = 10.sp, color = MutedFg)
                     }
                 }
             }

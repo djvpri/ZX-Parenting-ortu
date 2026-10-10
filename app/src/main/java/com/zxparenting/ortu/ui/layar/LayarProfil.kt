@@ -19,6 +19,14 @@ import androidx.compose.ui.unit.sp
 import com.zxparenting.ortu.BuildConfig
 import com.zxparenting.ortu.PemeriksaPembaruan
 import com.zxparenting.ortu.ui.tema.*
+import androidx.compose.ui.res.stringResource
+import androidx.compose.material.icons.filled.Translate
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.foundation.layout.Column
+import com.zxparenting.ortu.ManajerBahasa
+import com.zxparenting.ortu.R
+import android.app.Activity
 
 @Composable
 fun LayarProfil(
@@ -45,11 +53,11 @@ fun LayarProfil(
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         Spacer(Modifier.height(14.dp))
-        Text("Profil", style = MaterialTheme.typography.titleLarge)
+        Text(stringResource(R.string.profil), style = MaterialTheme.typography.titleLarge)
 
         KartuClay(kecil = true) {
             Column {
-                Text("Nama", fontSize = 10.sp, color = MutedFg, fontWeight = FontWeight.Bold)
+                Text(stringResource(R.string.nama), fontSize = 10.sp, color = MutedFg, fontWeight = FontWeight.Bold)
                 Text(nama ?: "-", fontSize = 14.sp, fontWeight = FontWeight.Bold)
             }
         }
@@ -90,7 +98,7 @@ fun LayarProfil(
                         statusUpdate = if (tag != null) "Memasang v${tag.removePrefix("v")}…" else null
                     }
                 }) {
-                    Text("Periksa", fontSize = 11.sp)
+                    Text(stringResource(R.string.periksa), fontSize = 11.sp)
                 }
             }
         }
@@ -102,18 +110,18 @@ fun LayarProfil(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Text("Bahasa", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                Text(stringResource(R.string.bahasa), fontSize = 12.sp, fontWeight = FontWeight.Bold)
                 Row {
                     FilterChip(
                         selected = Teks.bahasa() == Bahasa.ID,
                         onClick = { Teks.setBahasa(Bahasa.ID) },
-                        label = { Text("ID", fontSize = 11.sp) },
+                        label = { Text(stringResource(R.string.id), fontSize = 11.sp) },
                     )
                     Spacer(Modifier.width(6.dp))
                     FilterChip(
                         selected = Teks.bahasa() == Bahasa.EN,
                         onClick = { Teks.setBahasa(Bahasa.EN) },
-                        label = { Text("EN", fontSize = 11.sp) },
+                        label = { Text(stringResource(R.string.en), fontSize = 11.sp) },
                     )
                 }
             }
@@ -122,7 +130,7 @@ fun LayarProfil(
         // Tema picker
         KartuClay(kecil = true) {
             Column {
-                Text("Tema", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                Text(stringResource(R.string.tema), fontSize = 12.sp, fontWeight = FontWeight.Bold)
                 Spacer(Modifier.height(8.dp))
                 daftarTema.forEach { key ->
                     val palet = remember(key) { TemaRepo.load(key) }
@@ -167,6 +175,49 @@ fun LayarProfil(
             Text("Hapus Akun & Data")
         }
 
+        // Language switcher
+        val ctx = LocalContext.current
+        val bahasaAktif = ManajerBahasa.bahasaAktif(ctx)
+        var showLangDialog by remember { mutableStateOf(false) }
+        OutlinedButton(
+            onClick = { showLangDialog = true },
+            modifier = Modifier.fillMaxWidth().height(48.dp),
+            shape = RoundedCornerShape(16.dp),
+        ) {
+            Icon(Icons.Default.Translate, contentDescription = null, modifier = Modifier.size(18.dp))
+            Spacer(Modifier.width(8.dp))
+            Text(stringResource(R.string.language))
+        }
+        Spacer(Modifier.height(8.dp))
+
+        if (showLangDialog) {
+            AlertDialog(
+                onDismissRequest = { showLangDialog = false },
+                title = { Text(stringResource(R.string.language)) },
+                text = {
+                    Column {
+                        listOf("en" to "English", "in" to "Indonesian").forEach { (kode, nama) ->
+                            TextButton(
+                                onClick = {
+                                    ManajerBahasa.setBahasa(ctx, kode)
+                                    showLangDialog = false
+                                    (ctx as? Activity)?.recreate()
+                                },
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Text(if (bahasaAktif == kode) "✓ $nama" else nama)
+                            }
+                        }
+                    }
+                },
+                confirmButton = {
+                    TextButton(onClick = { showLangDialog = false }) {
+                        Text(stringResource(R.string.batal))
+                    }
+                }
+            )
+        }
+
         // Tombol logout
         Button(
             onClick = onLogout,
@@ -178,7 +229,7 @@ fun LayarProfil(
         ) {
             Icon(Icons.Default.Logout, contentDescription = null, modifier = Modifier.size(18.dp), tint = Color.White)
             Spacer(Modifier.width(8.dp))
-            Text("Keluar", fontWeight = FontWeight.Bold, color = Color.White)
+            Text(stringResource(R.string.keluar), fontWeight = FontWeight.Bold, color = Color.White)
         }
         Spacer(Modifier.height(16.dp))
     }
@@ -193,7 +244,7 @@ fun LayarProfil(
                     Text("Hapus Permanen", color = Merah)
                 }
             },
-            dismissButton = { TextButton(onClick = { tanyaHapus = false }) { Text("Batal") } },
+            dismissButton = { TextButton(onClick = { tanyaHapus = false }) { Text(stringResource(R.string.batal)) } },
         )
     }
 }

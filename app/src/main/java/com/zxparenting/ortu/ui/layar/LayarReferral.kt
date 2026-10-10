@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.zxparenting.ortu.api.ReferralRes
 import com.zxparenting.ortu.ui.tema.*
+import androidx.compose.ui.res.stringResource
 
 @Composable
 fun LayarReferral(
@@ -76,7 +77,7 @@ fun LayarReferral(
                 OutlinedTextField(
                     value = kodeInput,
                     onValueChange = { kodeInput = it.uppercase() },
-                    placeholder = { Text("ABCD1234", fontSize = 13.sp) },
+                    placeholder = { Text(stringResource(R.string.abcd1234), fontSize = 13.sp) },
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true,
                 )

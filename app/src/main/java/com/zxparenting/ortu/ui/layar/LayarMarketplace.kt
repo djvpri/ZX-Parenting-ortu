@@ -22,6 +22,7 @@ import com.zxparenting.ortu.api.Hadiah
 import com.zxparenting.ortu.api.HadiahMarketRes
 import com.zxparenting.ortu.api.PesananHadiah
 import com.zxparenting.ortu.ui.tema.*
+import androidx.compose.ui.res.stringResource
 
 @Composable
 fun LayarMarketplace(
@@ -48,7 +49,7 @@ fun LayarMarketplace(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Text("Marketplace", style = MaterialTheme.typography.titleLarge)
+            Text(stringResource(R.string.marketplace), style = MaterialTheme.typography.titleLarge)
             BadgePill(teks = "$coinSaldo ZX", bg = Color(0xFFDCFCE7), fg = Color(0xFF166534))
         }
 
@@ -67,11 +68,11 @@ fun LayarMarketplace(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Text("Hadiah", fontSize = 11.sp, color = MutedFg, fontWeight = FontWeight.Bold)
+            Text(stringResource(R.string.hadiah), fontSize = 11.sp, color = MutedFg, fontWeight = FontWeight.Bold)
             TextButton(onClick = { tampilForm = !tampilForm }) {
                 Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(18.dp))
                 Spacer(Modifier.width(4.dp))
-                Text("Tambah")
+                Text(stringResource(R.string.tambah))
             }
         }
 
@@ -118,12 +119,12 @@ private fun KartuPesanan(p: PesananHadiah, onProses: (String, String) -> Unit) {
                     onClick = { onProses(p.id, "beli") },
                     modifier = Modifier.weight(1f).height(38.dp),
                     shape = RoundedCornerShape(10.dp),
-                ) { Text("Beli", fontSize = 12.sp) }
+                ) { Text(stringResource(R.string.beli), fontSize = 12.sp) }
                 OutlinedButton(
                     onClick = { onProses(p.id, "tolak") },
                     modifier = Modifier.weight(1f).height(38.dp),
                     shape = RoundedCornerShape(10.dp),
-                ) { Text("Tolak", fontSize = 12.sp, color = Merah) }
+                ) { Text(stringResource(R.string.tolak), fontSize = 12.sp, color = Merah) }
             }
         }
     }
@@ -152,10 +153,10 @@ private fun KartuHadiah(h: Hadiah, onHapus: (String) -> Unit) {
             }
             Column(horizontalAlignment = Alignment.End) {
                 Text("${h.hargaCoin}", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Hijau)
-                Text("ZX", fontSize = 9.sp, color = MutedFg)
+                Text(stringResource(R.string.zx), fontSize = 9.sp, color = MutedFg)
             }
             IconButton(onClick = { onHapus(h.id) }) {
-                Icon(Icons.Default.Delete, contentDescription = "Hapus", tint = Merah, modifier = Modifier.size(18.dp))
+                Icon(Icons.Default.Delete, contentDescription = stringResource(R.string.hapus), tint = Merah, modifier = Modifier.size(18.dp))
             }
         }
     }
@@ -174,7 +175,7 @@ private fun FormHadiah(
     KartuClay {
         Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
             Text("Buat Hadiah", fontSize = 14.sp, fontWeight = FontWeight.Bold)
-            FieldBiasa("Judul", judul) { judul = it }
+            FieldBiasa(stringResource(R.string.judul), judul) { judul = it }
             FieldBiasa("Deskripsi (opsional)", deskripsi) { deskripsi = it }
             FieldBiasa("Harga (ZX Coin)", harga, KeyboardType.Number) { harga = it }
             FieldBiasa("Stok (-1 = tanpa batas)", stok, KeyboardType.Number) { stok = it }
@@ -193,7 +194,7 @@ private fun FormHadiah(
                 if (loading) {
                     CircularProgressIndicator(modifier = Modifier.size(18.dp), strokeWidth = 2.dp)
                 } else {
-                    Text("Simpan")
+                    Text(stringResource(R.string.simpan))
                 }
             }
         }

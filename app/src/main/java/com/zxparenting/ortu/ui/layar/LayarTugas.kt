@@ -30,6 +30,7 @@ import com.zxparenting.ortu.api.Tugas
 import com.zxparenting.ortu.api.SoalItem
 import com.zxparenting.ortu.api.GenerateMeta
 import com.zxparenting.ortu.ui.tema.*
+import androidx.compose.ui.res.stringResource
 
 @Composable
 fun LayarTugas(
@@ -70,15 +71,15 @@ fun LayarTugas(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Text("Tugas", style = MaterialTheme.typography.titleLarge)
+            Text(stringResource(R.string.tugas), style = MaterialTheme.typography.titleLarge)
             Row(verticalAlignment = Alignment.CenterVertically) {
                 TextButton(onClick = { tampilGenerate = !tampilGenerate }) {
-                    Text("Generate")
+                    Text(stringResource(R.string.generate))
                 }
                 TextButton(onClick = onChallenges) {
                     Icon(Icons.Default.Star, contentDescription = null, modifier = Modifier.size(18.dp))
                     Spacer(Modifier.width(4.dp))
-                    Text("Misi")
+                    Text(stringResource(R.string.misi))
                 }
                 TextButton(onClick = onJadwalAi) {
                     Icon(Icons.Default.AutoAwesome, contentDescription = null, modifier = Modifier.size(18.dp))
@@ -88,7 +89,7 @@ fun LayarTugas(
                 TextButton(onClick = { tampilForm = !tampilForm }) {
                     Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(18.dp))
                     Spacer(Modifier.width(4.dp))
-                    Text("Buat")
+                    Text(stringResource(R.string.buat))
                 }
             }
         }
@@ -150,9 +151,9 @@ fun LayarTugas(
                 StatChip("Selesai", "$selesai", Hijau, Modifier.weight(1f))
                 StatChip("Ditolak", "$ditolak", Merah, Modifier.weight(1f))
                 StatChip("Expired", "$expired", MutedFg, Modifier.weight(1f))
-                StatChip("Token", "+$totalToken", Amber, Modifier.weight(1f))
+                StatChip(stringResource(R.string.token), "+$totalToken", Amber, Modifier.weight(1f))
             }
-            Text("Riwayat", fontSize = 11.sp, color = MutedFg, fontWeight = FontWeight.Bold)
+            Text(stringResource(R.string.riwayat), fontSize = 11.sp, color = MutedFg, fontWeight = FontWeight.Bold)
             lainnya.forEach { KartuTugas(it, onValidasi, onClick = { tugasDipilih = it }) }
         }
 
@@ -223,7 +224,7 @@ private fun KartuTugas(
                         Text(tugas.anak.nama, fontSize = 10.sp, color = MutedFg)
                         if (isAi) {
                             Spacer(Modifier.width(4.dp))
-                            Text("AI", fontSize = 9.sp, color = Ungu, fontWeight = FontWeight.Bold)
+                            Text(stringResource(R.string.ai), fontSize = 9.sp, color = Ungu, fontWeight = FontWeight.Bold)
                         }
                     }
                 }
@@ -254,7 +255,7 @@ private fun KartuTugas(
                             onClick = { onValidasi(tugas.id, "tolak") },
                             modifier = Modifier.size(32.dp),
                         ) {
-                            Icon(Icons.Default.Close, contentDescription = "Tolak", tint = Merah)
+                            Icon(Icons.Default.Close, contentDescription = stringResource(R.string.tolak), tint = Merah)
                         }
                     }
                 }
@@ -298,7 +299,7 @@ private fun FormTugas(
                 }
             }
 
-            FieldBiasa("Judul", judul) { judul = it }
+            FieldBiasa(stringResource(R.string.judul), judul) { judul = it }
             FieldBiasa("Deskripsi (opsional)", deskripsi) { deskripsi = it }
             FieldBiasa("Token reward (1-100)", reward, KeyboardType.Number) { reward = it }
 
@@ -316,7 +317,7 @@ private fun FormTugas(
                 if (loading) {
                     CircularProgressIndicator(modifier = Modifier.size(18.dp), strokeWidth = 2.dp)
                 } else {
-                    Text("Simpan")
+                    Text(stringResource(R.string.simpan))
                 }
             }
         }
@@ -393,11 +394,11 @@ private fun PanelGenerate(
             // Jenis soal dropdown
             Box {
                 OutlinedButton(onClick = { dropdownJenis = true }, modifier = Modifier.fillMaxWidth().height(48.dp), shape = RoundedCornerShape(12.dp)) {
-                    Text(if (jenisSoal == "pg") "Pilihan Ganda" else "Essay")
+                    Text(if (jenisSoal == "pg") stringResource(R.string.pilihan_ganda) else stringResource(R.string.essay))
                 }
                 DropdownMenu(expanded = dropdownJenis, onDismissRequest = { dropdownJenis = false }) {
-                    DropdownMenuItem(text = { Text("Pilihan Ganda") }, onClick = { jenisSoal = "pg"; dropdownJenis = false })
-                    DropdownMenuItem(text = { Text("Essay") }, onClick = { jenisSoal = "essay"; dropdownJenis = false })
+                    DropdownMenuItem(text = { Text(stringResource(R.string.pilihan_ganda)) }, onClick = { jenisSoal = "pg"; dropdownJenis = false })
+                    DropdownMenuItem(text = { Text(stringResource(R.string.essay)) }, onClick = { jenisSoal = "essay"; dropdownJenis = false })
                 }
             }
 

@@ -48,6 +48,7 @@ import com.zxparenting.ortu.ui.tema.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import androidx.compose.ui.res.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -123,7 +124,7 @@ fun DetailRiwayatSheet(
             item {
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
                     InfoChip("Status", tugas.status, Modifier.weight(1f))
-                    InfoChip("Token", "+${tugas.tokenReward}", Modifier.weight(1f))
+                    InfoChip(stringResource(R.string.token), "+${tugas.tokenReward}", Modifier.weight(1f))
                     if (tugas.tokenDiklaim != null && tugas.tokenDiklaim > 0) {
                         InfoChip("Diklaim", "${tugas.tokenDiklaim}", Modifier.weight(1f))
                     }

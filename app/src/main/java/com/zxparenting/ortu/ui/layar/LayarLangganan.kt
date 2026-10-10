@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.zxparenting.ortu.api.LanggananRes
 import com.zxparenting.ortu.ui.tema.*
+import androidx.compose.ui.res.stringResource
 
 @Composable
 fun LayarLangganan(
@@ -114,7 +115,7 @@ fun LayarLangganan(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,
                     ) {
-                        Text("Berakhir", fontSize = 12.sp, color = MutedFg)
+                        Text(stringResource(R.string.berakhir), fontSize = 12.sp, color = MutedFg)
                         Text("${langganan.hariSisa} ${Teks["hari"]}", fontSize = 14.sp, fontWeight = FontWeight.Bold)
                     }
                 }

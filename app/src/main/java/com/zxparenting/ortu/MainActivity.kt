@@ -75,12 +75,21 @@ import com.zxparenting.ortu.ui.tema.TemaZX
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import com.zxparenting.ortu.ManajerBahasa
 
 class MainActivity : ComponentActivity() {
     private lateinit var appUpdateManager: AppUpdateManager
 
+    override fun attachBaseContext(newBase: android.content.Context) {
+        val locale = ManajerBahasa.localeAktif(newBase)
+        val config = android.content.res.Configuration(newBase.resources.configuration)
+        config.setLocale(locale)
+        super.attachBaseContext(newBase.createConfigurationContext(config))
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        ManajerBahasa.inisialisasi(this)
         appUpdateManager = AppUpdateManagerFactory.create(this)
         enableEdgeToEdge()
         cekUpdate()
@@ -96,19 +105,19 @@ class MainActivity : ComponentActivity() {
                 if (tanyaUpdate) {
                     AlertDialog(
                         onDismissRequest = { tanyaUpdate = false },
-                        title = { Text("Update tersedia") },
-                        text = { Text("Versi baru tersedia di Play Store. Update sekarang?") },
+                        title = { Text(getString(R.string.update_tersedia)) },
+                        text = { Text(getString(R.string.versi_baru_tersedia_di_play_store_update)) },
                         confirmButton = {
                             TextButton(onClick = {
                                 tanyaUpdate = false
                                 mulaiUpdate()
-                            }) { Text("Update") }
+                            }) { Text(getString(R.string.update)) }
                         },
                         dismissButton = {
                             TextButton(onClick = {
                                 tanyaUpdate = false
                                 bukaPlayStore()
-                            }) { Text("Buka Play Store") }
+                            }) { Text(getString(R.string.buka_play_store)) }
                         },
                     )
                 }

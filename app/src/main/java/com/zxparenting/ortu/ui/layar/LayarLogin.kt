@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.zxparenting.ortu.ui.UiState
 import com.zxparenting.ortu.ui.tema.*
+import androidx.compose.ui.res.stringResource
 
 @Composable
 fun LayarLogin(
@@ -53,7 +54,7 @@ fun LayarLogin(
                 .background(Brush.verticalGradient(listOf(Biru, Ungu))),
             contentAlignment = Alignment.Center,
         ) {
-            Text("ZX", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 24.sp)
+            Text(stringResource(R.string.zx), color = Color.White, fontWeight = FontWeight.Bold, fontSize = 24.sp)
         }
         Spacer(Modifier.height(16.dp))
         Text("ZX Parenting", style = MaterialTheme.typography.titleLarge, textAlign = TextAlign.Center)
@@ -64,7 +65,7 @@ fun LayarLogin(
         OutlinedTextField(
             value = email,
             onValueChange = { email = it },
-            label = { Text("Email") },
+            label = { Text(stringResource(R.string.email)) },
             singleLine = true,
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(16.dp),
@@ -75,7 +76,7 @@ fun LayarLogin(
         OutlinedTextField(
             value = password,
             onValueChange = { password = it },
-            label = { Text("Password") },
+            label = { Text(stringResource(R.string.password)) },
             singleLine = true,
             visualTransformation = if (lihatPass) VisualTransformation.None else PasswordVisualTransformation(),
             trailingIcon = {
@@ -115,17 +116,17 @@ fun LayarLogin(
                     strokeWidth = 2.dp,
                 )
             } else {
-                Text("Masuk", fontWeight = FontWeight.Bold, fontSize = 14.5.sp)
+                Text(stringResource(R.string.masuk), fontWeight = FontWeight.Bold, fontSize = 14.5.sp)
             }
         }
 
-        // Pemisah "atau"
+        // Pemisah stringResource(R.string.atau)
         Row(
             modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             HorizontalDivider(modifier = Modifier.weight(1f))
-            Text("atau", fontSize = 12.sp, color = MutedFg, modifier = Modifier.padding(horizontal = 12.dp))
+            Text(stringResource(R.string.atau), fontSize = 12.sp, color = MutedFg, modifier = Modifier.padding(horizontal = 12.dp))
             HorizontalDivider(modifier = Modifier.weight(1f))
         }
 

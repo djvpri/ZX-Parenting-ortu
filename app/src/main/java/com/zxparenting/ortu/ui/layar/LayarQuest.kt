@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.zxparenting.ortu.api.Quest
 import com.zxparenting.ortu.ui.tema.*
+import androidx.compose.ui.res.stringResource
 
 @Composable
 fun LayarQuest(
@@ -48,7 +49,7 @@ fun LayarQuest(
             TextButton(onClick = { tampilForm = !tampilForm }) {
                 Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(18.dp))
                 Spacer(Modifier.width(4.dp))
-                Text("Buat")
+                Text(stringResource(R.string.buat))
             }
         }
 
@@ -97,7 +98,7 @@ private fun KartuQuest(q: Quest) {
                 }
                 Column(horizontalAlignment = Alignment.End) {
                     Text("+${q.tokenReward}", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Hijau)
-                    Text("Token", fontSize = 9.sp, color = MutedFg)
+                    Text(stringResource(R.string.token), fontSize = 9.sp, color = MutedFg)
                 }
             }
 
@@ -142,7 +143,7 @@ private fun FormQuest(
         Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
             Text("Buat Quest Keluarga", fontSize = 14.sp, fontWeight = FontWeight.Bold)
             Text("Semua anak aktif otomatis jadi anggota.", fontSize = 10.sp, color = MutedFg)
-            FieldBiasa("Judul", judul) { judul = it }
+            FieldBiasa(stringResource(R.string.judul), judul) { judul = it }
             FieldBiasa("Deskripsi (opsional)", deskripsi) { deskripsi = it }
             FieldBiasa("Token reward (1-1000)", reward, KeyboardType.Number) { reward = it }
             Button(
@@ -159,7 +160,7 @@ private fun FormQuest(
                 if (loading) {
                     CircularProgressIndicator(modifier = Modifier.size(18.dp), strokeWidth = 2.dp)
                 } else {
-                    Text("Simpan")
+                    Text(stringResource(R.string.simpan))
                 }
             }
         }

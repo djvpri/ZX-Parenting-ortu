@@ -25,6 +25,7 @@ import com.zxparenting.ortu.api.JadwalTugasAI
 import com.zxparenting.ortu.ui.tema.*
 import kotlinx.coroutines.launch
 import org.json.JSONArray
+import androidx.compose.ui.res.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -160,7 +161,7 @@ private fun KartuJadwalAi(
                 TextButton(onClick = { onHapus(jadwal.id) }) {
                     Icon(Icons.Default.Delete, contentDescription = null, modifier = Modifier.size(16.dp), tint = Merah)
                     Spacer(Modifier.width(4.dp))
-                    Text("Hapus", color = Merah, fontSize = 12.sp)
+                    Text(stringResource(R.string.hapus), color = Merah, fontSize = 12.sp)
                 }
             }
         }
@@ -255,7 +256,7 @@ private fun FormJadwalAi(
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            placeholder = { Text("15:00") },
+            placeholder = { Text(stringResource(R.string.15_00)) },
         )
 
         // Hari aktif

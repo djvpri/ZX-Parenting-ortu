@@ -25,6 +25,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import com.zxparenting.ortu.api.Device
 import com.zxparenting.ortu.api.DevicePatch
 import com.zxparenting.ortu.ui.tema.*
+import androidx.compose.ui.res.stringResource
 
 @Composable
 fun LayarLokasi(
@@ -40,7 +41,7 @@ fun LayarLokasi(
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         Spacer(Modifier.height(14.dp))
-        Text("Lokasi", style = MaterialTheme.typography.titleLarge)
+        Text(stringResource(R.string.lokasi), style = MaterialTheme.typography.titleLarge)
 
         if (devices.isEmpty()) {
             KartuClay {

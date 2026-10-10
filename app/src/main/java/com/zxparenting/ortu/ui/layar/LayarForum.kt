@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.zxparenting.ortu.api.ForumPost
 import com.zxparenting.ortu.ui.tema.*
+import androidx.compose.ui.res.stringResource
 
 @Composable
 fun LayarForum(
@@ -55,7 +56,7 @@ fun LayarForum(
             TextButton(onClick = { tampilForm = !tampilForm }) {
                 Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(18.dp))
                 Spacer(Modifier.width(4.dp))
-                Text("Post")
+                Text(stringResource(R.string.post))
             }
         }
 
@@ -115,7 +116,7 @@ private fun KartuPost(p: ForumPost, onBuka: () -> Unit, onHapus: () -> Unit) {
                     Spacer(Modifier.width(4.dp))
                     Text("${p._count?.komentar ?: 0}", fontSize = 10.sp, color = MutedFg)
                 }
-                TextButton(onClick = onBuka) { Text("Buka", fontSize = 11.sp) }
+                TextButton(onClick = onBuka) { Text(stringResource(R.string.buka), fontSize = 11.sp) }
             }
         }
     }
@@ -138,7 +139,7 @@ private fun FormPost(
             OutlinedTextField(
                 value = judul,
                 onValueChange = { judul = it },
-                label = { Text("Judul") },
+                label = { Text(stringResource(R.string.judul)) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
                 shape = RoundedCornerShape(12.dp),
@@ -146,7 +147,7 @@ private fun FormPost(
             OutlinedTextField(
                 value = isi,
                 onValueChange = { isi = it },
-                label = { Text("Isi") },
+                label = { Text(stringResource(R.string.isi)) },
                 modifier = Modifier.fillMaxWidth().height(100.dp),
                 shape = RoundedCornerShape(12.dp),
             )
@@ -172,7 +173,7 @@ private fun FormPost(
                 if (loading) {
                     CircularProgressIndicator(modifier = Modifier.size(18.dp), strokeWidth = 2.dp)
                 } else {
-                    Text("Post")
+                    Text(stringResource(R.string.post))
                 }
             }
         }
@@ -201,7 +202,7 @@ private fun DetailPost(
             IconButton(onClick = onBack) {
                 Icon(Icons.Default.ArrowBack, contentDescription = "Kembali")
             }
-            Text("Forum", style = MaterialTheme.typography.titleLarge)
+            Text(stringResource(R.string.forum), style = MaterialTheme.typography.titleLarge)
         }
 
         // Post
