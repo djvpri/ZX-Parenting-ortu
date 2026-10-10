@@ -21,12 +21,12 @@ val sifatKeystore = Properties().apply {
 
 android {
     namespace = "com.zxparenting.ortu"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = bacaAlamat("idPaket")
         minSdk = 24
-        targetSdk = 35
+        targetSdk = 36
         versionCode = bacaAlamat("versiKode").toInt()
         versionName = bacaAlamat("versiNama")
         buildConfigField("String", "VERSI_NAMA", "\"${bacaAlamat("versiNama")}\"")
