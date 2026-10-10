@@ -23,6 +23,7 @@ import com.zxparenting.ortu.api.Device
 import com.zxparenting.ortu.api.Tugas
 import com.zxparenting.ortu.ui.tema.*
 import androidx.compose.ui.res.stringResource
+import com.zxparenting.ortu.R
 
 @Composable
 fun LayarBeranda(

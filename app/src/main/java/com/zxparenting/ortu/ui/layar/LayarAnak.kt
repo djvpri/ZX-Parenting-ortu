@@ -28,6 +28,7 @@ import com.zxparenting.ortu.api.Anak
 import com.zxparenting.ortu.ui.tema.*
 import java.util.Calendar
 import androidx.compose.ui.res.stringResource
+import com.zxparenting.ortu.R
 
 private val GENDER_OPSI = listOf("Laki-laki", "Perempuan")
 

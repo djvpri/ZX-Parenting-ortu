@@ -23,6 +23,7 @@ import com.zxparenting.ortu.api.HadiahMarketRes
 import com.zxparenting.ortu.api.PesananHadiah
 import com.zxparenting.ortu.ui.tema.*
 import androidx.compose.ui.res.stringResource
+import com.zxparenting.ortu.R
 
 @Composable
 fun LayarMarketplace(

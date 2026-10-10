@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.sp
 import com.zxparenting.ortu.ui.UiState
 import com.zxparenting.ortu.ui.tema.*
 import androidx.compose.ui.res.stringResource
+import com.zxparenting.ortu.R
 
 @Composable
 fun LayarDaftar(state: UiState, onDaftar: (String, String, String) -> Unit, onKeLogin: () -> Unit) {
