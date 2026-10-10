@@ -26,6 +26,7 @@ import com.zxparenting.ortu.ui.tema.*
 import kotlinx.coroutines.launch
 import org.json.JSONArray
 import androidx.compose.ui.res.stringResource
+import com.zxparenting.ortu.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
