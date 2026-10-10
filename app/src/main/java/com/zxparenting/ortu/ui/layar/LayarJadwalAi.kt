@@ -256,7 +256,7 @@ private fun FormJadwalAi(
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            placeholder = { Text(stringResource(R.string.15_00)) },
+            placeholder = { Text(stringResource(R.string._15_00)) },
         )
 
         // Hari aktif

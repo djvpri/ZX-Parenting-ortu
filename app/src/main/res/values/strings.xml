@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">ZX Parenting</string>
-    <string name="15_00">15:00</string>
+    <string name="_15_00">15:00</string>
     <string name="abcd1234">ABCD1234</string>
     <string name="ai">AI</string>
     <string name="ai_insight">AI Insight</string>
