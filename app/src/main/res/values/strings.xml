@@ -21,7 +21,7 @@
     <string name="belum_ada_anak_klik_tambah_untuk_membuat">No children yet. Click Add to create a child profile.</string>
     <string name="belum_ada_hadiah">No rewards yet.</string>
     <string name="belum_ada_perangkat_terhubung">No connected devices.</string>
-    <string name="belum_ada_perangkat_terhubung_npasang_ap">No connected devices.\nInstall agent app on child's phone then pair.</string>
+    <string name="belum_ada_perangkat_terhubung_npasang_ap">No connected devices.\nInstall agent app on child\'s phone then pair.</string>
     <string name="belum_ada_post_bagikan_tips_atau_pertany">No posts yet. Share tips or questions!</string>
     <string name="belum_ada_quest_buat_quest_keluarga_untu">No quests yet. Create a family quest to motivate your child!</string>
     <string name="belum_ada_transaksi">No transactions yet.</string>
@@ -71,7 +71,7 @@
     <string name="jadwal_ai">AI Schedule</string>
     <string name="jam_kirim_hh_mm">Send Time (HH:mm)</string>
     <string name="jam_tidur_curfew">Bedtime (Curfew)</string>
-    <string name="jawaban_anak">Child's answer</string>
+    <string name="jawaban_anak">Child\'s answer</string>
     <string name="judul">Title</string>
     <string name="kelas">Grade</string>
     <string name="keluar">Logout</string>
@@ -115,7 +115,7 @@
     <string name="saldo">Balance</string>
     <string name="saldo_token">Token Balance</string>
     <string name="semua_anak_aktif_otomatis_jadi_anggota">All active children automatically become members.</string>
-    <string name="semua_data_kamu_dan_anak_akan_dihapus_pe">All your and child's data will be permanently deleted. This action cannot be undone.</string>
+    <string name="semua_data_kamu_dan_anak_akan_dihapus_pe">All your and child\'s data will be permanently deleted. This action cannot be undone.</string>
     <string name="simpan">Save</string>
     <string name="simpan_aturan">Save Rules</string>
     <string name="simpan_jadwal">Save Schedule</string>
