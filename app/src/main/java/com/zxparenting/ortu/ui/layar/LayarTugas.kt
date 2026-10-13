@@ -20,6 +20,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -66,31 +67,80 @@ fun LayarTugas(
             .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        Spacer(Modifier.height(14.dp))
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
+        // === V2: App Bar Gradient ===
+        // Header gradient dengan judul + tombol Buat
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp))
+                .background(
+                    Brush.linearGradient(
+                        colors = listOf(Biru, Biru.copy(alpha = 0.85f)),
+                    )
+                )
+                .padding(horizontal = 20.dp, vertical = 14.dp),
         ) {
-            Text(stringResource(R.string.tugas), style = MaterialTheme.typography.titleLarge)
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                TextButton(onClick = { tampilGenerate = !tampilGenerate }) {
-                    Text(stringResource(R.string.generate))
+            Column {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Column {
+                        Text(
+                            stringResource(R.string.tugas),
+                            style = MaterialTheme.typography.titleLarge,
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold,
+                        )
+                        val totalAktif = tugasList.count { it.status == "PENDING" || it.status == "MENUNGGU" || it.status == "DIKUMPULKAN" }
+                        val totalSelesai = tugasList.count { it.status == "SELESAI" }
+                        Text(
+                            "$totalAktif aktif · $totalSelesai selesai",
+                            fontSize = 12.sp,
+                            color = Color.White.copy(alpha = 0.7f),
+                        )
+                    }
+                    Button(
+                        onClick = { tampilForm = !tampilForm },
+                        shape = RoundedCornerShape(24.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color.White,
+                            contentColor = Biru,
+                        ),
+                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                    ) {
+                        Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(18.dp))
+                        Spacer(Modifier.width(6.dp))
+                        Text(stringResource(R.string.buat), fontWeight = FontWeight.Bold)
+                    }
                 }
-                TextButton(onClick = onChallenges) {
-                    Icon(Icons.Default.Star, contentDescription = null, modifier = Modifier.size(18.dp))
-                    Spacer(Modifier.width(4.dp))
-                    Text(stringResource(R.string.misi))
-                }
-                TextButton(onClick = onJadwalAi) {
-                    Icon(Icons.Default.AutoAwesome, contentDescription = null, modifier = Modifier.size(18.dp))
-                    Spacer(Modifier.width(4.dp))
-                    Text("Jadwal AI")
-                }
-                TextButton(onClick = { tampilForm = !tampilForm }) {
-                    Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(18.dp))
-                    Spacer(Modifier.width(4.dp))
-                    Text(stringResource(R.string.buat))
+
+                Spacer(Modifier.height(14.dp))
+
+                // Quick action cards — 3 ikon dalam header gradient
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                ) {
+                    TombolAksiHeader(
+                        icon = Icons.Default.AutoAwesome,
+                        label = stringResource(R.string.generate),
+                        modifier = Modifier.weight(1f),
+                        onClick = { tampilGenerate = !tampilGenerate },
+                    )
+                    TombolAksiHeader(
+                        icon = Icons.Default.Star,
+                        label = stringResource(R.string.misi),
+                        modifier = Modifier.weight(1f),
+                        onClick = onChallenges,
+                    )
+                    TombolAksiHeader(
+                        icon = Icons.Default.AutoAwesome,
+                        label = stringResource(R.string.jadwal_ai),
+                        modifier = Modifier.weight(1f),
+                        onClick = onJadwalAi,
+                    )
                 }
             }
         }
@@ -536,5 +586,26 @@ private fun StatChip(label: String, value: String, warna: Color, modifier: Modif
             Text(value, fontSize = 15.sp, fontWeight = FontWeight.Bold, color = warna)
             Text(label, fontSize = 9.sp, color = MutedFg)
         }
+    }
+}
+
+@Composable
+private fun TombolAksiHeader(
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    label: String,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit,
+) {
+    Column(
+        modifier = modifier
+            .clip(RoundedCornerShape(16.dp))
+            .clickable(onClick = onClick)
+            .background(Color.White.copy(alpha = 0.15f))
+            .padding(vertical = 10.dp, horizontal = 8.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Icon(icon, contentDescription = label, tint = Color.White, modifier = Modifier.size(20.dp))
+        Spacer(Modifier.height(4.dp))
+        Text(label, fontSize = 10.sp, color = Color.White, fontWeight = FontWeight.Medium)
     }
 }
