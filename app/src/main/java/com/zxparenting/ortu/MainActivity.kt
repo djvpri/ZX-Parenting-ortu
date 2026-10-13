@@ -89,6 +89,13 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // Tangkap crash tak terduga → kirim ke backend sebelum app mati.
+        val ctx = this
+        val prev = Thread.getDefaultUncaughtExceptionHandler()
+        Thread.setDefaultUncaughtExceptionHandler { t, e ->
+            LaporError.kirim(ctx, "MainActivity", e.javaClass.simpleName + ": " + e.message)
+            prev?.uncaughtException(t, e)
+        }
         ManajerBahasa.inisialisasi(this)
         appUpdateManager = AppUpdateManagerFactory.create(this)
         enableEdgeToEdge()
