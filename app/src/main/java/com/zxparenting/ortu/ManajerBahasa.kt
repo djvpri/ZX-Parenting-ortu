@@ -2,6 +2,8 @@ package com.zxparenting.ortu
 
 import android.content.Context
 import android.os.Build
+import com.zxparenting.ortu.ui.tema.Bahasa
+import com.zxparenting.ortu.ui.tema.Teks
 import java.util.Locale
 
 /**
@@ -23,6 +25,7 @@ object ManajerBahasa {
             else -> Locale("en")
         }
         Locale.setDefault(locale)
+        Teks.setBahasa(if (kode == "in") Bahasa.ID else Bahasa.EN)
     }
 
     fun setBahasa(ctx: Context, kode: String) {

@@ -106,30 +106,6 @@ fun LayarProfil(
             }
         }
 
-        // Toggle bahasa
-        KartuClay(kecil = true) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Text(stringResource(R.string.bahasa), fontSize = 12.sp, fontWeight = FontWeight.Bold)
-                Row {
-                    FilterChip(
-                        selected = Teks.bahasa() == Bahasa.ID,
-                        onClick = { Teks.setBahasa(Bahasa.ID) },
-                        label = { Text(stringResource(R.string.id), fontSize = 11.sp) },
-                    )
-                    Spacer(Modifier.width(6.dp))
-                    FilterChip(
-                        selected = Teks.bahasa() == Bahasa.EN,
-                        onClick = { Teks.setBahasa(Bahasa.EN) },
-                        label = { Text(stringResource(R.string.en), fontSize = 11.sp) },
-                    )
-                }
-            }
-        }
-
         // Tema picker
         KartuClay(kecil = true) {
             Column {
