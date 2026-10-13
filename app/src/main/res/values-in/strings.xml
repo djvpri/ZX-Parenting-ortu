@@ -30,6 +30,10 @@
     <string name="belum_punya_akun_daftar">Belum punya akun? Daftar</string>
     <string name="benar">✓ Benar</string>
     <string name="berakhir">Berakhir</string>
+    <string name="status_selesai">Selesai</string>
+    <string name="status_ditolak">Ditolak</string>
+    <string name="status_dikumpulkan">Dikumpulkan</string>
+    <string name="status_aktif">Aktif</string>
     <string name="buat">Buat</string>
     <string name="buat_hadiah">Buat Hadiah</string>
     <string name="buat_jadwal">Buat Jadwal</string>
@@ -52,9 +56,9 @@
     <string name="family_quest">Family Quest</string>
     <string name="forum">Forum</string>
     <string name="forum_keluarga">Forum Keluarga</string>
-    <string name="generate">Generate</string>
-    <string name="generate_soal">Generate Soal</string>
-    <string name="generate_soal_ai">Generate Soal AI</string>
+    <string name="generate">Buat</string>
+    <string name="generate_soal">Buat Soal</string>
+    <string name="generate_soal_ai">Buat Soal AI</string>
     <string name="gps_belum_melaporkan_posisi">GPS belum melaporkan posisi.</string>
     <string name="gps_pelacakan">GPS Pelacakan</string>
     <string name="gratis_30_hari_free_trial">Gratis 30 hari (Free Trial)</string>

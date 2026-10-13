@@ -30,6 +30,10 @@
     <string name="belum_punya_akun_daftar">No account? Register</string>
     <string name="benar">✓ Correct</string>
     <string name="berakhir">Expired</string>
+    <string name="status_selesai">Completed</string>
+    <string name="status_ditolak">Rejected</string>
+    <string name="status_dikumpulkan">Submitted</string>
+    <string name="status_aktif">Active</string>
     <string name="buat">Create</string>
     <string name="buat_hadiah">Create Reward</string>
     <string name="buat_jadwal">Create Schedule</string>

@@ -13,3 +13,4 @@ app/keystore.properties
 /keystore.properties
 /keystore/
 *.apk
+message

@@ -149,9 +149,9 @@ fun LayarTugas(
             val expired = lainnya.count { it.status == "EXPIRED" }
             val totalToken = lainnya.filter { it.status == "SELESAI" }.sumOf { it.tokenReward }
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
-                StatChip("Selesai", "$selesai", Hijau, Modifier.weight(1f))
-                StatChip("Ditolak", "$ditolak", Merah, Modifier.weight(1f))
-                StatChip("Expired", "$expired", MutedFg, Modifier.weight(1f))
+                StatChip(stringResource(R.string.status_selesai), "$selesai", Hijau, Modifier.weight(1f))
+                StatChip(stringResource(R.string.status_ditolak), "$ditolak", Merah, Modifier.weight(1f))
+                StatChip(stringResource(R.string.berakhir), "$expired", MutedFg, Modifier.weight(1f))
                 StatChip(stringResource(R.string.token), "+$totalToken", Amber, Modifier.weight(1f))
             }
             Text(stringResource(R.string.riwayat), fontSize = 11.sp, color = MutedFg, fontWeight = FontWeight.Bold)
@@ -194,11 +194,11 @@ private fun KartuTugas(
         else -> MutedFg
     }
     val teksStatus = when (tugas.status) {
-        "SELESAI" -> "Selesai"
-        "DITOLAK" -> "Ditolak"
-        "MENUNGGU" -> "Dikumpulkan"
-        "DIKUMPULKAN" -> "Dikumpulkan"
-        "PENDING" -> "Aktif"
+        "SELESAI" -> stringResource(R.string.status_selesai)
+        "DITOLAK" -> stringResource(R.string.status_ditolak)
+        "MENUNGGU" -> stringResource(R.string.status_dikumpulkan)
+        "DIKUMPULKAN" -> stringResource(R.string.status_dikumpulkan)
+        "PENDING" -> stringResource(R.string.status_aktif)
         else -> tugas.status
     }
 
@@ -250,7 +250,7 @@ private fun KartuTugas(
                             onClick = { onValidasi(tugas.id, "selesai") },
                             modifier = Modifier.size(32.dp),
                         ) {
-                            Icon(Icons.Default.Check, contentDescription = "Selesai", tint = Hijau)
+                            Icon(Icons.Default.Check, contentDescription = stringResource(R.string.status_selesai), tint = Hijau)
                         }
                         IconButton(
                             onClick = { onValidasi(tugas.id, "tolak") },
