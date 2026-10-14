@@ -340,12 +340,12 @@ class ZxVm(val simpanan: Simpanan) : ViewModel() {
         }
     }
 
-    fun buatHadiah(judul: String, deskripsi: String?, hargaCoin: Int, stok: Int) {
+    fun buatHadiah(judul: String, deskripsi: String?, hargaToken: Int, stok: Int) {
         val token = state.value.token ?: return
         state.value = state.value.copy(loading = true, error = null)
         viewModelScope.launch {
             try {
-                val res = api.hadiahCreate("Bearer $token", HadiahCreateReq(judul, deskripsi, hargaCoin, stok))
+                val res = api.hadiahCreate("Bearer $token", HadiahCreateReq(judul, deskripsi, hargaToken, stok))
                 state.value = state.value.copy(loading = false)
                 if (res.isSuccessful) muatMarket(token)
                 else state.value = state.value.copy(error = "Gagal buat hadiah (${res.code()})")
@@ -372,9 +372,8 @@ class ZxVm(val simpanan: Simpanan) : ViewModel() {
                 val res = api.pesananProses("Bearer $token", PesananProsesReq(pesananId, aksi))
                 if (res.isSuccessful) {
                     muatMarket(token)
-                    muatCoin(token) // saldo berubah kalau beli
                 } else if (res.code() == 400) {
-                    state.value = state.value.copy(error = "Saldo Coin tidak cukup")
+                    state.value = state.value.copy(error = "Saldo Token anak tidak cukup")
                 }
             } catch (_: Exception) {}
         }

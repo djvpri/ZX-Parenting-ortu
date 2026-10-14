@@ -147,7 +147,8 @@ data class Device(
     val appBlokir: List<String>?,
     val anak: AnakRef?,
 )
-data class AnakRef(val id: String, val nama: String)
+data class AnakRef(val id: String? = null, val nama: String, val tokenBalance: TokenBalanceRef? = null)
+data class TokenBalanceRef(val balance: Int)
 
 data class DevicePatch(
     val sessionLimit: Int? = null,
@@ -169,14 +170,14 @@ data class Hadiah(
     val id: String,
     val judul: String,
     val deskripsi: String?,
-    val hargaCoin: Int,
+    val hargaToken: Int,
     val stok: Int,
     val aktif: Boolean,
 )
 data class HadiahCreateReq(
     val judul: String,
     val deskripsi: String? = null,
-    val hargaCoin: Int,
+    val hargaToken: Int,
     val stok: Int = 1,
 )
 data class PesananHadiah(
@@ -186,9 +187,9 @@ data class PesananHadiah(
     val anak: AnakRef,
     val hadiah: HadiahRef,
 )
-data class HadiahRef(val judul: String, val hargaCoin: Int)
+data class HadiahRef(val judul: String, val hargaToken: Int)
 data class HadiahMarketRes(val hadiah: List<Hadiah>, val pesanan: List<PesananHadiah>)
-data class PesananProsesReq(val id: String, val aksi: String) // "beli" | "tolak"
+data class PesananProsesReq(val id: String, val aksi: String) // "terima" | "tolak"
 
 // ===== Coin =====
 data class CoinRes(val saldo: Int, val ledger: List<CoinLedgerEntry>)
@@ -765,8 +766,8 @@ data class AnakOkRes(val ok: Boolean)
 data class AnakResetPinReq(val pin: String)
 data class TugasCreateRes(val ok: Boolean, val tugasId: String)
 data class TugasOkRes(val ok: Boolean)
-data class HadiahPatchReq(val id: String, val aktif: Boolean? = null, val stok: Int? = null, val hargaCoin: Int? = null)
-data class PesananProsesRes(val ok: Boolean, val status: String, val saldo: Int? = null)
+data class HadiahPatchReq(val id: String, val aktif: Boolean? = null, val stok: Int? = null, val hargaToken: Int? = null)
+data class PesananProsesRes(val ok: Boolean, val status: String, val saldoToken: Int? = null)
 data class CoinSaldoRes(val saldo: Int)
 
 // ===== Tugas Review (ortu lihat hasil jawaban anak) =====

@@ -172,4 +172,6 @@
     <string name="terjual">Terjual</string>
     <string name="sudah_dibeli">Dimiliki</string>
     <string name="gratis">Gratis</string>
+    <string name="terima">Terima</string>
+    <string name="harga_token">Harga (Token)</string>
 </resources>

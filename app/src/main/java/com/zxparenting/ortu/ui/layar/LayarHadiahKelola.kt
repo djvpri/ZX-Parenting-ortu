@@ -36,7 +36,7 @@ fun LayarHadiahKelola(
     sudahBeli: Set<String>,
     coinSaldo: Int,
     loading: Boolean,
-    onBuatHadiah: (judul: String, deskripsi: String?, hargaCoin: Int, stok: Int) -> Unit,
+    onBuatHadiah: (judul: String, deskripsi: String?, hargaToken: Int, stok: Int) -> Unit,
     onHapusHadiah: (id: String) -> Unit,
     onProsesPesanan: (id: String, aksi: String) -> Unit,
     onBeliMarket: (kontenId: String) -> Unit,
@@ -168,16 +168,17 @@ private fun KartuPesanan(p: PesananHadiah, onProses: (String, String) -> Unit) {
                 Spacer(Modifier.width(10.dp))
                 Column(modifier = Modifier.weight(1f)) {
                     Text(p.hadiah.judul, fontSize = 13.sp, fontWeight = FontWeight.Bold)
-                    Text("${p.anak.nama} • ${p.hadiah.hargaCoin} Coin", fontSize = 10.sp, color = MutedFg)
+                    val saldoAnak = p.anak.tokenBalance?.balance ?: 0
+                    Text("${p.anak.nama} • ${p.hadiah.hargaToken} Token (saldo: $saldoAnak)", fontSize = 10.sp, color = MutedFg)
                 }
             }
             Spacer(Modifier.height(8.dp))
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Button(
-                    onClick = { onProses(p.id, "beli") },
+                    onClick = { onProses(p.id, "terima") },
                     modifier = Modifier.weight(1f).height(38.dp),
                     shape = RoundedCornerShape(10.dp),
-                ) { Text(stringResource(R.string.beli), fontSize = 12.sp) }
+                ) { Text(stringResource(R.string.terima), fontSize = 12.sp) }
                 OutlinedButton(
                     onClick = { onProses(p.id, "tolak") },
                     modifier = Modifier.weight(1f).height(38.dp),
@@ -210,8 +211,8 @@ private fun KartuHadiah(h: Hadiah, onHapus: (String) -> Unit) {
                 Text("${stringResource(R.string.stok)}: ${if (h.stok == -1) "∞" else h.stok}", fontSize = 10.sp, color = MutedFg)
             }
             Column(horizontalAlignment = Alignment.End) {
-                Text("${h.hargaCoin}", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Hijau)
-                Text(stringResource(R.string.coin), fontSize = 9.sp, color = MutedFg)
+                Text("${h.hargaToken}", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Hijau)
+                Text(stringResource(R.string.token), fontSize = 9.sp, color = MutedFg)
             }
             IconButton(onClick = { onHapus(h.id) }) {
                 Icon(Icons.Default.Delete, contentDescription = stringResource(R.string.hapus), tint = Merah, modifier = Modifier.size(18.dp))
@@ -223,7 +224,7 @@ private fun KartuHadiah(h: Hadiah, onHapus: (String) -> Unit) {
 @Composable
 private fun FormHadiah(
     loading: Boolean,
-    onBuat: (judul: String, deskripsi: String?, hargaCoin: Int, stok: Int) -> Unit,
+    onBuat: (judul: String, deskripsi: String?, hargaToken: Int, stok: Int) -> Unit,
 ) {
     var judul by remember { mutableStateOf("") }
     var deskripsi by remember { mutableStateOf("") }
@@ -235,7 +236,7 @@ private fun FormHadiah(
             Text(stringResource(R.string.buat_hadiah), fontSize = 14.sp, fontWeight = FontWeight.Bold)
             FieldBiasa(stringResource(R.string.judul), judul) { judul = it }
             FieldBiasa(stringResource(R.string.deskripsi_opsional), deskripsi) { deskripsi = it }
-            FieldBiasa(stringResource(R.string.harga_coin), harga, KeyboardType.Number) { harga = it }
+            FieldBiasa(stringResource(R.string.harga_token), harga, KeyboardType.Number) { harga = it }
             FieldBiasa(stringResource(R.string.stok_tanpa_batas), stok, KeyboardType.Number) { stok = it }
             Button(
                 onClick = {

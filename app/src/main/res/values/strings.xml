@@ -172,4 +172,6 @@
     <string name="terjual">Sold</string>
     <string name="sudah_dibeli">Owned</string>
     <string name="gratis">Free</string>
+    <string name="terima">Accept</string>
+    <string name="harga_token">Price (Token)</string>
 </resources>
