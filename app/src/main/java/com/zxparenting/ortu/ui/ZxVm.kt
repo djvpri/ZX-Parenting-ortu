@@ -49,6 +49,9 @@ import com.zxparenting.ortu.api.TugasValidasiReq
 import com.zxparenting.ortu.api.JadwalTugasAI
 import com.zxparenting.ortu.api.JadwalAiCreateReq
 import com.zxparenting.ortu.api.JadwalAiUpdateReq
+import com.zxparenting.ortu.api.MarketItem
+import com.zxparenting.ortu.api.MarketBeliItem
+import com.zxparenting.ortu.api.MarketBeliReq
 import com.zxparenting.ortu.data.Simpanan
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -84,6 +87,9 @@ data class UiState(
     val generateMeta: GenerateMeta? = null,
     val generateLoading: Boolean = false,
     val jadwalAiList: List<JadwalTugasAI> = emptyList(),
+    val marketItems: List<MarketItem> = emptyList(),
+    val marketBeli: List<MarketBeliItem> = emptyList(),
+    val marketLoading: Boolean = false,
 )
 
 class ZxVm(val simpanan: Simpanan) : ViewModel() {
@@ -395,6 +401,55 @@ class ZxVm(val simpanan: Simpanan) : ViewModel() {
                 state.value = state.value.copy(loading = false)
                 if (res.isSuccessful) muatCoin(token)
                 else state.value = state.value.copy(error = "Gagal topup (${res.code()})")
+            } catch (e: Exception) {
+                state.value = state.value.copy(loading = false, error = "Jaringan error: ${e.message}")
+            }
+        }
+    }
+
+    fun muatMarketApp(token: String?) {
+        if (token == null) return
+        state.value = state.value.copy(marketLoading = true)
+        viewModelScope.launch {
+            try {
+                val res = api.marketList("Bearer $token", limit = 50)
+                if (res.isSuccessful) {
+                    state.value = state.value.copy(marketItems = res.body()?.items ?: emptyList(), marketLoading = false)
+                } else {
+                    state.value = state.value.copy(marketLoading = false)
+                }
+            } catch (_: Exception) {
+                state.value = state.value.copy(marketLoading = false)
+            }
+        }
+    }
+
+    fun muatMarketBeli(token: String?) {
+        if (token == null) return
+        viewModelScope.launch {
+            try {
+                val res = api.marketBeliList("Bearer $token")
+                if (res.isSuccessful) {
+                    state.value = state.value.copy(marketBeli = res.body()?.items ?: emptyList())
+                }
+            } catch (_: Exception) {}
+        }
+    }
+
+    fun beliMarket(kontenId: String) {
+        val token = state.value.token ?: return
+        state.value = state.value.copy(loading = true, error = null)
+        viewModelScope.launch {
+            try {
+                val res = api.marketBeli("Bearer $token", MarketBeliReq(kontenId))
+                state.value = state.value.copy(loading = false)
+                if (res.isSuccessful) {
+                    muatCoin(token)
+                    muatMarketBeli(token)
+                } else {
+                    val msg = res.errorBody()?.string() ?: "Gagal beli (${res.code()})"
+                    state.value = state.value.copy(error = msg)
+                }
             } catch (e: Exception) {
                 state.value = state.value.copy(loading = false, error = "Jaringan error: ${e.message}")
             }

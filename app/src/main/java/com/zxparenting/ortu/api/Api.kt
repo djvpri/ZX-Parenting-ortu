@@ -560,6 +560,25 @@ interface ApiZx {
         @Body req: CoinTopupReq,
     ): Response<CoinSaldoRes>
 
+    // Market (item app — beli pakai Coin)
+    @GET("marketplace")
+    suspend fun marketList(
+        @Header("Authorization") bearer: String,
+        @Query("tipe") tipe: String? = null,
+        @Query("cari") cari: String? = null,
+        @Query("limit") limit: Int = 20,
+        @Query("offset") offset: Int = 0,
+    ): Response<MarketListRes>
+
+    @GET("marketplace/beli")
+    suspend fun marketBeliList(@Header("Authorization") bearer: String): Response<MarketBeliListRes>
+
+    @POST("marketplace/beli")
+    suspend fun marketBeli(
+        @Header("Authorization") bearer: String,
+        @Body req: MarketBeliReq,
+    ): Response<MarketBeliRes>
+
     // Quest
     @GET("quests")
     suspend fun questList(@Header("Authorization") bearer: String): Response<List<Quest>>
@@ -772,3 +791,35 @@ data class ReviewItem(
     val benar: Boolean,
     val explanation: String,
 )
+
+// ===== Market (item app — beli pakai Coin) =====
+data class MarketItem(
+    val id: String,
+    val tipe: String,
+    val judul: String,
+    val deskripsi: String?,
+    val topik: String?,
+    val levelKesulitan: Int,
+    val hargaCoin: Int,
+    val pembelian: Int,
+    val rating: Float,
+    val pembuatId: String,
+    val isOfficial: Boolean,
+    val createdAt: String,
+)
+data class MarketListRes(val items: List<MarketItem>, val total: Int, val limit: Int, val offset: Int)
+
+data class MarketBeliReq(val kontenId: String)
+data class MarketBeliRes(val ok: Boolean, val harga: Int = 0, val error: String? = null)
+
+data class MarketBeliItem(
+    val id: String,
+    val tipe: String,
+    val judul: String,
+    val deskripsi: String?,
+    val topik: String?,
+    val levelKesulitan: Int,
+    val konten: String,
+    val isOfficial: Boolean,
+)
+data class MarketBeliListRes(val items: List<MarketBeliItem>)

@@ -56,7 +56,7 @@ import com.zxparenting.ortu.ui.layar.LayarLangganan
 import com.zxparenting.ortu.ui.layar.LayarLaporan
 import com.zxparenting.ortu.ui.layar.LayarLokasi
 import com.zxparenting.ortu.ui.layar.LayarLogin
-import com.zxparenting.ortu.ui.layar.LayarMarketplace
+import com.zxparenting.ortu.ui.layar.LayarHadiahKelola
 import com.zxparenting.ortu.ui.layar.LayarPesan
 import com.zxparenting.ortu.ui.layar.LayarPinjam
 import com.zxparenting.ortu.ui.layar.LayarReferral
@@ -349,13 +349,18 @@ class MainActivity : ComponentActivity() {
                                 onJadwalAi = { subLayar = 14 },
                                 onChallenges = { subLayar = 13 },
                             )
-                            3 -> LayarMarketplace(
+                            3 -> LayarHadiahKelola(
                                 market = state.market,
+                                marketItems = state.marketItems,
+                                marketLoading = state.marketLoading,
+                                sudahBeli = state.marketBeli.map { it.id }.toSet(),
                                 coinSaldo = state.coin?.saldo ?: 0,
                                 loading = state.loading,
                                 onBuatHadiah = { j, d, h, s -> vm.buatHadiah(j, d, h, s) },
                                 onHapusHadiah = { id -> vm.hapusHadiah(id) },
                                 onProsesPesanan = { id, aksi -> vm.prosesPesanan(id, aksi) },
+                                onBeliMarket = { id -> vm.beliMarket(id) },
+                                onMuatMarket = { vm.muatMarketApp(state.token) },
                             )
                             4 -> LayarProfil(
                                 nama = state.nama,
@@ -451,7 +456,7 @@ enum class BottomTab(val ikon: ImageVector) {
         Beranda -> Teks["beranda"]
         Anak -> Teks["anak"]
         Tugas -> Teks["tugas"]
-        Market -> Teks["market"]
+        Market -> Teks["hadiah"]
         Profil -> Teks["profil"]
     }
 }
